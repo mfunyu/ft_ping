@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "error.h"
 #include "libft.h"
 #include <stddef.h>
 #include <stdlib.h>
@@ -9,40 +10,69 @@
 static t_options	options[] = {
 	{'?', "--help",		HELP,	false},
 	{'v', "--verbose",	VERBOSE,false},
+	{'c', "--count",	COUNT,	true},
 	{'\0', "\0",		NONE,	false}
 };
 
-t_options	match_options(char *option, t_args *args)
+void	parse_value(t_args *args, int value_flag, char *value)
 {
-	int			diff;
+	int	error;
+
+	printf("%s\n", value);
+	args->flags[value_flag] = ft_atoi_check(value, &error);
+	if (error == ERROR)
+		error_exit("invalid value");
+}
+
+void	match_long_option(char *option, t_args *args)
+{
+	int	diff;
+
+	for (int i = 0; options[i].flag; i++)
+	{
+		diff = ft_strncmp(option, options[i].long_option, ft_strlen(options[i].long_option));
+		if (!diff)
+		{
+			args->flags[options[i].flag] = 1;
+			return ;
+		}
+	}
+	error_exit_usage("unrecognized option ''");
+}
+
+t_flags	match_short_option(char *option, t_args *args)
+{
+	t_flags	value;
+
+	value = NONE;
+	for (int i = 1; i < (int)ft_strlen(option); i++)
+	{
+		if (value)
+		{
+			parse_value(args, value, option + i);
+			return (NONE);
+		}
+		for (int j = 0; options[j].flag; j++)
+		{
+			if (option[i] != options[j].short_option)
+				error_exit_usage("invalid option -- ");
+			args->flags[options[j].flag] = 1;
+			if (options[j].req_value)
+				value = options[j].flag;
+		}
+	}
+	return (value);
+}
+
+t_flags	match_options(char *option, t_args *args)
+{
 
 	if (option[1] == '-')
 	{
-		for (int i = 0; options[i].flag; i++)
-		{
-			diff = ft_strncmp(option, options[i].long_option, ft_strlen(options[i].long_option));
-			if (!diff)
-			{
-				args->flags[options[i].flag] = 1;
-				return (options[i]);
-			}
-		}
+		match_long_option(option, args);
+		return (NONE);
 	}
-	else
-	{
-		for (int i = 1; i < (int)ft_strlen(option); i++)
-		{
-			for (int j = 0; options[j].flag; j++)
-			{
-				if (option[i] == options[j].short_option)
-				{
-					args->flags[options[i].flag] = 1;
-					return (options[j]);
-				}
-			}
-		}
-	}
-	return (options[2]);
+	return (match_short_option(option, args));
 }
 
 t_args	parse_args(int ac, char **av)
@@ -50,8 +80,6 @@ t_args	parse_args(int ac, char **av)
 	t_args		args = {0};
 	int			value_flag;
 	int			idx;
-	t_options	opt;
-	int			error;
 
 	args.params = av;
 	value_flag = 0;
@@ -60,18 +88,12 @@ t_args	parse_args(int ac, char **av)
 	{
 		if (av[i][0] == '-')
 		{
-			opt = match_options(av[i], &args);
-			if (opt.req_value)
-				value_flag = opt.flag;
+			value_flag = match_options(av[i], &args);
 		}
 		else if (value_flag)
 		{
-			args.flags[value_flag] = ft_atoi_check(av[i], &error);
-			if (error == ERROR)
-			{
-				printf("ping: invalid value");
-				exit(1);
-			}
+			parse_value(&args, value_flag, av[i]);
+			value_flag = 0;
 		}
 		else
 			args.params[idx++] = av[i];

@@ -8,6 +8,7 @@ typedef enum	e_flags
 	NONE = 0,
 	HELP,
 	VERBOSE,
+	COUNT,
 	TOTAL
 }				t_flags;
 
