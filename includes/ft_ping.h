@@ -3,7 +3,7 @@
 
 # include "parser.h"
 
-void	parse_args(int ac, char **av, t_args *args);
+t_args	parse_args(int ac, char **av);
 void	print_args(t_args args);
 
 #endif /* FT_PING_H */

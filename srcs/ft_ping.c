@@ -11,11 +11,11 @@ void	error_exit(char *msg)
 
 int	main(int ac, char **av)
 {
-	t_args	args = {0};
+	t_args	args;
 
 	if (ac <= 1)
 		error_exit("missing host operand");
-	parse_args(ac, av, &args);
+	args = parse_args(ac, av);
 	print_args(args);
 	return (0);
 }
