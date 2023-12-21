@@ -7,11 +7,12 @@
 
 #include <unistd.h>
 
-static t_options	options[] = {
-	{'?', "--help",		HELP,	false},
-	{'v', "--verbose",	VERBOSE,false},
-	{'c', "--count",	COUNT,	true},
-	{'\0', "\0",		NONE,	false}
+/* Must follows the exact order of enum e_flags */
+static t_options	g_options[] = {
+{'?', "--help",		HELP,		false},
+{'v', "--verbose",	VERBOSE,	false},
+{'c', "--count",	COUNT,		true},
+{'\0', "\0",		NONE,		false}
 };
 
 int	parse_value(char *value)
@@ -30,12 +31,12 @@ t_flags	match_long_option(char *option)
 	int		diff;
 	size_t	n;
 
-	for (int i = 0; options[i].flag; i++)
+	for (int i = 0; g_options[i].flag; i++)
 	{
-		n = ft_strlen(options[i].long_option);
-		diff = ft_strncmp(option, options[i].long_option, n);
+		n = ft_strlen(g_options[i].long_option);
+		diff = ft_strncmp(option, g_options[i].long_option, n);
 		if (!diff)
-			return (options[i].flag);
+			return (g_options[i].flag);
 	}
 	error_exit_usage("unrecognized option ''");
 	return (NONE);
@@ -43,10 +44,10 @@ t_flags	match_long_option(char *option)
 
 t_flags	match_short_option(char option)
 {
-	for (int i = 0; options[i].flag; i++)
+	for (int i = 0; g_options[i].flag; i++)
 	{
-		if (option == options[i].short_option)
-			return (options[i].flag);
+		if (option == g_options[i].short_option)
+			return (g_options[i].flag);
 	}
 	error_exit_usage("invalid option -- ");
 	return (NONE);
@@ -73,7 +74,7 @@ t_flags	parse_option(char *option, t_args *args)
 		}
 		match = match_short_option(option[j]);
 		args->flags[match] = 1;
-		if (options[match - 1].req_value)
+		if (g_options[match - 1].req_value)
 			flag = match;
 	}
 	return (flag);
