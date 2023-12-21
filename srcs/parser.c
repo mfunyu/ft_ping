@@ -27,11 +27,13 @@ int	parse_value(char *value)
 
 t_flags	match_long_option(char *option)
 {
-	int	diff;
+	int		diff;
+	size_t	n;
 
 	for (int i = 0; options[i].flag; i++)
 	{
-		diff = ft_strncmp(option, options[i].long_option, ft_strlen(options[i].long_option));
+		n = ft_strlen(options[i].long_option);
+		diff = ft_strncmp(option, options[i].long_option, n);
 		if (!diff)
 			return (options[i].flag);
 	}
@@ -50,12 +52,38 @@ t_flags	match_short_option(char option)
 	return (NONE);
 }
 
+int	parse_option(char *option, t_args *args)
+{
+	t_flags	flag;
+	int		value_flag;
+
+	if (option[1] == '-')
+	{
+		flag = match_long_option(option);
+		args->flags[flag] = 1;
+		return (0);
+	}
+	value_flag = 0;
+	for (int j = 1; j < (int)ft_strlen(option); j++)
+	{
+		if (value_flag)
+		{
+			args->flags[value_flag] = parse_value(option + j);
+			return (0);
+		}
+		flag = match_short_option(option[j]);
+		args->flags[flag] = 1;
+		if (options[flag - 1].req_value)
+			value_flag = flag;
+	}
+	return (value_flag);
+}
+
 t_args	parse_args(int ac, char **av)
 {
 	t_args		args = {0};
 	int			value_flag;
 	int			idx;
-	t_flags		flag;
 
 	args.params = av;
 	value_flag = 0;
@@ -68,28 +96,7 @@ t_args	parse_args(int ac, char **av)
 			value_flag = 0;
 		}
 		else if (av[i][0] == '-' && av[i][1])
-		{
-			if (av[i][1] == '-')
-			{
-				flag = match_long_option(av[i]);
-				args.flags[flag] = 1;
-			}
-			else
-			{
-				for (int j = 1; j < (int)ft_strlen(av[i]); j++)
-				{
-					if (value_flag)
-					{
-						args.flags[value_flag] = parse_value(av[i] + j);
-						break ;
-					}
-					flag = match_short_option(av[i][j]);
-					args.flags[flag] = 1;
-					if (options[flag].req_value)
-						value_flag = flag;
-				}
-			}
-		}
+			value_flag = parse_option(av[i], &args);
 		else
 			args.params[idx++] = av[i];
 	}
