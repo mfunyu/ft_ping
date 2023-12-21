@@ -91,6 +91,8 @@ t_args	parse_args(int ac, char **av)
 	idx = 0;
 	for (int i = 1; i < ac; i++)
 	{
+		if (args.flags[HELP])
+			return (args);
 		if (flag)
 		{
 			args.flags[flag] = parse_value(av[i]);
