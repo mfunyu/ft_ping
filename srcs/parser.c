@@ -4,12 +4,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-t_options	match_options(char *option)
+#include <unistd.h>
+
+t_options	match_options(char *option, t_args *args)
 {
 	t_options	lst[] = {
-		{'?', "--help",	HELP,		false},
-		{'v', "--verbose", VERBOSE,	false},
-		{'\0', "\0",		NONE,		false}
+		{'?', "--help",		HELP,	false},
+		{'v', "--verbose",	VERBOSE,false},
+		{'\0', "\0",		NONE,	false}
 	};
 	int			diff;
 
@@ -19,7 +21,10 @@ t_options	match_options(char *option)
 		{
 			diff = ft_strncmp(option, lst[i].long_option, ft_strlen(lst[i].long_option));
 			if (!diff)
+			{
+				args->flags[lst[i].flag] = 1;
 				return (lst[i]);
+			}
 		}
 	}
 	else
@@ -29,37 +34,47 @@ t_options	match_options(char *option)
 			for (int j = 0; lst[j].flag; j++)
 			{
 				if (option[i] == lst[j].short_option)
+				{
+					args->flags[lst[i].flag] = 1;
 					return (lst[j]);
+				}
 			}
 		}
 	}
 	return (lst[2]);
 }
 
-void	parse_args(int ac, char **av)
+void	parse_args(int ac, char **av, t_args *args)
 {
-	char		*param;
-	bool		is_value;
+	int			value_flag;
 	t_options	opt;
+	int			idx;
+	int			error;
 
-	param = NULL;
-	is_value = 0;
+	value_flag = 0;
+	args->params = av;
+	idx = 0;
 	for (int i = 1; i < ac; i++)
 	{
 		printf("%s\n", av[i]);
 		if (av[i][0] == '-')
 		{
-			opt = match_options(av[i]);
+			opt = match_options(av[i], args);
 			printf("-> %c\n", opt.short_option);
-			is_value = opt.flag;
+			if (opt.req_value)
+				value_flag = opt.flag;
 		}
-		else if (is_value)
+		else if (value_flag)
 		{
-			//ft_atoi_check(av[i]);
+			args->flags[value_flag] = ft_atoi_check(av[i], &error);
+			if (error == ERROR)
+			{
+				printf("ping: invalid value");
+				exit(1);
+			}
 		}
-		else if (!param)
-			param = av[i];
+		else
+			args->params[idx] = av[i];
 	}
-	if (param)
-		printf("%s\n", param);
+	args->params[idx] = NULL;
 }
