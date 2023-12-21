@@ -5,9 +5,14 @@
 void	help(void)
 {
 	printf("Usage: ping [OPTION...] HOST ...\n\
-Send ICMP ECHO_REQUEST packets to network hosts.\n\n\
- Options valid for all request types:\n\
-  -v, --verbose              verbose output\n\n\
+Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
+	printf(" Options valid for all request types:\n\
+  -v, --verbose              verbose output\n");
+# ifdef BONUS
+	printf("\
+  -c, --count=NUMBER         stop after sending NUMBER packets\n");
+# endif
+	printf("\n\
   -?, --help                 give this help list\n\n");
 }
 

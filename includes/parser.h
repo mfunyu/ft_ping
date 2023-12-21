@@ -8,7 +8,9 @@ typedef enum	e_flags
 	NONE = 0,
 	HELP,
 	VERBOSE,
+# ifdef BONUS
 	COUNT,
+# endif
 	TOTAL
 }				t_flags;
 

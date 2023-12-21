@@ -23,6 +23,11 @@ CC		:= gcc
 CFLAGS	:= -Wall -Wextra -Werror
 INCLUDES:= -I $(DIR_INCLUDES) -I $(LIBFT)
 
+
+ifdef BONUS
+	CFLAGS	+= -D BONUS
+endif
+
 # ---------------------------------------------------------------------------- #
 #                                     RULES                                    #
 # ---------------------------------------------------------------------------- #
@@ -54,6 +59,10 @@ fclean	: clean
 
 .PHONY: re
 re		: fclean all
+
+.PHONY	: bonus
+bonus	:
+	make BONUS=1
 
 # ---------------------------------------------------------------------------- #
 #                                    DOCKER                                    #

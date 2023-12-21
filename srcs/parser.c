@@ -11,7 +11,9 @@
 static t_options	g_options[] = {
 {'?', "--help",		HELP,		false},
 {'v', "--verbose",	VERBOSE,	false},
+# ifdef BONUS
 {'c', "--count",	COUNT,		true},
+# endif
 {'\0', "\0",		NONE,		false}
 };
 
