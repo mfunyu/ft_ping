@@ -10,9 +10,9 @@
 - Supports `-v` and `-?` options
 
   | option | details |
-  | :-: | :-: |
-  | -v | |
-  | -? | |
+  | :- | :- |
+  | -v, --verbose | verbose output |
+  | -?, --help | give this help list |
 
 ## References
 
