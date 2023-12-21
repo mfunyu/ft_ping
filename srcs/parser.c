@@ -17,8 +17,13 @@ static t_options	g_options[] = {
 {'\0', "\0",		NONE,		false}
 };
 
-int	parse_value(char *value)
+int	parse_value(char *value) // no value, pass current option and av
 {
+	// check case of '-c123'
+	// check case of '--c=123'
+	// check next of av
+	// if non match, ping: option requires an argument -- 'c'
+	// or ping: option '--count' requires an argument
 	int	error;
 	int	ret;
 
@@ -35,8 +40,8 @@ t_flags	match_long_option(char *option)
 
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		n = ft_strlen(g_options[i].long_option);
-		diff = ft_strncmp(option, g_options[i].long_option, n + 1);
+		n = ft_strlen(option);
+		diff = ft_strncmp(g_options[i].long_option + 2, option + 2, n - 1);
 		if (!diff)
 			return (g_options[i].flag);
 	}
@@ -64,6 +69,8 @@ t_flags	parse_option(char *option, t_args *args)
 	{
 		match = match_long_option(option);
 		args->flags[match] = 1;
+		if (g_options[match - 1].req_value)
+			return (match);
 		return (NONE);
 	}
 	flag = NONE;
