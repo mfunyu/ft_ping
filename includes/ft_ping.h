@@ -4,5 +4,6 @@
 # include "parser.h"
 
 void	parse_args(int ac, char **av, t_args *args);
+void	print_args(t_args args);
 
 #endif /* FT_PING_H */

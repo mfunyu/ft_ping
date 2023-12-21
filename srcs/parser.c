@@ -74,7 +74,18 @@ void	parse_args(int ac, char **av, t_args *args)
 			}
 		}
 		else
-			args->params[idx] = av[i];
+			args->params[idx++] = av[i];
 	}
 	args->params[idx] = NULL;
+}
+
+void	print_args(t_args args)
+{
+	printf("[options]\n");
+	for (int i = 0; i < TOTAL; i++)
+		printf("%d: %d\n", i, args.flags[i]);
+	printf("[params]\n");
+	for (int i = 0; args.params[i]; i++)
+		printf("%s, ", args.params[i]);
+	printf("\n");
 }
