@@ -19,7 +19,7 @@ OBJS	= $(addprefix $(DIR_OBJS)/, $(SRCS:.c=.o))
 DEPS	:= $(OBJS:.o=.d)
 CC		:= gcc
 CFLAGS	:= -Wall -Wextra -Werror
-INCLUDES:= -I $(DIR_INCLUDES)
+INCLUDES:= -I $(DIR_INCLUDES) -I $(LIBFT)
 
 # ---------------------------------------------------------------------------- #
 #                                     RULES                                    #
