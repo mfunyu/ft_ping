@@ -38,7 +38,7 @@ t_flags	match_long_option(char *option)
 		if (!diff)
 			return (g_options[i].flag);
 	}
-	error_exit_usage("unrecognized option ''");
+	error_exit_value("unrecognized option", option);
 	return (NONE);
 }
 
@@ -49,7 +49,7 @@ t_flags	match_short_option(char option)
 		if (option == g_options[i].short_option)
 			return (g_options[i].flag);
 	}
-	error_exit_usage("invalid option -- ");
+	error_exit_value("invalid option --", &option);
 	return (NONE);
 }
 
@@ -102,7 +102,8 @@ t_args	parse_args(int ac, char **av)
 			args.params[idx++] = av[i];
 	}
 	if (flag)
-		error_exit_usage("option requires an argument -- 'c'");
+		error_exit_value("option requires an argument --",
+			&g_options[flag - 1].short_option);
 	args.params[idx] = NULL;
 	return (args);
 }
