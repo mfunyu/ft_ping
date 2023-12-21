@@ -14,6 +14,17 @@
   | -v, --verbose | verbose output |
   | -?, --help | give this help list |
 
+### bonus compilation
+
+- Supports `-w` option
+
+  | option | details |
+  | :- | :- |
+  | -c, --count=NUMBER | stop after sending NUMBER packets |
+  | -q, --quiet | quiet output |
+  | -w, --timeout=N | stop after N seconds |
+
+
 ## References
 
 - Internet Controle Message Protocol (ICMP) RFC792
