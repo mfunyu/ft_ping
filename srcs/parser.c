@@ -42,7 +42,8 @@ void	match_long_option(char *option, t_args *args)
 
 t_flags	match_short_option(char *option, t_args *args)
 {
-	t_flags	value;
+	t_flags		value;
+	t_options	current;
 
 	value = NONE;
 	for (int i = 1; i < (int)ft_strlen(option); i++)
@@ -52,13 +53,18 @@ t_flags	match_short_option(char *option, t_args *args)
 			parse_value(args, value, option + i);
 			return (NONE);
 		}
-		for (int j = 0; options[j].flag; j++)
+		for (int j = 0;; j++)
 		{
-			if (option[i] != options[j].short_option)
+			current = options[j];
+			if (!current.flag)
 				error_exit_usage("invalid option -- ");
-			args->flags[options[j].flag] = 1;
-			if (options[j].req_value)
-				value = options[j].flag;
+			if (option[i] == current.short_option)
+			{
+				args->flags[current.flag] = 1;
+				if (current.req_value)
+					value = current.flag;
+				break ;
+			}
 		}
 	}
 	return (value);
@@ -86,7 +92,7 @@ t_args	parse_args(int ac, char **av)
 	idx = 0;
 	for (int i = 1; i < ac; i++)
 	{
-		if (av[i][0] == '-')
+		if (av[i][0] == '-' && av[i][1])
 		{
 			value_flag = match_options(av[i], &args);
 		}
