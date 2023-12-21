@@ -70,17 +70,6 @@ t_flags	match_short_option(char *option, t_args *args)
 	return (value);
 }
 
-t_flags	match_options(char *option, t_args *args)
-{
-
-	if (option[1] == '-')
-	{
-		match_long_option(option, args);
-		return (NONE);
-	}
-	return (match_short_option(option, args));
-}
-
 t_args	parse_args(int ac, char **av)
 {
 	t_args		args = {0};
@@ -94,7 +83,10 @@ t_args	parse_args(int ac, char **av)
 	{
 		if (av[i][0] == '-' && av[i][1])
 		{
-			value_flag = match_options(av[i], &args);
+			if (av[i][1] == '-')
+				match_long_option(av[i], &args);
+			else
+				value_flag = match_short_option(av[i], &args);
 		}
 		else if (value_flag)
 		{
@@ -104,6 +96,8 @@ t_args	parse_args(int ac, char **av)
 		else
 			args.params[idx++] = av[i];
 	}
+	if (value_flag)
+		error_exit_usage("option requires an argument -- 'c'");
 	args.params[idx] = NULL;
 	return (args);
 }
