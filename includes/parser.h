@@ -12,11 +12,10 @@ typedef enum	e_flags
 
 typedef struct	s_options
 {
-	char	*short_option;
+	char	short_option;
 	char	*long_option;
 	t_flags	flag;
 	bool	req_value;
 }				t_options;
-
 
 #endif /* PARSER_H */
