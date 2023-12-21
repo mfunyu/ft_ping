@@ -34,7 +34,7 @@ t_flags	match_long_option(char *option)
 	for (int i = 0; g_options[i].flag; i++)
 	{
 		n = ft_strlen(g_options[i].long_option);
-		diff = ft_strncmp(option, g_options[i].long_option, n);
+		diff = ft_strncmp(option, g_options[i].long_option, n + 1);
 		if (!diff)
 			return (g_options[i].flag);
 	}
