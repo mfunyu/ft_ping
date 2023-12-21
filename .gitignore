@@ -4,6 +4,7 @@
 !includes/
 !srcs/
 !Makefile
+!Dockerfile
 !*.gitignore
 !*.md
 

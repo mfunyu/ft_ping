@@ -52,3 +52,15 @@ fclean	: clean
 
 .PHONY: re
 re		: fclean all
+
+# ---------------------------------------------------------------------------- #
+#                                    DOCKER                                    #
+# ---------------------------------------------------------------------------- #
+
+.PHONY:	build
+build	:
+	docker build . -t ft_ping
+
+.PHONY:	exec
+exec		:
+	docker run -it ft_ping /bin/bash
