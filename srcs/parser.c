@@ -81,17 +81,17 @@ t_args	parse_args(int ac, char **av)
 	idx = 0;
 	for (int i = 1; i < ac; i++)
 	{
-		if (av[i][0] == '-' && av[i][1])
+		if (value_flag)
+		{
+			parse_value(&args, value_flag, av[i]);
+			value_flag = 0;
+		}
+		else if (av[i][0] == '-' && av[i][1])
 		{
 			if (av[i][1] == '-')
 				match_long_option(av[i], &args);
 			else
 				value_flag = match_short_option(av[i], &args);
-		}
-		else if (value_flag)
-		{
-			parse_value(&args, value_flag, av[i]);
-			value_flag = 0;
 		}
 		else
 			args.params[idx++] = av[i];
