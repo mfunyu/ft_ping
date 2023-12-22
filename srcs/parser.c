@@ -17,13 +17,8 @@ static t_options	g_options[] = {
 {'\0', "\0",		NONE,		false}
 };
 
-int	parse_value(char *value) // no value, pass current option and av
+int	get_value(char *value)
 {
-	// check case of '-c123'
-	// check case of '--c=123'
-	// check next of av
-	// if non match, ping: option requires an argument -- 'c'
-	// or ping: option '--count' requires an argument
 	int	error;
 	int	ret;
 
@@ -33,7 +28,32 @@ int	parse_value(char *value) // no value, pass current option and av
 	return (ret);
 }
 
-void	match_long_option(char **av, t_args *args)
+int	parse_value(char *option, char **av, bool is_short) // no value, pass current option and av
+{
+	// check case of '-c123'
+	if (is_short)
+	{
+		if (option[1])
+			return (get_value(option[1]));
+	}
+	// check case of '--c=123'
+	else
+	{
+		argument = ft_strchr(option, '=');
+		if (argument)
+			return (get_value(argument));
+	}
+	// check next of av
+	if (av + 1)
+		return (get_value(av + 1));
+
+	if (is_short)
+		error_exit_value("option requires an argument --", option);
+	else
+		error_exit_value("option '' requires an argument");
+}
+
+int	match_long_option(char *option, t_args *args)
 {
 	int		c;
 	char	*option;
@@ -44,64 +64,64 @@ void	match_long_option(char **av, t_args *args)
 		c = ft_strlen("--");
 		while (option[c] && g_options[i].long_option[c] == option[c])
 			c++;
+		if (!option[c] || option[c] == '=')
+			return (i);
 		if (!option[c])
 		{
 			args->flags[g_options[i].flag] = 1;
-			if (g_options[i].req_value)
-				args->flags[g_options[i].flag] = parse_value(option + 1);
+			//if (g_options[i].req_value)
+			//	args->flags[g_options[i].flag] = parse_value(option + 1);
 			return ;
 		}
 		if (option[c] == '=')
 		{
-			if (!g_options[i].req_value)
-				error_exit_usage("ping: option '--numeric' doesn't allow an argument");
-			args->flags[g_options[i].flag] = parse_value(option + c + 1);
+			//if (!g_options[i].req_value)
+			//	error_exit_usage("ping: option '--numeric' doesn't allow an argument");
+			//args->flags[g_options[i].flag] = parse_value(option + c + 1);
 			return ;
 		}
 	}
 	error_exit_value("unrecognized option", option);
 }
 
-t_flags	match_short_option(char option)
+int		match_short_option(char *option)
 {
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		if (option == g_options[i].short_option)
-			return (g_options[i].flag);
+		if (option[0] != g_options[i].short_option)
+			return (i);
 	}
 	error_exit_value("invalid option --", &option);
-	return (NONE);
+	return (0);
 }
 
-t_flags	parse_option(char **av, t_args *args)
+void	parse_option(char **av, t_args *args)
 {
 	t_flags	match;
 	t_flags	flag;
 	char	*option;
+	int		idx;
 
 	option = av[0];
 	if (option[1] == '-')
 	{
-		match_long_option(av, args);
-		return (NONE);
+		idx = match_long_option(av, args);
+		if (g_options[idx].req_value)
+			args->flags[flag] = parse_value(option, av);
+		else if (ft_strchr(option, '='))
+			error_exit_usage("ping: option '--numeric' doesn't allow an argument");
+		else
+			args->flags[flag] = 1;
+		return ;
 	}
 	flag = NONE;
 	for (int j = 1; j < (int)ft_strlen(option); j++)
 	{
-		if (flag)
-		{
-			args->flags[flag] = parse_value(option + j);
-			return (NONE);
-		}
-		match = match_short_option(option[j]);
+		idx = match_short_option(option + j, args);
 		args->flags[match] = 1;
-		if (g_options[match - 1].req_value)
-			flag = match;
+		if (g_options[idx].req_value)
+			args->flags[flag] = parse_value(option + j, av);
 	}
-	if (flag)
-		error_exit_value("option requires an argument --",
-			&g_options[flag - 1].short_option);
-	return (flag);
 }
 
 t_args	parse_args(int ac, char **av)
