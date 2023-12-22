@@ -41,11 +41,9 @@ void	match_long_option(char **av, t_args *args)
 	option = av[0];
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		for (c = 2; option[c]; c++)
-		{
-			if (g_options[i].long_option[c] != option[c])
-				break ;
-		}
+		c = ft_strlen("--");
+		while (option[c] && g_options[i].long_option[c] == option[c])
+			c++;
 		if (!option[c])
 		{
 			args->flags[g_options[i].flag] = 1;
