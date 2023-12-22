@@ -33,20 +33,35 @@ int	parse_value(char *value) // no value, pass current option and av
 	return (ret);
 }
 
-t_flags	match_long_option(char *option)
+void	match_long_option(char **av, t_args *args)
 {
-	int		diff;
-	size_t	n;
+	int		c;
+	char	*option;
 
+	option = av[0];
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		n = ft_strlen(option);
-		diff = ft_strncmp(g_options[i].long_option + 2, option + 2, n - 1);
-		if (!diff)
-			return (g_options[i].flag);
+		for (c = 2; option[c]; c++)
+		{
+			if (g_options[i].long_option[c] != option[c])
+				break ;
+		}
+		if (!option[c])
+		{
+			args->flags[g_options[i].flag] = 1;
+			if (g_options[i].req_value)
+				args->flags[g_options[i].flag] = parse_value(option + 1);
+			return ;
+		}
+		if (option[c] == '=')
+		{
+			if (!g_options[i].req_value)
+				error_exit_usage("ping: option '--numeric' doesn't allow an argument");
+			args->flags[g_options[i].flag] = parse_value(option + c + 1);
+			return ;
+		}
 	}
 	error_exit_value("unrecognized option", option);
-	return (NONE);
 }
 
 t_flags	match_short_option(char option)
@@ -60,17 +75,16 @@ t_flags	match_short_option(char option)
 	return (NONE);
 }
 
-t_flags	parse_option(char *option, t_args *args)
+t_flags	parse_option(char **av, t_args *args)
 {
 	t_flags	match;
 	t_flags	flag;
+	char	*option;
 
+	option = av[0];
 	if (option[1] == '-')
 	{
-		match = match_long_option(option);
-		args->flags[match] = 1;
-		if (g_options[match - 1].req_value)
-			return (match);
+		match_long_option(av, args);
 		return (NONE);
 	}
 	flag = NONE;
@@ -86,35 +100,28 @@ t_flags	parse_option(char *option, t_args *args)
 		if (g_options[match - 1].req_value)
 			flag = match;
 	}
+	if (flag)
+		error_exit_value("option requires an argument --",
+			&g_options[flag - 1].short_option);
 	return (flag);
 }
 
 t_args	parse_args(int ac, char **av)
 {
 	t_args		args = {0};
-	t_flags		flag;
 	int			idx;
 
 	args.params = av;
-	flag = NONE;
 	idx = 0;
 	for (int i = 1; i < ac; i++)
 	{
 		if (args.flags[HELP])
 			return (args);
-		if (flag)
-		{
-			args.flags[flag] = parse_value(av[i]);
-			flag = NONE;
-		}
-		else if (av[i][0] == '-' && av[i][1])
-			flag = parse_option(av[i], &args);
+		if (av[i][0] == '-' && av[i][1])
+			parse_option(av + i, &args);
 		else
 			args.params[idx++] = av[i];
 	}
-	if (flag)
-		error_exit_value("option requires an argument --",
-			&g_options[flag - 1].short_option);
 	args.params[idx] = NULL;
 	return (args);
 }
