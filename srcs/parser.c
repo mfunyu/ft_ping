@@ -74,7 +74,7 @@ int	match_long_option(char *option)
 	return (0);
 }
 
-t_flags	parse_long_option(char *option, t_args *args)
+int	parse_long_option(char *option, t_args *args)
 {
 	int		idx;
 	t_flags	flag;
@@ -86,26 +86,26 @@ t_flags	parse_long_option(char *option, t_args *args)
 		if (!g_options[idx].req_value)
 			error_exit_usage("ping: option '--xxx' doesn't allow an argument");
 		args->flags[flag] = parse_value(option + ft_strlen("--"));
-		return (NONE);
+		return (-1);
 	}
 	args->flags[flag] = 1;
 	if (g_options[idx].req_value)
-		return (flag);
-	return (NONE);
+		return (idx);
+	return (-1);
 }
 
 int		match_short_option(char *option)
 {
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		if (option[0] != g_options[i].short_option)
+		if (option[0] == g_options[i].short_option)
 			return (i);
 	}
 	error_exit_value("invalid option --", option);
 	return (0);
 }
 
-t_flags	parse_short_option(char *option, t_args *args)
+int	parse_short_option(char *option, t_args *args)
 { 
 	int		idx;
 	t_flags	flag;
@@ -113,47 +113,51 @@ t_flags	parse_short_option(char *option, t_args *args)
 	for (int j = 1; j < (int)ft_strlen(option); j++)
 	{
 		idx = match_short_option(option + j);
+		printf("idx: %d\n", idx);
 		flag = g_options[idx].flag;
 		args->flags[flag] = 1;
 		if (g_options[idx].req_value)
 		{
 			if (!option[j + 1])
-				return (flag);
+				return (idx);
 			args->flags[flag] = parse_value(option + j + 1);
 			break ;
 		}
 	}
-	return (NONE);
+	return (-1);
 }
 
 t_args	parse_args(int ac, char **av)
 {
 	t_args		args = {0};
 	int			idx;
-	t_flags		flag;
+	int			ret;
 
 	args.params = av;
 	idx = 0;
-	flag = 0;
+	ret = -1;
 	for (int i = 1; i < ac; i++)
 	{
 		if (args.flags[HELP])
 			return (args);
-		if (flag)
+		if (ret >= 0)
 		{
-			args.flags[flag] = parse_value(av[i]);
-			flag = 0;
+			args.flags[ret] = parse_value(av[i]);
+			ret = -1;
 		}
 		else if (av[i][0] == '-' && av[i][1])
 		{
 			if (av[i][1] == '-')
-				flag = parse_long_option(av[i], &args);
+				ret = parse_long_option(av[i], &args);
 			else
-				flag = parse_short_option(av[i], &args);
+				ret = parse_short_option(av[i], &args);
+			printf("ret: %d\n", ret);
 		}
 		else
 			args.params[idx++] = av[i];
 	}
+	if (ret >= 0)
+		error_exit_value("option requires an argument --", g_options[ret].long_option);
 	args.params[idx] = NULL;
 	return (args);
 }
