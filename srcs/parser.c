@@ -16,7 +16,7 @@ static t_options	g_options[] = {
 {'\0', "\0",		NONE,		false}
 };
 
-void	parse_error_exit(t_parse_errs type, char *option, bool is_short)
+static void	_parse_error_exit(t_parse_errs type, char *option, bool is_short)
 {
 	fprintf(stderr, "ft_ping: ");
 	if (type == INVALID)
@@ -43,7 +43,7 @@ void	parse_error_exit(t_parse_errs type, char *option, bool is_short)
 	error_exit_usage(NULL);
 }
 
-int	parse_value(char *value)
+static int	_parse_value(char *value)
 {
 	int	error;
 	int	ret;
@@ -56,7 +56,18 @@ int	parse_value(char *value)
 	return (ret);
 }
 
-int	match_long_option(char *option)
+static int	_match_short_option(char option)
+{
+	for (int i = 0; g_options[i].flag; i++)
+	{
+		if (option == g_options[i].short_option)
+			return (i);
+	}
+	_parse_error_exit(INVALID, &option, true);
+	return (0);
+}
+
+static int	_match_long_option(char *option)
 {
 	int	c;
 
@@ -68,49 +79,11 @@ int	match_long_option(char *option)
 		if (!option[c] || option[c] == '=')
 			return (i);
 	}
-	parse_error_exit(INVALID, option, false);
+	_parse_error_exit(INVALID, option, false);
 	return (0);
 }
 
-bool	parse_long_option(char **av, t_args *args)
-{
-	char	*option;
-	int		idx;
-	t_flags	flag;
-
-	option = av[0];
-	idx = match_long_option(option);
-	flag = g_options[idx].flag;
-	if (ft_strchr(option, '='))
-	{
-		if (!g_options[idx].req_value)
-			parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
-		args->flags[flag] = parse_value(ft_strchr(option, '=') + 1);
-		return (false);
-	}
-	if (g_options[idx].req_value)
-	{
-		if (!av[1])
-			parse_error_exit(MISSING, g_options[idx].long_option, false);
-		args->flags[flag] = parse_value(av[1]);
-		return (true);
-	}
-	args->flags[flag] = 1;
-	return (false);
-}
-
-int		match_short_option(char option)
-{
-	for (int i = 0; g_options[i].flag; i++)
-	{
-		if (option == g_options[i].short_option)
-			return (i);
-	}
-	parse_error_exit(INVALID, &option, true);
-	return (0);
-}
-
-bool	parse_short_option(char **av, t_args *args)
+static bool	_parse_short_option(char **av, t_args *args)
 {
 	char	*option;
 	int		idx;
@@ -119,22 +92,49 @@ bool	parse_short_option(char **av, t_args *args)
 	option = av[0];
 	for (int j = 1; j < (int)ft_strlen(option); j++)
 	{
-		idx = match_short_option(option[j]);
+		idx = _match_short_option(option[j]);
 		flag = g_options[idx].flag;
 		if (g_options[idx].req_value)
 		{
 			if (option[j + 1])
 			{
-				args->flags[flag] = parse_value(option + j + 1);
+				args->flags[flag] = _parse_value(option + j + 1);
 				return (false);
 			}
 			if (!av[1])
-				parse_error_exit(MISSING, &g_options[idx].short_option, true);
-			args->flags[flag] = parse_value(av[1]);
+				_parse_error_exit(MISSING, &g_options[idx].short_option, true);
+			args->flags[flag] = _parse_value(av[1]);
 			return (true);
 		}
 		args->flags[flag] = 1;
 	}
+	return (false);
+}
+
+static bool	_parse_long_option(char **av, t_args *args)
+{
+	char	*option;
+	int		idx;
+	t_flags	flag;
+
+	option = av[0];
+	idx = _match_long_option(option);
+	flag = g_options[idx].flag;
+	if (ft_strchr(option, '='))
+	{
+		if (!g_options[idx].req_value)
+			_parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
+		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1);
+		return (false);
+	}
+	if (g_options[idx].req_value)
+	{
+		if (!av[1])
+			_parse_error_exit(MISSING, g_options[idx].long_option, false);
+		args->flags[flag] = _parse_value(av[1]);
+		return (true);
+	}
+	args->flags[flag] = 1;
 	return (false);
 }
 
@@ -153,9 +153,9 @@ void	parse_args(t_args *args, int ac, char **av)
 		if (av[i][0] == '-' && av[i][1])
 		{
 			if (av[i][1] == '-')
-				skip = parse_long_option(av + i, args);
+				skip = _parse_long_option(av + i, args);
 			else
-				skip = parse_short_option(av + i, args);
+				skip = _parse_short_option(av + i, args);
 			i += skip;
 		}
 		else
