@@ -17,6 +17,33 @@ static t_options	g_options[] = {
 {'\0', "\0",		NONE,		false}
 };
 
+void	parse_error_exit(t_parse_errs type, char *option, bool is_short)
+{
+	fprintf(stderr, "ft_ping: ");
+	if (type == INVALID)
+	{
+		if (is_short)
+			fprintf(stderr, "invalid option -- '%s'", option);
+		else
+			fprintf(stderr, "unrecognized option '%s'", option);
+
+	}
+	else if (type == MISSING)
+	{
+		if (is_short)
+			fprintf(stderr, "option requires an argument --%s", option);
+		else
+			fprintf(stderr, "option '%s' requires an argument", option);
+
+	}
+	else if (type == NOT_ALLOWED)
+	{
+		fprintf(stderr, "option '%s' doesn't allow an argument", option);
+	}
+	fprintf(stderr, "\n");
+	error_exit_usage(NULL);
+}
+
 int	parse_value(char *value)
 {
 	int	error;
@@ -40,7 +67,7 @@ int	match_long_option(char *option)
 		if (!option[c] || option[c] == '=')
 			return (i);
 	}
-	error_exit_value("unrecognized option", option);
+	parse_error_exit(INVALID, option, false);
 	return (0);
 }
 
@@ -56,29 +83,29 @@ bool	parse_long_option(char **av, t_args *args)
 	if (ft_strchr(option, '='))
 	{
 		if (!g_options[idx].req_value)
-			error_exit_usage("ping: option '--xxx' doesn't allow an argument");
+			parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
 		args->flags[flag] = parse_value(option + ft_strlen("--"));
 		return (false);
 	}
-	args->flags[flag] = 1;
 	if (g_options[idx].req_value)
 	{
 		if (!av[1])
-			error_exit_value("option requires an argument --", g_options[idx].long_option);
+			parse_error_exit(MISSING, g_options[idx].long_option, false);
 		args->flags[flag] = parse_value(av[1]);
 		return (true);
 	}
+	args->flags[flag] = 1;
 	return (false);
 }
 
-int		match_short_option(char *option)
+int		match_short_option(char option)
 {
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		if (option[0] == g_options[i].short_option)
+		if (option == g_options[i].short_option)
 			return (i);
 	}
-	error_exit_value("invalid option --", option);
+	parse_error_exit(INVALID, &option, true);
 	return (0);
 }
 
@@ -91,7 +118,7 @@ bool	parse_short_option(char **av, t_args *args)
 	option = av[0];
 	for (int j = 1; j < (int)ft_strlen(option); j++)
 	{
-		idx = match_short_option(option + j);
+		idx = match_short_option(option[j]);
 		flag = g_options[idx].flag;
 		args->flags[flag] = 1;
 		if (g_options[idx].req_value)
@@ -102,7 +129,7 @@ bool	parse_short_option(char **av, t_args *args)
 				return (false);
 			}
 			if (!av[1])
-				error_exit_value("option requires an argument --", &g_options[idx].short_option);
+				parse_error_exit(MISSING, &g_options[idx].short_option, true);
 			args->flags[flag] = parse_value(av[1]);
 			return (true);
 		}
