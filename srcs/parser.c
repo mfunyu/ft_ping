@@ -48,6 +48,8 @@ int	parse_value(char *value)
 	int	error;
 	int	ret;
 
+	if (!*value)
+		return (0);
 	ret = ft_atoi_check(value, &error);
 	if (error == ERROR)
 		error_exit("invalid value");
@@ -83,7 +85,7 @@ bool	parse_long_option(char **av, t_args *args)
 	{
 		if (!g_options[idx].req_value)
 			parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
-		args->flags[flag] = parse_value(option + ft_strlen("--"));
+		args->flags[flag] = parse_value(ft_strchr(option, '=') + 1);
 		return (false);
 	}
 	if (g_options[idx].req_value)
