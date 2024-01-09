@@ -51,7 +51,7 @@ static int	_parse_value(char *value)
 	if (!*value)
 		return (0);
 	ret = ft_atoi_check(value, &error);
-	if (error == ERROR)
+	if (error)
 		error_exit("invalid value");
 	return (ret);
 }
@@ -118,6 +118,8 @@ static bool	_parse_long_option(char **av, t_args *args)
 	t_flags	flag;
 
 	option = av[0];
+	if (ft_strlen(option) <= 2)
+		return (false);
 	idx = _match_long_option(option);
 	flag = g_options[idx].flag;
 	if (ft_strchr(option, '='))
