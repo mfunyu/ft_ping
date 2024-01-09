@@ -58,7 +58,7 @@ int	parse_value(char *value)
 
 int	match_long_option(char *option)
 {
-	int		c;
+	int	c;
 
 	for (int i = 0; g_options[i].flag; i++)
 	{
@@ -121,7 +121,6 @@ bool	parse_short_option(char **av, t_args *args)
 	{
 		idx = match_short_option(option[j]);
 		flag = g_options[idx].flag;
-		args->flags[flag] = 1;
 		if (g_options[idx].req_value)
 		{
 			if (option[j + 1])
@@ -134,6 +133,7 @@ bool	parse_short_option(char **av, t_args *args)
 			args->flags[flag] = parse_value(av[1]);
 			return (true);
 		}
+		args->flags[flag] = 1;
 	}
 	return (false);
 }
@@ -141,11 +141,11 @@ bool	parse_short_option(char **av, t_args *args)
 void	parse_args(t_args *args, int ac, char **av)
 {
 	int		idx;
-	bool	next;
+	bool	skip;
 
-	args->params = av;
 	idx = 0;
-	next = false;
+	skip = false;
+	args->params = av;
 	for (int i = 1; i < ac; i++)
 	{
 		if (args->flags[HELP])
@@ -153,10 +153,10 @@ void	parse_args(t_args *args, int ac, char **av)
 		if (av[i][0] == '-' && av[i][1])
 		{
 			if (av[i][1] == '-')
-				next = parse_long_option(av + i, args);
+				skip = parse_long_option(av + i, args);
 			else
-				next = parse_short_option(av + i, args);
-			i += next;
+				skip = parse_short_option(av + i, args);
+			i += skip;
 		}
 		else
 			args->params[idx++] = av[i];
