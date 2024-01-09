@@ -7,7 +7,6 @@
 
 #include <unistd.h>
 
-/* Must follows the exact order of enum e_flags */
 static t_options	g_options[] = {
 {'?', "--help",		HELP,		false},
 {'v', "--verbose",	VERBOSE,	false},
@@ -137,32 +136,30 @@ bool	parse_short_option(char **av, t_args *args)
 	return (false);
 }
 
-t_args	parse_args(int ac, char **av)
+void	parse_args(t_args *args, int ac, char **av)
 {
-	t_args	args = {0};
 	int		idx;
 	bool	next;
 
-	args.params = av;
+	args->params = av;
 	idx = 0;
 	next = false;
 	for (int i = 1; i < ac; i++)
 	{
-		if (args.flags[HELP])
-			return (args);
+		if (args->flags[HELP])
+			return ;
 		if (av[i][0] == '-' && av[i][1])
 		{
 			if (av[i][1] == '-')
-				next = parse_long_option(av + i, &args);
+				next = parse_long_option(av + i, args);
 			else
-				next = parse_short_option(av + i, &args);
+				next = parse_short_option(av + i, args);
 			i += next;
 		}
 		else
-			args.params[idx++] = av[i];
+			args->params[idx++] = av[i];
 	}
-	args.params[idx] = NULL;
-	return (args);
+	args->params[idx] = NULL;
 }
 
 void	print_args(t_args args)

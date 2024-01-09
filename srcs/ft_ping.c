@@ -4,7 +4,7 @@
 
 void	help(void)
 {
-	printf("Usage: ping [OPTION...] HOST ...\n\
+	printf("Usage: ./ft_ping [OPTION...] HOST ...\n\
 Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
 	printf(" Options valid for all request types:\n\
   -v, --verbose              verbose output\n");
@@ -18,11 +18,11 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
 
 int	main(int ac, char **av)
 {
-	t_args	args;
+	t_args	args = {0};
 
 	if (ac <= 1)
 		error_exit_usage("missing host operand");
-	args = parse_args(ac, av);
+	parse_args(&args, ac, av);
 	if (args.flags[HELP])
 	{
 		help();
