@@ -74,11 +74,13 @@ int	match_long_option(char *option)
 	return (0);
 }
 
-int	parse_long_option(char *option, t_args *args)
+int	parse_long_option(char **av, t_args *args)
 {
+	char	*option;
 	int		idx;
 	t_flags	flag;
 
+	option = av[0];
 	idx = match_long_option(option);
 	flag = g_options[idx].flag;
 	if (ft_strchr(option, '='))
@@ -105,11 +107,13 @@ int		match_short_option(char *option)
 	return (0);
 }
 
-int	parse_short_option(char *option, t_args *args)
-{ 
+int	parse_short_option(char **av, t_args *args)
+{
+	char	*option;
 	int		idx;
 	t_flags	flag;
 
+	option = av[0];
 	for (int j = 1; j < (int)ft_strlen(option); j++)
 	{
 		idx = match_short_option(option + j);
@@ -148,9 +152,9 @@ t_args	parse_args(int ac, char **av)
 		else if (av[i][0] == '-' && av[i][1])
 		{
 			if (av[i][1] == '-')
-				ret = parse_long_option(av[i], &args);
+				ret = parse_long_option(av + i, &args);
 			else
-				ret = parse_short_option(av[i], &args);
+				ret = parse_short_option(av + i, &args);
 			printf("ret: %d\n", ret);
 		}
 		else
