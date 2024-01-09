@@ -24,6 +24,20 @@
   | -q, --quiet | quiet output |
   | -w, --timeout=N | stop after N seconds |
 
+## Usage
+
+- Compilation
+  ```
+  make
+  ```
+
+- Run docker
+  ```
+  make build
+  ```
+  ```
+  make exec
+  ```
 
 ## References
 
