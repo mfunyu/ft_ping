@@ -2,7 +2,8 @@ NAME	:= ft_ping
 
 SRCS	:= ft_ping.c \
 			parser.c \
-			error.c
+			error.c \
+			dns.c
 
 # ---------------------------------------------------------------------------- #
 #                                     PATHS                                    #
@@ -23,6 +24,7 @@ CC		:= gcc
 CFLAGS	:= -Wall -Wextra -Werror
 INCLUDES:= -I $(DIR_INCLUDES) -I $(LIBFT)
 
+BONUS=1
 
 ifdef BONUS
 	CFLAGS	+= -D BONUS
@@ -75,3 +77,7 @@ build	:
 .PHONY:	exec
 exec		:
 	docker run -it ft_ping /bin/bash
+
+# ---------------------------------------------------------------------------- #
+#                                     HELP                                     #
+# ---------------------------------------------------------------------------- #

@@ -16,6 +16,11 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
   -?, --help                 give this help list\n\n");
 }
 
+void	ft_ping(t_args *args)
+{
+	dns_resolution(args->params[0]);
+}
+
 int	main(int ac, char **av)
 {
 	t_args	args = {0};
@@ -31,5 +36,6 @@ int	main(int ac, char **av)
 	if (!args.params[0])
 		error_exit_usage("missing host operand");
 	print_args(args);
+	ft_ping(&args);
 	return (0);
 }
