@@ -60,7 +60,8 @@ fclean	: clean
 	$(RM) $(NAME)
 
 .PHONY: re
-re		: fclean all
+re		: fclean
+	$(MAKE) all
 
 .PHONY	: bonus
 bonus	:
