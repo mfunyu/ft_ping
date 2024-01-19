@@ -6,6 +6,9 @@
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
 
-int		dns_resolution(char const *hostname);
+struct addrinfo	*host_to_addrinfo(char const *hostname);
+int				create_raw_socket(void);
+void			send_packet(struct addrinfo *addr, int sfd);
+void			cleanup(struct addrinfo *addr, int sfd);
 
 #endif /* FT_PING_H */

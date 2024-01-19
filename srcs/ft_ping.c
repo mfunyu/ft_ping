@@ -18,7 +18,15 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
 
 void	ft_ping(t_args *args)
 {
-	dns_resolution(args->params[0]);
+	struct addrinfo *addr;
+	int sfd;
+
+	addr = host_to_addrinfo(args->params[0]);
+	sfd = create_raw_socket();
+
+	send_packet(addr, sfd);
+
+	cleanup(addr, sfd);
 }
 
 int	main(int ac, char **av)
