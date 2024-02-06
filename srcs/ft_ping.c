@@ -11,6 +11,8 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
 # ifdef BONUS
 	printf("\
   -c, --count=NUMBER         stop after sending NUMBER packets\n");
+	printf("\
+  -t, --ttl=N                specify N as time-to-live\n");
 # endif
 	printf("\n\
   -?, --help                 give this help list\n\n");
