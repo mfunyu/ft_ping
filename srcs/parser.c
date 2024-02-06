@@ -53,7 +53,12 @@ static int	_parse_value(char *value, int idx)
 		return (0);
 	ret = ft_atoi_check(value, &error);
 	if (error)
-		error_exit(g_options[idx].error_msg);
+	{
+		if (idx == -1)
+			error_exit("invalid value");
+		else
+			error_exit(g_options[idx].error_msg);
+	}
 	return (ret);
 }
 
@@ -127,14 +132,14 @@ static bool	_parse_long_option(char **av, t_args *args)
 	{
 		if (!g_options[idx].req_value)
 			_parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1, idx);
+		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1, -1);
 		return (false);
 	}
 	if (g_options[idx].req_value)
 	{
 		if (!av[1])
 			_parse_error_exit(MISSING, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(av[1], idx);
+		args->flags[flag] = _parse_value(av[1], -1);
 		return (true);
 	}
 	args->flags[flag] = 1;
