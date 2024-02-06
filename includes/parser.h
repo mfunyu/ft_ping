@@ -29,7 +29,6 @@ typedef struct	s_options
 	char	*long_option;
 	t_flags	flag;
 	bool	req_value;
-	char	*error_msg;
 }				t_options;
 
 typedef struct	s_args

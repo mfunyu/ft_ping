@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "error.h"
 #include "libft.h"
+#include "ft_ping.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,14 +9,14 @@
 #include <unistd.h>
 
 static t_options	g_options[] = {
-{'?', "--help",		HELP,		false, ""},
-{'v', "--verbose",	VERBOSE,	false, ""},
+{'?', "--help",		HELP,		false},
+{'v', "--verbose",	VERBOSE,	false},
 # ifdef BONUS
-{'c', "--count",	COUNT,		true, "invalid option"},
-{'t', "--ttl",		TTL,		true, "unsupported packet type"},
-{'s', "--size",		SIZE,		true, "invalid option"},
+{'c', "--count",	COUNT,		true},
+{'t', "--ttl",		TTL,		true},
+{'s', "--size",		SIZE,		true},
 # endif
-{'\0', "\0",		NONE,		false, ""}
+{'\0', "\0",		NONE,		false}
 };
 
 static void	_parse_error_exit(t_parse_errs type, char *option, bool is_short)
@@ -53,12 +54,16 @@ static int	_parse_value(char *value, int idx)
 	if (!*value)
 		return (0);
 	ret = ft_atoi_check(value, &error);
-	if (error)
+	switch (g_options[idx].flag)
 	{
-		if (idx == -1)
-			error_exit("invalid value");
-		else
-			error_exit(g_options[idx].error_msg);
+		case SIZE:
+			if (error || ret < 0 || ICMP_MAX_PACKET_SIZE <= ret)
+				error_exit("option value too big");
+			break;
+		default:
+			if (error)
+				error_exit("invalid value");
+			break;
 	}
 	return (ret);
 }
@@ -133,14 +138,14 @@ static bool	_parse_long_option(char **av, t_args *args)
 	{
 		if (!g_options[idx].req_value)
 			_parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1, -1);
+		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1, idx);
 		return (false);
 	}
 	if (g_options[idx].req_value)
 	{
 		if (!av[1])
 			_parse_error_exit(MISSING, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(av[1], -1);
+		args->flags[flag] = _parse_value(av[1], idx);
 		return (true);
 	}
 	args->flags[flag] = 1;
