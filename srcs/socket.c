@@ -1,5 +1,6 @@
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,14 +40,29 @@ int create_raw_socket(void)
 	return (sfd);
 }
 
+char	*get_ip_addr(struct addrinfo *addr, char *ip)
+{
+	struct sockaddr_in const *addr_in;
+	const char	*ret;
+
+	addr_in = (struct sockaddr_in const *)addr->ai_addr;
+	ret = inet_ntop(AF_INET, &addr_in->sin_addr, ip, INET_ADDRSTRLEN);
+	if (!ret)
+		error_exit("inet_ntop error");
+	return (ip);
+}
+
 void	send_packet(struct addrinfo *addr, int sfd, char *msg, size_t len)
 {
-	int n;
+	static int	icmp_seq;
+	char	ip[INET_ADDRSTRLEN];
+	int		n;
 
-	printf("Sending packet...\n");
 	n = sendto(sfd, msg, len, 0, addr->ai_addr, addr->ai_addrlen);
 	if (n == -1)
 		error_exit("sendto error");
+	printf("%ld bytes from %s: ", len, get_ip_addr(addr, ip));
+	printf("icmp_seq=%d ttl=%d time=%d ms\n", icmp_seq++, 0, 0);
 }
 
 void	cleanup(struct addrinfo *addr, int sfd)
