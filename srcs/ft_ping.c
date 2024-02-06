@@ -18,6 +18,9 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
 # endif
 	printf("\n\
   -?, --help                 give this help list\n\n");
+	printf("Mandatory or optional arguments to long options are also mandatory or optional\n\
+for any corresponding short options.\n\n");
+	printf("Report bugs to: <htttps://github.com/mfunyu/ft_ping/issues>\n");
 }
 
 void	ft_ping(t_args *args)
