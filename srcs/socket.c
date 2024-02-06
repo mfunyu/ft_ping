@@ -9,9 +9,9 @@
 
 struct addrinfo	*host_to_addrinfo(char const *hostname)
 {
-	int s;
-	struct addrinfo *result;
-	struct addrinfo hints;
+	int				s;
+	struct addrinfo	*result;
+	struct addrinfo	hints;
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -26,31 +26,27 @@ struct addrinfo	*host_to_addrinfo(char const *hostname)
 		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
 		exit(EXIT_FAILURE);
 	}
-	printf("Family: %d\n", result->ai_family);
-	printf("Socktype: %d\n", result->ai_socktype);
-	printf("Protocol: %d\n", result->ai_protocol);
-	printf("Addr len: %d\n", result->ai_addrlen);
 	return (result);
 }
 
 int create_raw_socket(void)
 {
-	int sfd;
+	int	sfd;
 
-	sfd = socket(AF_INET, SOCK_DGRAM, IPPROTO_ICMP);
+	sfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (sfd == -1)
-		error_exit("socket");
+		error_exit("socket error");
 	return (sfd);
 }
 
-void	send_packet(struct addrinfo *addr, int sfd)
+void	send_packet(struct addrinfo *addr, int sfd, t_icmp_header *msg)
 {
 	int n;
 
 	printf("Sending packet...\n");
-	n = sendto(sfd, "hello", 5, 0, addr->ai_addr, addr->ai_addrlen);
+	n = sendto(sfd, (char *)msg, , 0, addr->ai_addr, addr->ai_addrlen);
 	if (n == -1)
-		error_exit("sendto");
+		error_exit("sendto error");
 }
 
 void	cleanup(struct addrinfo *addr, int sfd)

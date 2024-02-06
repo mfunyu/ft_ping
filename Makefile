@@ -3,7 +3,7 @@ NAME	:= ft_ping
 SRCS	:= ft_ping.c \
 			parser.c \
 			error.c \
-			dns.c
+			socket.c
 
 # ---------------------------------------------------------------------------- #
 #                                     PATHS                                    #
