@@ -2,6 +2,8 @@
 # define FT_PING_H
 
 # include "parser.h"
+# include <stdint.h>
+# include <stddef.h>
 
 # define ICMP_ECHO_REQUEST		8
 # define ICMP_ECHO_REPLY		0
@@ -29,9 +31,11 @@ typedef struct  s_icmp_header
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
 
+void	icmp_echo_request_message(char *msg, size_t len);
+
 struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);
-void			send_packet(struct addrinfo *addr, int sfd);
+void			send_packet(struct addrinfo *addr, int sfd, char *msg, size_t len);
 void			cleanup(struct addrinfo *addr, int sfd);
 
 #endif /* FT_PING_H */

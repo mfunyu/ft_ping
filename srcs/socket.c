@@ -39,12 +39,12 @@ int create_raw_socket(void)
 	return (sfd);
 }
 
-void	send_packet(struct addrinfo *addr, int sfd, t_icmp_header *msg)
+void	send_packet(struct addrinfo *addr, int sfd, char *msg, size_t len)
 {
 	int n;
 
 	printf("Sending packet...\n");
-	n = sendto(sfd, (char *)msg, , 0, addr->ai_addr, addr->ai_addrlen);
+	n = sendto(sfd, msg, len, 0, addr->ai_addr, addr->ai_addrlen);
 	if (n == -1)
 		error_exit("sendto error");
 }
