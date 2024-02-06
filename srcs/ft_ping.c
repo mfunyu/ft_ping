@@ -27,13 +27,17 @@ void	ft_ping(t_args *args)
 {
 	struct addrinfo	*addr;
 	int				sfd;
-	char			msg[64];
+	size_t			size;
+	char			msg[ICMP_MAX_PACKET_SIZE];
 
 	addr = host_to_addrinfo(args->params[0]);
 	sfd = create_raw_socket();
 
-	icmp_echo_request_message(msg, 64);
-	send_packet(addr, sfd, msg, 64);
+	size = ICMP_DEFAULT_PACKET_SIZE;
+	if (args->flags[SIZE])
+		size = args->flags[SIZE];
+	icmp_echo_request_message(msg, size);
+	send_packet(addr, sfd, msg, size);
 
 	cleanup(addr, sfd);
 }

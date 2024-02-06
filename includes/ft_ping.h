@@ -7,6 +7,8 @@
 
 # define ICMP_ECHO_REQUEST		8
 # define ICMP_ECHO_REPLY		0
+
+# define ICMP_DEFAULT_PACKET_SIZE	64
 # define ICMP_MAX_PACKET_SIZE		65400
 
 /*
