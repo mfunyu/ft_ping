@@ -39,6 +39,7 @@ void	ft_ping(t_args *args)
 	icmp_echo_request_message(msg, size);
 	send_packet(addr, sfd, msg, size);
 
+	receive_packet(sfd);
 	cleanup(addr, sfd);
 }
 

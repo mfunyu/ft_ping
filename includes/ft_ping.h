@@ -39,6 +39,7 @@ void	icmp_echo_request_message(char *msg, size_t len);
 struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);
 void			send_packet(struct addrinfo *addr, int sfd, char *msg, size_t len);
+void			receive_packet(int sfd);
 void			cleanup(struct addrinfo *addr, int sfd);
 
 #endif /* FT_PING_H */
