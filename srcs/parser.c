@@ -13,6 +13,7 @@ static t_options	g_options[] = {
 # ifdef BONUS
 {'c', "--count",	COUNT,		true, "invalid option"},
 {'t', "--ttl",		TTL,		true, "unsupported packet type"},
+{'s', "--size",		SIZE,		true, "invalid option"},
 # endif
 {'\0', "\0",		NONE,		false, ""}
 };

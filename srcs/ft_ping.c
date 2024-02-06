@@ -6,13 +6,15 @@ void	help(void)
 {
 	printf("Usage: ./ft_ping [OPTION...] HOST ...\n\
 Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
-	printf(" Options valid for all request types:\n\
+	printf(" Options valid:\n\
   -v, --verbose              verbose output\n");
 # ifdef BONUS
 	printf("\
   -c, --count=NUMBER         stop after sending NUMBER packets\n");
 	printf("\
   -t, --ttl=N                specify N as time-to-live\n");
+	printf("\
+  -s, --size=NUMBER          send NUMBER data octets\n");
 # endif
 	printf("\n\
   -?, --help                 give this help list\n\n");

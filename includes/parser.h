@@ -11,6 +11,7 @@ typedef enum	e_flags
 # ifdef BONUS
 	COUNT,
 	TTL,
+	SIZE,
 # endif
 	TOTAL
 }				t_flags;
