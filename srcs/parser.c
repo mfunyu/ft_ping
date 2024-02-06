@@ -8,13 +8,13 @@
 #include <unistd.h>
 
 static t_options	g_options[] = {
-{'?', "--help",		HELP,		false},
-{'v', "--verbose",	VERBOSE,	false},
+{'?', "--help",		HELP,		false, ""},
+{'v', "--verbose",	VERBOSE,	false, ""},
 # ifdef BONUS
-{'c', "--count",	COUNT,		true},
-{'t', "--ttl",		TTL,		true},
+{'c', "--count",	COUNT,		true, "invalid option"},
+{'t', "--ttl",		TTL,		true, "unsupported packet type"},
 # endif
-{'\0', "\0",		NONE,		false}
+{'\0', "\0",		NONE,		false, ""}
 };
 
 static void	_parse_error_exit(t_parse_errs type, char *option, bool is_short)
@@ -44,7 +44,7 @@ static void	_parse_error_exit(t_parse_errs type, char *option, bool is_short)
 	error_exit_usage(NULL);
 }
 
-static int	_parse_value(char *value)
+static int	_parse_value(char *value, int idx)
 {
 	int	error;
 	int	ret;
@@ -53,7 +53,7 @@ static int	_parse_value(char *value)
 		return (0);
 	ret = ft_atoi_check(value, &error);
 	if (error)
-		error_exit("invalid value");
+		error_exit(g_options[idx].error_msg);
 	return (ret);
 }
 
@@ -99,12 +99,12 @@ static bool	_parse_short_option(char **av, t_args *args)
 		{
 			if (option[j + 1])
 			{
-				args->flags[flag] = _parse_value(option + j + 1);
+				args->flags[flag] = _parse_value(option + j + 1, idx);
 				return (false);
 			}
 			if (!av[1])
 				_parse_error_exit(MISSING, &g_options[idx].short_option, true);
-			args->flags[flag] = _parse_value(av[1]);
+			args->flags[flag] = _parse_value(av[1], idx);
 			return (true);
 		}
 		args->flags[flag] = 1;
@@ -127,14 +127,14 @@ static bool	_parse_long_option(char **av, t_args *args)
 	{
 		if (!g_options[idx].req_value)
 			_parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1);
+		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1, idx);
 		return (false);
 	}
 	if (g_options[idx].req_value)
 	{
 		if (!av[1])
 			_parse_error_exit(MISSING, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(av[1]);
+		args->flags[flag] = _parse_value(av[1], idx);
 		return (true);
 	}
 	args->flags[flag] = 1;
