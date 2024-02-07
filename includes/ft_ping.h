@@ -5,9 +5,6 @@
 # include <stdint.h>
 # include <stddef.h>
 
-# define ICMP_ECHO_REQUEST		8
-# define ICMP_ECHO_REPLY		0
-
 # define ICMP_DEFAULT_PACKET_SIZE	64
 # define ICMP_MAX_PACKET_SIZE		65400
 
@@ -21,15 +18,6 @@
 **    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 **    |     Data ...
 */
-
-typedef struct  s_icmp_header
-{
-	uint8_t		type; // 8
-	uint8_t		code; // 16
-	uint16_t	checksum; // 32
-	uint16_t	identifier; // 48
-	uint16_t	sequence_number; // 64 ( 8 bytes )
-}				t_icmp_header;
 
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);

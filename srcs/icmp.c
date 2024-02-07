@@ -1,6 +1,7 @@
 #include "ft_ping.h"
 #include "libft.h"
 #include <stdio.h>
+#include <netinet/ip_icmp.h>
 
 uint16_t	icmp_calc_checksum(char *msg, size_t len)
 {
@@ -23,7 +24,7 @@ void	icmp_add_data(char *msg, size_t len)
 {
 	size_t	i;
 
-	i = sizeof(t_icmp_header);
+	i = sizeof(struct icmphdr);
 	while (i < len)
 	{
 		msg[i] = '*';
@@ -33,17 +34,17 @@ void	icmp_add_data(char *msg, size_t len)
 
 void	icmp_resuqest_print(char *msg, size_t len)
 {
-	t_icmp_header	*header;
+	struct icmphdr	*header;
 	size_t			i;
 
-	header = (t_icmp_header *)msg;
+	header = (struct icmphdr *)msg;
 	printf("type: %02x\n", header->type);
 	printf("code: %02x\n", header->code);
 	printf("checksum: %04x\n", header->checksum);
-	printf("identifier: %04x\n", header->identifier);
-	printf("sequence_number: %04x\n", header->sequence_number);
+	printf("un.echo.id: %04x\n", header->un.echo.id);
+	printf("un.echo.sequence: %04x\n", header->un.echo.sequence);
 	printf("data: ");
-	i = sizeof(t_icmp_header);
+	i = sizeof(struct icmphdr);
 	while (i < len)
 	{
 		printf("%c", msg[i]);
@@ -61,13 +62,13 @@ void	icmp_resuqest_print(char *msg, size_t len)
 
 void	icmp_echo_request_message(char *msg, size_t len)
 {
-	t_icmp_header	header;
+	struct icmphdr	header;
 
-	header.type = ICMP_ECHO_REQUEST;
+	header.type = ICMP_ECHO;
 	header.code = 0;
 	header.checksum = 0;
-	header.identifier = 0;
-	header.sequence_number = 0;
+	header.un.echo.id = 0;
+	header.un.echo.sequence = 0;
 
 	ft_memcpy(msg, &header, sizeof(header));
 	icmp_add_data(msg, len);
