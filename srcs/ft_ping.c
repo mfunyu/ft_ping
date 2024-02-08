@@ -1,6 +1,8 @@
 #include "ft_ping.h"
 #include "error.h"
 #include <stdio.h>
+#include <unistd.h>
+#include <netinet/ip_icmp.h>
 
 void	help(void)
 {
@@ -25,22 +27,19 @@ for any corresponding short options.\n\n");
 
 void	ft_ping(t_args *args)
 {
-	struct addrinfo	*addr;
 	int				sfd;
-	size_t			size;
-	char			msg[ICMP_MAX_PACKET_SIZE];
+	t_icmp_send		send;
 
-	addr = host_to_addrinfo(args->params[0]);
 	sfd = create_raw_socket();
 
-	size = ICMP_DEFAULT_PACKET_SIZE;
-	if (args->flags[SIZE])
-		size = args->flags[SIZE] + sizeof(struct icmphdr);
-	icmp_echo_request_message(msg, size);
-	send_packet(addr, sfd, msg, size);
+	init_send(&send, args);
+	for(;;){
+		handle_send(sfd, &send);
 
-	receive_packet(sfd);
-	cleanup(addr, sfd);
+		handle_recv(sfd);
+		usleep(1000000);
+	}
+	cleanup(send.addr, sfd);
 }
 
 int	main(int ac, char **av)
