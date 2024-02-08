@@ -68,6 +68,7 @@ void	send_packet(struct addrinfo *addr, int sfd, char *msg, size_t len)
 void	receive_packet(int sfd)
 {
 	char		buf[1024];
+	char		addrbuf[1024];
 	struct msghdr	msg;
 	struct iovec	iov;
 	ssize_t			ret;
@@ -80,9 +81,12 @@ void	receive_packet(int sfd)
 	iov.iov_len = 1024;
 	msg.msg_iov = &iov;
 	msg.msg_iovlen = 1;
+	msg.msg_name = addrbuf;
+	msg.msg_namelen = sizeof(addrbuf);
+
 	ret = recvmsg(sfd, &msg, MSG_DONTWAIT);
 	if (ret == -1)
-		error_exit("recvmsg error");
+		printf("recvmsg error");
 	printf("received %ld bytes\n", ret);
 }
 
