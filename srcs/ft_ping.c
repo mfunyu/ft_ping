@@ -35,7 +35,7 @@ void	ft_ping(t_args *args)
 
 	size = ICMP_DEFAULT_PACKET_SIZE;
 	if (args->flags[SIZE])
-		size = args->flags[SIZE];
+		size = args->flags[SIZE] + sizeof(struct icmphdr);
 	icmp_echo_request_message(msg, size);
 	send_packet(addr, sfd, msg, size);
 

@@ -7,23 +7,16 @@ uint16_t	icmp_calc_checksum(char *msg, size_t len)
 {
 	size_t		i;
 	uint32_t	sum;
-	uint16_t	word;
+	uint16_t	*words;
 
 	i = 0;
 	sum = 0;
-	while (i < len)
-	{
-		word = msg[i];
-		word += msg[i + 1] << 8;
-		sum += word;
-		sum = (sum & 0xffff) + (sum >> 16);
-		printf("msg[%ld]: %02x, ", i, msg[i]);
-		printf("word: %04x, ", word);
-		printf("sum: %x\n", sum);
-		i += 2;
-	}
+	words = (uint16_t *)msg;
+	while (i < len / 2)
+		sum += words[i++];
 	if (len % 2)
-		sum += (uint16_t)msg[len - 1] << 8;
+		sum += words[len / 2];
+	sum = (sum & 0xffff) + (sum >> 16);
 	return (~sum);
 }
 
