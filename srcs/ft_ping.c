@@ -36,7 +36,8 @@ void	ft_ping(t_args *args)
 	for(;;){
 		handle_send(sfd, &send);
 
-		handle_recv(sfd);
+		handle_recv(sfd, &send);
+
 		usleep(1000000);
 	}
 	cleanup(send.addr, sfd);

@@ -22,8 +22,10 @@
 
 typedef struct	s_icmp_send
 {
-	size_t			len;
+	int				len;
 	struct addrinfo	*addr;
+	int				seq;
+	struct timeval	tv;
 	char			msg[ICMP_MAX_PACKET_SIZE];
 	char			ip[INET_ADDRSTRLEN];
 }				t_icmp_send;
@@ -32,14 +34,13 @@ void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
 void	init_send(t_icmp_send *send, t_args *args);
 
-void	handle_recv(int sfd);
 void	handle_send(int sfd, t_icmp_send *send);
+void	handle_recv(int sfd, t_icmp_send *send);
 
 void	icmp_echo_request_message(char *msg, size_t len);
 
 struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);
-void			receive_packet(int sfd);
 void			cleanup(struct addrinfo *addr, int sfd);
 
 #endif /* FT_PING_H */
