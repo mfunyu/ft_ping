@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include "ft_ping.h"
 #include "error.h"
+#include <errno.h>
 
 static void	_print_icmp_error()
 {
@@ -12,29 +13,32 @@ static void	_print_icmp_error()
 	return ;
 }
 
-int	receive_packet(int sfd)
+int	receive_packet(int sfd, struct msghdr *msg)
 {
 	char		buf[1024];
 	char		addrbuf[1024];
-	struct msghdr	msg;
 	struct iovec	iov;
 	ssize_t			ret;
 
-	memset(&msg, 0, sizeof(msg));
+	memset(msg, 0, sizeof(*msg));
 	iov.iov_base = buf;
 	iov.iov_len = 1024;
-	msg.msg_iov = &iov;
-	msg.msg_iovlen = 1;
-	msg.msg_name = addrbuf;
-	msg.msg_namelen = sizeof(addrbuf);
+	msg->msg_iov = &iov;
+	msg->msg_iovlen = 1;
+	msg->msg_name = addrbuf;
+	msg->msg_namelen = sizeof(addrbuf);
 
-	ret = recvmsg(sfd, &msg, MSG_DONTWAIT);
-	if (ret == -1)
+	ret = recvmsg(sfd, msg, MSG_DONTWAIT);
+	if (ret < 0)
 	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return (-1);
+		else
+			error_exit("recvmsg error");
 		return (-1);
 	}
 	printf("received %ld bytes\n", ret);
-	return (0);
+	return (ret);
 }
 
 static void	_print_timetrip(struct timeval *tv_start, struct timeval *tv_end)
@@ -59,12 +63,14 @@ void	handle_recv(int sfd, t_icmp_send *send)
 {
 	int				ret;
 	struct timeval	tv;
+	struct msghdr	msg;
 
 	while (1)
 	{
-		ret = receive_packet(sfd);
+		ret = receive_packet(sfd, &msg);
 		if (ret >= 0)
 		{
+			// TOD: print something
 			if (gettimeofday(&tv, NULL))
 				error_exit("gettimeofday error");
 			_print_stats(send, &tv);
