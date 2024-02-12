@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <netinet/ip_icmp.h>
+#include <sys/time.h>
 
 void	help(void)
 {
@@ -25,20 +26,40 @@ for any corresponding short options.\n\n");
 	printf("Report bugs to: <htttps://github.com/mfunyu/ft_ping/issues>\n");
 }
 
+void	wait_max_one_sec(struct timeval *tv)
+{
+	struct timeval	now;
+	ssize_t			timepassed;
+
+	if (gettimeofday(&now, NULL))
+		error_exit("gettimeofday");
+
+	timepassed = now.tv_sec * 1000 * 1000 + now.tv_usec;
+	timepassed -= tv->tv_sec * 1000 * 1000 + tv->tv_usec;
+	if (timepassed >= 1000 * 1000)
+		return;
+	printf("%zu\n", 1000 * 1000 - timepassed);
+	usleep(1000 * 1000 - timepassed);
+}
+
 void	ft_ping(t_args *args)
 {
 	int				sfd;
 	t_icmp_send		send;
+	struct timeval	tv;
 
 	sfd = create_raw_socket();
 
 	init_send(&send, args);
 	for(;;){
+		if (gettimeofday(&tv, NULL))
+			error_exit("gettimeofday");
+
 		handle_send(sfd, &send);
 
 		handle_recv(sfd, &send);
 
-		usleep(1000000);
+		wait_max_one_sec(&tv);
 	}
 	cleanup(send.addr, sfd);
 }
