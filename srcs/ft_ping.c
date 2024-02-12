@@ -2,6 +2,7 @@
 #include "error.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <netinet/ip_icmp.h>
 #include <sys/time.h>
 
@@ -65,21 +66,26 @@ void	ft_ping(t_args *args)
 	cleanup(send.addr, sfd);
 }
 
+void	check_arguments(t_args *args, int ac, char **av)
+{
+	if (ac <= 1)
+		error_exit_usage("missing host operand");
+	parse_args(args, ac, av);
+	if (args->flags[HELP])
+	{
+		help();
+		exit(EXIT_SUCCESS);
+	}
+	if (!args->params[0])
+		error_exit_usage("missing host operand");
+	//print_args(args);
+}
+
 int	main(int ac, char **av)
 {
 	t_args	args = {0};
 
-	if (ac <= 1)
-		error_exit_usage("missing host operand");
-	parse_args(&args, ac, av);
-	if (args.flags[HELP])
-	{
-		help();
-		return (0);
-	}
-	if (!args.params[0])
-		error_exit_usage("missing host operand");
-	//print_args(args);
+	check_arguments(&args, ac, av);
 	ft_ping(&args);
 	return (0);
 }
