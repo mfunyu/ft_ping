@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <netinet/ip_icmp.h>
 #include "ft_ping.h"
+#include "error.h"
 
 void	print_icmp_error()
 {
@@ -21,23 +22,29 @@ static void	_print_timetrip(struct timeval *tv_start, struct timeval *tv_end)
 	printf(" time=%ld,%03ld ms", triptime / 1000, triptime % 1000);
 }
 
-void	print_stats(t_icmp_send *send, struct timeval *tv)
+static void	_print_stats(t_icmp_send *send, struct timeval *tv)
 {
-	printf("%d bytes from %s: icmp_seq=%d", send->len, send->ip, send->seq++);
+	printf(" icmp_seq=%d", send->seq++);
 	printf(" ttl=%d", 0);
 	_print_timetrip(&(send->tv), tv);
-	printf("\n");
 }
 
-void	print_recv(ssize_t ret, struct msghdr *msg)
+void	print_recv(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
 {
+	struct timeval tv;
+	if (gettimeofday(&tv, NULL))
+		error_exit("gettimeofday error");
 	(void)msg;
+
+	printf("%d bytes from %s:", send->len, send->ip);
 	switch (ret)
 	{
 		case -1:
 			printf("timeout\n");
 			break;
 		default:
-			printf("received %ld bytes\n", ret);
+			_print_stats(send, &tv);
+			printf(" (received %ld bytes)", ret);
 	}
+	printf("\n");
 }

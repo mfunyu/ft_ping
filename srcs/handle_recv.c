@@ -4,7 +4,20 @@
 #include "ft_ping.h"
 #include "error.h"
 #include <errno.h>
+#include <stdio.h>
 #include "print.h"
+
+void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
+{
+	char *buf = msg->msg_iov->iov_base;
+
+	printf("addrbuf: %s\n", buf);
+	struct icmphdr *hdr;
+
+	hdr = (struct icmphdr *)(buf + 8);
+	printf("type: %02x\n", hdr->type);
+	print_recv(ret, msg, send);
+}
 
 int	receive_packet(int sfd, struct msghdr *msg)
 {
@@ -22,31 +35,25 @@ int	receive_packet(int sfd, struct msghdr *msg)
 	msg->msg_namelen = sizeof(addrbuf);
 
 	ret = recvmsg(sfd, msg, 0);
-	if (ret < 0)
-	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			return (-1);
-		else
-			error_exit("recvmsg error");
-		return (-1);
-	}
-	print_recv(ret, msg);
 	return (ret);
 }
 
 void	handle_recv(int sfd, t_icmp_send *send)
 {
 	int				ret;
-	struct timeval	tv;
 	struct msghdr	msg;
 
 	ret = receive_packet(sfd, &msg);
 	if (ret > 0)
 	{
-		// TOD: print something
-		if (gettimeofday(&tv, NULL))
-			error_exit("gettimeofday error");
-		print_stats(send, &tv);
+		analyse_packet(ret, &msg, send);
 		return ;
+	}
+	if (ret < 0)
+	{
+		if (errno == EAGAIN || errno == EWOULDBLOCK)
+			return ;
+		else
+			error_exit("recvmsg error");
 	}
 }
