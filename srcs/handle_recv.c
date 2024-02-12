@@ -10,7 +10,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_recv *recv)
+bool	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_recv *recv)
 {
 	struct icmphdr		*hdr;
 	struct sockaddr_in	*src_addr;
@@ -18,17 +18,19 @@ void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_recv *recv)
 
 	content = msg->msg_iov->iov_base;
 	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
+	recv->type = hdr->type;
+	if (recv->type == ICMP_ECHO)
+		return (false);
+
 	src_addr = (struct sockaddr_in*)msg->msg_name;
 
 	recv->len = ret - sizeof(struct iphdr);
 	memcpy(recv->ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
 	getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv->host, INET_ADDRSTRLEN, NULL, 0, 0);
-	recv->type = hdr->type;
 
 	printf("type: %d ", recv->type);
 	printf("ip: %s ", recv->ip);
-	printf("seq: %d\n", recv->seq);
-	print_recv(msg, recv);
+	return (true);
 }
 
 int	receive_packet(int sfd, struct msghdr *msg)
@@ -61,9 +63,11 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	{
 		if (gettimeofday(&(recv.tv), NULL))
 			error_exit("gettimeofday error");
+		if (!analyse_packet(ret, &msg, &recv))
+			return ;
 		recv.seq = send->seq++;
 		recv.tv_ret = send->tv;
-		analyse_packet(ret, &msg, &recv);
+		print_recv(&msg, &recv);
 		return ;
 	}
 	if (ret < 0)
