@@ -13,10 +13,10 @@ void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
 
 	printf("addrbuf: %s\n", buf);
 	struct icmphdr *hdr;
-
-	hdr = (struct icmphdr *)(buf + 8);
+	hdr = (struct icmphdr *)(buf + 20);
 	printf("type: %02x\n", hdr->type);
-	print_recv(ret, msg, send);
+
+	print_recv(hdr->type, msg, send);
 }
 
 int	receive_packet(int sfd, struct msghdr *msg)

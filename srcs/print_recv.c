@@ -24,27 +24,27 @@ static void	_print_timetrip(struct timeval *tv_start, struct timeval *tv_end)
 
 static void	_print_stats(t_icmp_send *send, struct timeval *tv)
 {
-	printf(" icmp_seq=%d", send->seq++);
+	printf(": icmp_seq=%d", send->seq++);
 	printf(" ttl=%d", 0);
 	_print_timetrip(&(send->tv), tv);
 }
 
-void	print_recv(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
+void	print_recv(ssize_t type, struct msghdr *msg, t_icmp_send *send)
 {
 	struct timeval tv;
 	if (gettimeofday(&tv, NULL))
 		error_exit("gettimeofday error");
 	(void)msg;
 
-	printf("%d bytes from %s:", send->len, send->ip);
-	switch (ret)
+	printf("%d bytes from %s", send->len, send->ip);
+	switch (type)
 	{
-		case -1:
-			printf("timeout\n");
+		case ICMP_TIME_EXCEEDED:
+			printf(": Time to live exceeded");
 			break;
 		default:
+			printf("type: %ld\n", type);
 			_print_stats(send, &tv);
-			printf(" (received %ld bytes)", ret);
 	}
 	printf("\n");
 }
