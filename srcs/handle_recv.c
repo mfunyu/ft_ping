@@ -8,6 +8,7 @@
 #include "print.h"
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <netdb.h>
 
 void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
 {
@@ -17,18 +18,18 @@ void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
 	char				*content;
 
 	content = msg->msg_iov->iov_base;
-	src_addr = (struct sockaddr_in*)msg->msg_name;
 	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
+	src_addr = (struct sockaddr_in*)msg->msg_name;
 
-	recv.len = ret;
+	recv.len = ret - sizeof(struct iphdr);
 	memcpy(recv.ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
-	recv.host = "localhost";
+	getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv.host, INET_ADDRSTRLEN, NULL, 0, 0);
 	recv.seq = send->seq++;
 	recv.type = hdr->type;
 	recv.tv = send->tv;
 
-	printf("type: %d\n", recv.type);
-	printf("ip: %s\n", recv.ip);
+	printf("type: %d ", recv.type);
+	printf("ip: %s ", recv.ip);
 	printf("seq: %d\n", recv.seq);
 	print_recv(msg, &recv);
 }

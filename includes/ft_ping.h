@@ -4,6 +4,7 @@
 # include "parser.h"
 # include <stdint.h>
 # include <stddef.h>
+# include <limits.h>
 # include <netinet/ip_icmp.h>
 
 # define ICMP_DEFAULT_PACKET_SIZE	64
@@ -51,7 +52,7 @@ typedef struct	s_icmp_recv
 {
 	struct timeval	tv_ret;
 	struct timeval	tv;
-	char			*host;
+	char			host[HOST_NAME_MAX];
 	char			ip[INET_ADDRSTRLEN];
 	int				seq;
 	int				len;
