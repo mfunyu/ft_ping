@@ -7,7 +7,8 @@ SRCS	:= ft_ping.c \
 			socket.c \
 			handle_recv.c \
 			handle_send.c \
-			init.c
+			init.c \
+			print_recv.c
 
 # ---------------------------------------------------------------------------- #
 #                                     PATHS                                    #

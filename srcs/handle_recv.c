@@ -1,17 +1,10 @@
-#include <stdio.h>
 #include <string.h>
 #include <netinet/ip_icmp.h>
 #include <sys/time.h>
 #include "ft_ping.h"
 #include "error.h"
 #include <errno.h>
-
-static void	_print_icmp_error()
-{
-	printf("IP Hdr Dump:\n");
-	// TODO: print ip header dump
-	return ;
-}
+#include "print.h"
 
 int	receive_packet(int sfd, struct msghdr *msg)
 {
@@ -37,26 +30,8 @@ int	receive_packet(int sfd, struct msghdr *msg)
 			error_exit("recvmsg error");
 		return (-1);
 	}
-	printf("received %ld bytes\n", ret);
+	print_recv(ret, msg);
 	return (ret);
-}
-
-static void	_print_timetrip(struct timeval *tv_start, struct timeval *tv_end)
-{
-	size_t	triptime;
-
-	triptime = (tv_end->tv_sec - tv_start->tv_sec) * 1000 * 1000;
-	triptime += tv_end->tv_usec - tv_start->tv_usec;
-
-	printf(" time=%ld,%03ld ms", triptime / 1000, triptime % 1000);
-}
-
-static void	_print_stats(t_icmp_send *send, struct timeval *tv)
-{
-	printf("%d bytes from %s: icmp_seq=%d", send->len, send->ip, send->seq++);
-	printf(" ttl=%d", 0);
-	_print_timetrip(&(send->tv), tv);
-	printf("\n");
 }
 
 void	handle_recv(int sfd, t_icmp_send *send)
@@ -66,13 +41,12 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	struct msghdr	msg;
 
 	ret = receive_packet(sfd, &msg);
-	if (ret >= 0)
+	if (ret > 0)
 	{
 		// TOD: print something
 		if (gettimeofday(&tv, NULL))
 			error_exit("gettimeofday error");
-		_print_stats(send, &tv);
+		print_stats(send, &tv);
 		return ;
 	}
-	_print_icmp_error();
 }
