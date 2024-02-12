@@ -39,13 +39,18 @@ void	print_recv(struct msghdr *msg, t_icmp_recv *recv)
 	printf("%d bytes from", recv->len);
 	switch (recv->type)
 	{
+		case ICMP_ECHOREPLY:
+			printf(" %s", recv->ip);
+			_print_stats(recv, &tv);
+			break;
+		case ICMP_DEST_UNREACH:
+			printf(" %s (%s)", recv->host, recv->ip);
+			printf(": Destination Host Unreachable");
+			break;
 		case ICMP_TIME_EXCEEDED:
 			printf(" %s (%s)", recv->host, recv->ip);
 			printf(": Time to live exceeded");
 			break;
-		default:
-			printf(" %s", recv->ip);
-			_print_stats(recv, &tv);
 	}
 	printf("\n");
 }
