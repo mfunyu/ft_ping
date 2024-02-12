@@ -74,5 +74,5 @@ void	icmp_echo_request_message(char *msg, size_t len)
 	icmp_add_data(msg, len);
 	header.checksum = icmp_calc_checksum(msg, len);
 	ft_memcpy(msg, &header, sizeof(header));
-	icmp_resuqest_print(msg, len);
+	//icmp_resuqest_print(msg, len);
 }

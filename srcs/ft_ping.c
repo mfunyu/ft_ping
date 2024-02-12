@@ -38,7 +38,6 @@ void	wait_max_one_sec(struct timeval *tv)
 	timepassed -= tv->tv_sec * 1000 * 1000 + tv->tv_usec;
 	if (timepassed >= 1000 * 1000)
 		return;
-	printf("%zu\n", 1000 * 1000 - timepassed);
 	usleep(1000 * 1000 - timepassed);
 }
 
@@ -80,7 +79,7 @@ int	main(int ac, char **av)
 	}
 	if (!args.params[0])
 		error_exit_usage("missing host operand");
-	print_args(args);
+	//print_args(args);
 	ft_ping(&args);
 	return (0);
 }

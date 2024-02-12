@@ -10,10 +10,9 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
+void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_recv *recv)
 {
 	struct icmphdr		*hdr;
-	t_icmp_recv			recv;
 	struct sockaddr_in	*src_addr;
 	char				*content;
 
@@ -21,17 +20,15 @@ void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
 	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
 	src_addr = (struct sockaddr_in*)msg->msg_name;
 
-	recv.len = ret - sizeof(struct iphdr);
-	memcpy(recv.ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
-	getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv.host, INET_ADDRSTRLEN, NULL, 0, 0);
-	recv.seq = send->seq++;
-	recv.type = hdr->type;
-	recv.tv = send->tv;
+	recv->len = ret - sizeof(struct iphdr);
+	memcpy(recv->ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
+	getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv->host, INET_ADDRSTRLEN, NULL, 0, 0);
+	recv->type = hdr->type;
 
-	printf("type: %d ", recv.type);
-	printf("ip: %s ", recv.ip);
-	printf("seq: %d\n", recv.seq);
-	print_recv(msg, &recv);
+	printf("type: %d ", recv->type);
+	printf("ip: %s ", recv->ip);
+	printf("seq: %d\n", recv->seq);
+	print_recv(msg, recv);
 }
 
 int	receive_packet(int sfd, struct msghdr *msg)
@@ -57,11 +54,14 @@ void	handle_recv(int sfd, t_icmp_send *send)
 {
 	int				ret;
 	struct msghdr	msg;
+	t_icmp_recv		recv;
 
 	ret = receive_packet(sfd, &msg);
 	if (ret > 0)
 	{
-		analyse_packet(ret, &msg, send);
+		recv.seq = send->seq++;
+		recv.tv = send->tv;
+		analyse_packet(ret, &msg, &recv);
 		return ;
 	}
 	if (ret < 0)
