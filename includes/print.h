@@ -1,6 +1,6 @@
 #ifndef PRINT_H
 # define PRINT_H
 
-void	print_recv(ssize_t ret, struct msghdr *msg, t_icmp_send *send);
+void	print_recv(struct msghdr *msg, t_icmp_recv *recv);
 
 #endif /* PRINT_H */

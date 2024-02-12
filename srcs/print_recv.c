@@ -22,29 +22,30 @@ static void	_print_timetrip(struct timeval *tv_start, struct timeval *tv_end)
 	printf(" time=%ld,%03ld ms", triptime / 1000, triptime % 1000);
 }
 
-static void	_print_stats(t_icmp_send *send, struct timeval *tv)
+static void	_print_stats(t_icmp_recv *recv, struct timeval *tv)
 {
-	printf(": icmp_seq=%d", send->seq++);
+	printf(": icmp_seq=%d", recv->seq);
 	printf(" ttl=%d", 0);
-	_print_timetrip(&(send->tv), tv);
+	_print_timetrip(&(recv->tv), tv);
 }
 
-void	print_recv(ssize_t type, struct msghdr *msg, t_icmp_send *send)
+void	print_recv(struct msghdr *msg, t_icmp_recv *recv)
 {
 	struct timeval tv;
 	if (gettimeofday(&tv, NULL))
 		error_exit("gettimeofday error");
 	(void)msg;
 
-	printf("%d bytes from %s", send->len, send->ip);
-	switch (type)
+	printf("%d bytes from", recv->len);
+	switch (recv->type)
 	{
 		case ICMP_TIME_EXCEEDED:
+			printf(" %s (%s)", recv->host, recv->ip);
 			printf(": Time to live exceeded");
 			break;
 		default:
-			printf("type: %ld\n", type);
-			_print_stats(send, &tv);
+			printf(" %s", recv->ip);
+			_print_stats(recv, &tv);
 	}
 	printf("\n");
 }

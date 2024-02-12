@@ -11,16 +11,26 @@
 
 void	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_send *send)
 {
-	char *buf = msg->msg_iov->iov_base;
+	struct icmphdr		*hdr;
+	t_icmp_recv			recv;
+	struct sockaddr_in	*src_addr;
+	char				*content;
 
-	printf("addrbuf: %s\n", buf);
-	(void)ret;
-	struct icmphdr *hdr;
-	hdr = (struct icmphdr *)(buf + sizeof(struct iphdr));
-	printf("type: %02x\n", hdr->type);
-	printf("msg %s\n", inet_ntoa(((struct sockaddr_in*)msg->msg_name)->sin_addr));
+	content = msg->msg_iov->iov_base;
+	src_addr = (struct sockaddr_in*)msg->msg_name;
+	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
 
-	print_recv(hdr->type, msg, send);
+	recv.len = ret;
+	memcpy(recv.ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
+	recv.host = "localhost";
+	recv.seq = send->seq++;
+	recv.type = hdr->type;
+	recv.tv = send->tv;
+
+	printf("type: %d\n", recv.type);
+	printf("ip: %s\n", recv.ip);
+	printf("seq: %d\n", recv.seq);
+	print_recv(msg, &recv);
 }
 
 int	receive_packet(int sfd, struct msghdr *msg)

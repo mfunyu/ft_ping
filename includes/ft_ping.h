@@ -20,6 +20,23 @@
 **    |     Data ...
 */
 
+/*
+** struct icmphdr
+** {
+**   u_int8_t type;                // message type
+**   u_int8_t code;                // type sub-code
+**   u_int16_t checksum;
+**   union
+**   {
+**     struct
+**     {
+**       u_int16_t        id;
+**       u_int16_t        sequence;
+**     } echo;                        // echo datagram
+**   } un;
+** };
+*/
+
 typedef struct	s_icmp_send
 {
 	int				len;
@@ -29,6 +46,18 @@ typedef struct	s_icmp_send
 	char			msg[ICMP_MAX_PACKET_SIZE];
 	char			ip[INET_ADDRSTRLEN];
 }				t_icmp_send;
+
+typedef struct	s_icmp_recv
+{
+	struct timeval	tv_ret;
+	struct timeval	tv;
+	char			*host;
+	char			ip[INET_ADDRSTRLEN];
+	int				seq;
+	int				len;
+	int				type;
+
+}				t_icmp_recv;
 
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
