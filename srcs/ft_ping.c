@@ -52,6 +52,7 @@ void	ft_ping(t_args *args)
 
 	init_send(&send, args);
 	init_recv(sfd);
+	printf("PING %s (%s) %ld data bytes\n", args->params[0], send.ip, send.len - sizeof(struct icmphdr));
 	for(;;){
 		if (gettimeofday(&tv, NULL))
 			error_exit("gettimeofday");
