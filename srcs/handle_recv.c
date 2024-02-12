@@ -59,8 +59,10 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	ret = receive_packet(sfd, &msg);
 	if (ret > 0)
 	{
+		if (gettimeofday(&(recv.tv), NULL))
+			error_exit("gettimeofday error");
 		recv.seq = send->seq++;
-		recv.tv = send->tv;
+		recv.tv_ret = send->tv;
 		analyse_packet(ret, &msg, &recv);
 		return ;
 	}

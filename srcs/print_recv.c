@@ -22,18 +22,15 @@ static void	_print_timetrip(struct timeval *tv_start, struct timeval *tv_end)
 	printf(" time=%ld,%03ld ms", triptime / 1000, triptime % 1000);
 }
 
-static void	_print_stats(t_icmp_recv *recv, struct timeval *tv)
+static void	_print_stats(t_icmp_recv *recv)
 {
 	printf(": icmp_seq=%d", recv->seq);
 	printf(" ttl=%d", 0);
-	_print_timetrip(&(recv->tv), tv);
+	_print_timetrip(&(recv->tv_ret), &(recv->tv));
 }
 
 void	print_recv(struct msghdr *msg, t_icmp_recv *recv)
 {
-	struct timeval tv;
-	if (gettimeofday(&tv, NULL))
-		error_exit("gettimeofday error");
 	(void)msg;
 
 	printf("%d bytes from", recv->len);
@@ -41,7 +38,7 @@ void	print_recv(struct msghdr *msg, t_icmp_recv *recv)
 	{
 		case ICMP_ECHOREPLY:
 			printf(" %s", recv->ip);
-			_print_stats(recv, &tv);
+			_print_stats(recv);
 			break;
 		case ICMP_DEST_UNREACH:
 			printf(" %s (%s)", recv->host, recv->ip);
