@@ -28,7 +28,7 @@ int	receive_packet(int sfd, struct msghdr *msg)
 	msg->msg_name = addrbuf;
 	msg->msg_namelen = sizeof(addrbuf);
 
-	ret = recvmsg(sfd, msg, MSG_DONTWAIT);
+	ret = recvmsg(sfd, msg, 0);
 	if (ret < 0)
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -65,17 +65,14 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	struct timeval	tv;
 	struct msghdr	msg;
 
-	while (1)
+	ret = receive_packet(sfd, &msg);
+	if (ret >= 0)
 	{
-		ret = receive_packet(sfd, &msg);
-		if (ret >= 0)
-		{
-			// TOD: print something
-			if (gettimeofday(&tv, NULL))
-				error_exit("gettimeofday error");
-			_print_stats(send, &tv);
-			return ;
-		}
+		// TOD: print something
+		if (gettimeofday(&tv, NULL))
+			error_exit("gettimeofday error");
+		_print_stats(send, &tv);
+		return ;
 	}
 	_print_icmp_error();
 }

@@ -51,6 +51,7 @@ void	ft_ping(t_args *args)
 	sfd = create_raw_socket();
 
 	init_send(&send, args);
+	init_recv(sfd);
 	for(;;){
 		if (gettimeofday(&tv, NULL))
 			error_exit("gettimeofday");

@@ -33,6 +33,7 @@ typedef struct	s_icmp_send
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
 void	init_send(t_icmp_send *send, t_args *args);
+void	init_recv(int sfd);
 
 void	handle_send(int sfd, t_icmp_send *send);
 void	handle_recv(int sfd, t_icmp_send *send);

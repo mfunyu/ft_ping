@@ -18,5 +18,6 @@ void	handle_send(int sfd, t_icmp_send *send)
 	_send_packet(sfd, send);
 	if (gettimeofday(&send->tv, NULL))
 		error_exit("gettimeofday error");
+	printf("send\n");
 }
 
