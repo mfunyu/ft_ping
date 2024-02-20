@@ -42,27 +42,43 @@ void	wait_max_one_sec(struct timeval *tv)
 	usleep(1000 * 1000 - timepassed);
 }
 
+void	main_loop(int sfd, t_icmp_send *send)
+{
+	struct timeval	tv;
+	struct timeval	timeout = {
+		.tv_sec = 0,
+		.tv_usec = 10000,
+	};
+	int 			ready;
+	fd_set			readfds;
+
+	while (1)
+	{
+		FD_ZERO(&readfds);
+		FD_SET(sfd, &readfds);
+		ready = select(sfd + 1, &readfds, NULL, NULL, &timeout);
+		if (ready < 0)
+			error_exit("select");
+		if (gettimeofday(&tv, NULL))
+			error_exit("gettimeofday");
+
+		handle_send(sfd, send);
+		if (ready)
+			handle_recv(sfd, send);
+		wait_max_one_sec(&tv);
+	}
+}
+
 void	ft_ping(t_args *args)
 {
 	int				sfd;
 	t_icmp_send		send;
-	struct timeval	tv;
 
 	sfd = create_raw_socket();
-
 	init_send(&send, args);
 	init_recv(sfd);
 	printf("PING %s (%s): %ld data bytes\n", args->params[0], send.ip, send.len - sizeof(struct icmphdr));
-	for(;;){
-		if (gettimeofday(&tv, NULL))
-			error_exit("gettimeofday");
-
-		handle_send(sfd, &send);
-
-		handle_recv(sfd, &send);
-
-		wait_max_one_sec(&tv);
-	}
+	main_loop(sfd, &send);
 	cleanup(send.addr, sfd);
 }
 
