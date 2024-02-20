@@ -52,7 +52,7 @@ void	main_loop(int sfd, t_icmp_send *send)
 	int 			ready;
 	fd_set			readfds;
 
-	while (1)
+	while (g_status != INTERRUPT)
 	{
 		if (g_status == SEND)
 			handle_send(sfd, send);
@@ -70,6 +70,16 @@ void	main_loop(int sfd, t_icmp_send *send)
 	}
 }
 
+void	print_footer(char *host, t_icmp_send *send)
+{
+	(void)send;
+	printf("\n--- %s ping statistics ---\n", host);
+	printf("%d packets transmitted, %d packets received, %d%% packet loss\n",
+		0, 0, 0);
+	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
+		0.0, 0.0, 0.0, 0.0);
+}
+
 void	ft_ping(t_args *args)
 {
 	int				sfd;
@@ -79,8 +89,10 @@ void	ft_ping(t_args *args)
 	init_send(&send, args);
 	init_recv(sfd);
 	signal(SIGALRM, &sig_alarm);
+	signal(SIGINT, &sig_int);
 	printf("PING %s (%s): %ld data bytes\n", args->params[0], send.ip, send.len - sizeof(struct icmphdr));
 	main_loop(sfd, &send);
+	print_footer(args->params[0], &send);
 	cleanup(send.addr, sfd);
 }
 
