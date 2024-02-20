@@ -10,11 +10,12 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-bool	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_recv *recv)
+bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 {
 	struct icmphdr		*hdr;
 	struct sockaddr_in	*src_addr;
 	char				*content;
+	int					ret;
 
 	content = msg->msg_iov->iov_base;
 	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
@@ -24,12 +25,14 @@ bool	analyse_packet(ssize_t ret, struct msghdr *msg, t_icmp_recv *recv)
 
 	src_addr = (struct sockaddr_in*)msg->msg_name;
 
-	recv->len = ret - sizeof(struct iphdr);
+	recv->len = total - sizeof(struct iphdr);
 	memcpy(recv->ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
-	getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv->host, INET_ADDRSTRLEN, NULL, 0, 0);
+	ret = getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
+	if (ret)
+		printf("getnameinfo error: %s\n", gai_strerror(ret));
 
 	printf("type: %d ", recv->type);
-	printf("ip: %s ", recv->ip);
+	printf("ip: %s \n", recv->ip);
 	return (true);
 }
 
@@ -48,7 +51,7 @@ int	receive_packet(int sfd, struct msghdr *msg)
 	msg->msg_name = &src_addr;
 	msg->msg_namelen = sizeof(src_addr);
 
-	ret = recvmsg(sfd, msg, 0);
+	ret = recvmsg(sfd, msg, MSG_DONTWAIT);
 	return (ret);
 }
 
