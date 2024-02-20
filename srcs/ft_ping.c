@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <netinet/ip_icmp.h>
 #include <sys/time.h>
+#include <signal.h>
+#include <errno.h>
+
+e_status g_status = SEND;
 
 void	help(void)
 {
@@ -27,24 +31,20 @@ for any corresponding short options.\n\n");
 	printf("Report bugs to: <htttps://github.com/mfunyu/ft_ping/issues>\n");
 }
 
-void	wait_max_one_sec(struct timeval *tv)
+void	sig_alarm(int sig)
 {
-	struct timeval	now;
-	ssize_t			timepassed;
+	(void)sig;
+	g_status = SEND;
+}
 
-	if (gettimeofday(&now, NULL))
-		error_exit("gettimeofday");
-
-	timepassed = now.tv_sec * 1000 * 1000 + now.tv_usec;
-	timepassed -= tv->tv_sec * 1000 * 1000 + tv->tv_usec;
-	if (timepassed >= 1000 * 1000)
-		return;
-	usleep(1000 * 1000 - timepassed);
+void	sig_int(int sig)
+{
+	(void)sig;
+	g_status = INTERRUPT;
 }
 
 void	main_loop(int sfd, t_icmp_send *send)
 {
-	struct timeval	tv;
 	struct timeval	timeout = {
 		.tv_sec = 0,
 		.tv_usec = 10000,
@@ -54,18 +54,19 @@ void	main_loop(int sfd, t_icmp_send *send)
 
 	while (1)
 	{
+		if (g_status == SEND)
+			handle_send(sfd, send);
 		FD_ZERO(&readfds);
 		FD_SET(sfd, &readfds);
 		ready = select(sfd + 1, &readfds, NULL, NULL, &timeout);
 		if (ready < 0)
+		{
+			if (errno == EINTR)
+				continue;
 			error_exit("select");
-		if (gettimeofday(&tv, NULL))
-			error_exit("gettimeofday");
-
-		handle_send(sfd, send);
-		if (ready)
+		}
+		else if (ready)
 			handle_recv(sfd, send);
-		wait_max_one_sec(&tv);
 	}
 }
 
@@ -77,6 +78,7 @@ void	ft_ping(t_args *args)
 	sfd = create_raw_socket();
 	init_send(&send, args);
 	init_recv(sfd);
+	signal(SIGALRM, &sig_alarm);
 	printf("PING %s (%s): %ld data bytes\n", args->params[0], send.ip, send.len - sizeof(struct icmphdr));
 	main_loop(sfd, &send);
 	cleanup(send.addr, sfd);

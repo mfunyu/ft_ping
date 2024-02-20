@@ -2,6 +2,7 @@
 #include "error.h"
 #include <stdio.h>
 #include <netdb.h>
+#include <unistd.h>
 #include <sys/time.h>
 
 static void	_send_packet(int sfd, t_icmp_send *send)
@@ -19,5 +20,7 @@ void	handle_send(int sfd, t_icmp_send *send)
 	if (gettimeofday(&send->tv, NULL))
 		error_exit("gettimeofday error");
 	printf("send\n");
+	alarm(1);
+	g_status = NO_STATUS;
 }
 

@@ -37,6 +37,12 @@
 **   } un;
 ** };
 */
+typedef enum	s_status
+{
+	NO_STATUS,
+	SEND,
+	INTERRUPT,
+}				e_status;
 
 typedef struct	s_icmp_send
 {
@@ -59,6 +65,8 @@ typedef struct	s_icmp_recv
 	int				type;
 
 }				t_icmp_recv;
+
+extern e_status	g_status;
 
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
