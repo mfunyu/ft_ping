@@ -16,6 +16,7 @@ static void	_send_packet(int sfd, t_icmp_send *send)
 
 void	handle_send(int sfd, t_icmp_send *send)
 {
+	icmp_echo_request_message(send->msg, send->len);
 	_send_packet(sfd, send);
 	if (gettimeofday(&send->tv, NULL))
 		error_exit("gettimeofday error");

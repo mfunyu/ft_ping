@@ -1,6 +1,7 @@
 #include "ft_ping.h"
 #include "libft.h"
 #include <stdio.h>
+#include <unistd.h>
 #include <netinet/ip_icmp.h>
 
 uint16_t	icmp_calc_checksum(char *msg, size_t len)
@@ -62,13 +63,17 @@ void	icmp_resuqest_print(char *msg, size_t len)
 
 void	icmp_echo_request_message(char *msg, size_t len)
 {
+	static int		sequence = 0;
+	static int		id;
 	struct icmphdr	header;
 
+	if (!id)
+		id = getpid();
 	header.type = ICMP_ECHO;
 	header.code = 0;
 	header.checksum = 0;
-	header.un.echo.id = 0;
-	header.un.echo.sequence = 0;
+	header.un.echo.id = id;
+	header.un.echo.sequence = sequence++;
 
 	ft_memcpy(msg, &header, sizeof(header));
 	icmp_add_data(msg, len);

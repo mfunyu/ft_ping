@@ -25,7 +25,6 @@ void	init_send(t_icmp_send *send, t_args *args)
 
 	send->addr = host_to_addrinfo(args->params[0]);
 	send->seq = 0;
-	icmp_echo_request_message(send->msg, send->len);
 	get_ip_addr(send->addr, send->ip);
 }
 
