@@ -50,7 +50,6 @@ typedef struct	s_icmp_send
 	struct addrinfo	*addr;
 	int				seq;
 	struct timeval	tv;
-	char			msg[ICMP_MAX_PACKET_SIZE];
 	char			ip[INET_ADDRSTRLEN];
 }				t_icmp_send;
 
