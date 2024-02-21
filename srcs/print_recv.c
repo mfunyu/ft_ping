@@ -14,7 +14,7 @@ void	print_icmp_error()
 
 static void	_print_stats(t_icmp_recv *recv)
 {
-	printf(": icmp_seq=%d", recv->seq);
+	printf(": icmp_seq=%d", recv->sequence);
 	printf(" ttl=%d", 0);
 	printf(" time=%ld,%03ld ms", recv->triptime / 1000, recv->triptime % 1000);
 }

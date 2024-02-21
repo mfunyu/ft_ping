@@ -48,7 +48,6 @@ typedef struct	s_icmp_send
 {
 	int				len;
 	struct addrinfo	*addr;
-	int				seq;
 	struct timeval	tv;
 	char			ip[INET_ADDRSTRLEN];
 }				t_icmp_send;
@@ -58,7 +57,7 @@ typedef struct	s_icmp_recv
 	char			host[HOST_NAME_MAX];
 	char			ip[INET_ADDRSTRLEN];
 	size_t			triptime;
-	int				seq;
+	int				sequence;
 	int				len;
 	int				type;
 

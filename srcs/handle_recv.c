@@ -9,6 +9,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 
 bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 {
@@ -19,10 +20,11 @@ bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 
 	content = msg->msg_iov->iov_base;
 	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
-	recv->type = hdr->type;
-	if (recv->type == ICMP_ECHO)
+	if (hdr->type == ICMP_ECHO)
 		return (false);
 
+	recv->type = hdr->type;
+	recv->sequence = hdr->un.echo.sequence;
 	src_addr = (struct sockaddr_in*)msg->msg_name;
 
 	recv->len = total - sizeof(struct iphdr);
@@ -71,7 +73,6 @@ void	handle_recv(int sfd, t_icmp_send *send)
 			return ;
 		recv.triptime = (tv.tv_sec - send->tv.tv_sec) * 1000 * 1000;
 		recv.triptime += tv.tv_usec - send->tv.tv_usec;
-		recv.seq = send->seq++;
 		print_recv(&msg, &recv);
 		return ;
 	}
