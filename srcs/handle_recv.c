@@ -59,17 +59,19 @@ void	handle_recv(int sfd, t_icmp_send *send)
 {
 	int				ret;
 	struct msghdr	msg;
+	struct timeval	tv;
 	t_icmp_recv		recv;
 
 	ret = receive_packet(sfd, &msg);
 	if (ret > 0)
 	{
-		if (gettimeofday(&(recv.tv), NULL))
+		if (gettimeofday(&tv, NULL))
 			error_exit("gettimeofday error");
 		if (!analyse_packet(ret, &msg, &recv))
 			return ;
+		recv.triptime = (tv.tv_sec - send->tv.tv_sec) * 1000 * 1000;
+		recv.triptime += tv.tv_usec - send->tv.tv_usec;
 		recv.seq = send->seq++;
-		recv.tv_ret = send->tv;
 		print_recv(&msg, &recv);
 		return ;
 	}

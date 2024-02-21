@@ -12,21 +12,11 @@ void	print_icmp_error()
 	return ;
 }
 
-static void	_print_timetrip(struct timeval *tv_start, struct timeval *tv_end)
-{
-	size_t	triptime;
-
-	triptime = (tv_end->tv_sec - tv_start->tv_sec) * 1000 * 1000;
-	triptime += tv_end->tv_usec - tv_start->tv_usec;
-
-	printf(" time=%ld,%03ld ms", triptime / 1000, triptime % 1000);
-}
-
 static void	_print_stats(t_icmp_recv *recv)
 {
 	printf(": icmp_seq=%d", recv->seq);
 	printf(" ttl=%d", 0);
-	_print_timetrip(&(recv->tv_ret), &(recv->tv));
+	printf(" time=%ld,%03ld ms", recv->triptime / 1000, recv->triptime % 1000);
 }
 
 void	print_recv(struct msghdr *msg, t_icmp_recv *recv)
