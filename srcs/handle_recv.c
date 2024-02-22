@@ -22,8 +22,12 @@ bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
 	if (hdr->type == ICMP_ECHO)
 		return (false);
-
 	recv->type = hdr->type;
+	if (hdr->type != ICMP_ECHOREPLY)
+		hdr = (struct icmphdr *)((char *)hdr + sizeof(struct icmphdr) + sizeof(struct iphdr));
+	if (hdr->un.echo.id != getpid())
+		return (false);
+
 	recv->sequence = hdr->un.echo.sequence;
 	src_addr = (struct sockaddr_in*)msg->msg_name;
 
