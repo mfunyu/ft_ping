@@ -1,13 +1,9 @@
-#include <string.h>
-#include <netinet/ip_icmp.h>
-#include <sys/time.h>
 #include "ft_ping.h"
 #include "error.h"
 #include <errno.h>
 #include <stdio.h>
 #include "print.h"
 #include "utils.h"
-#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
@@ -51,7 +47,7 @@ void	resolve_source_info(t_packet *packet, t_icmp_recv *recv)
 
 	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
 	if (ret)
-		printf("getnameinfo error: %s\n", gai_strerror(ret));
+		error_exit_gai("getnameinfo error", ret);
 	printf("ip: %s \n", recv->ip);
 }
 
