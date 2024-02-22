@@ -41,6 +41,7 @@ void	get_source_info(struct sockaddr_in *src_addr, t_icmp_recv *recv)
 	ret = getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
 	if (ret)
 		printf("getnameinfo error: %s\n", gai_strerror(ret));
+	printf("ip: %s \n", recv->ip);
 }
 
 void	analyse_response(t_packet *packet, t_icmp_recv *recv, ssize_t total)
@@ -50,7 +51,6 @@ void	analyse_response(t_packet *packet, t_icmp_recv *recv, ssize_t total)
 	recv->len = total - sizeof(struct iphdr);
 
 	printf("type: %d ", recv->type);
-	printf("ip: %s \n", recv->ip);
 }
 
 void	calculate_timetrip(struct timeval *tv, t_icmp_send *send, t_icmp_recv *recv)
@@ -59,19 +59,19 @@ void	calculate_timetrip(struct timeval *tv, t_icmp_send *send, t_icmp_recv *recv
 	recv->triptime += tv->tv_usec - send->tv.tv_usec;
 }
 
-int	receive_packet(int sfd, struct msghdr *msg)
+int	receive_packet(int sfd, struct sockaddr_in *src_addr, struct msghdr *msg)
 {
 	char				buf[1024];
-	struct sockaddr_in	src_addr;
-	struct iovec		iov;
+	struct iovec		iov = {
+		.iov_base = buf,
+		.iov_len = 1024
+	};
 	ssize_t				ret;
 
 	memset(msg, 0, sizeof(*msg));
-	iov.iov_base = buf;
-	iov.iov_len = 1024;
 	msg->msg_iov = &iov;
 	msg->msg_iovlen = 1;
-	msg->msg_name = &src_addr;
+	msg->msg_name = src_addr;
 	msg->msg_namelen = sizeof(src_addr);
 
 	ret = recvmsg(sfd, msg, MSG_DONTWAIT);
@@ -82,22 +82,11 @@ void	handle_recv(int sfd, t_icmp_send *send)
 {
 	int				ret;
 	struct msghdr	msg;
+	struct sockaddr_in	src_addr;
 	struct timeval	tv;
 	t_icmp_recv		recv;
 
-	ret = receive_packet(sfd, &msg);
-	if (ret > 0)
-	{
-		if (gettimeofday(&tv, NULL))
-			error_exit("gettimeofday error");
-		if (!_is_valid_packet((t_packet *)msg.msg_iov->iov_base))
-			return ;
-		analyse_response((t_packet *)msg.msg_iov->iov_base, &recv, ret);
-		get_source_info((struct sockaddr_in *)msg.msg_name, &recv);
-		calculate_timetrip(&tv, send, &recv);
-		print_recv(&msg, &recv);
-		return ;
-	}
+	ret = receive_packet(sfd, &src_addr, &msg);
 	if (ret < 0)
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -105,4 +94,12 @@ void	handle_recv(int sfd, t_icmp_send *send)
 		else
 			error_exit("recvmsg error");
 	}
+	if (gettimeofday(&tv, NULL))
+		error_exit("gettimeofday error");
+	if (!_is_valid_packet((t_packet *)msg.msg_iov->iov_base))
+		return ;
+	analyse_response((t_packet *)msg.msg_iov->iov_base, &recv, ret);
+	get_source_info((struct sockaddr_in *)msg.msg_name, &recv);
+	calculate_timetrip(&tv, send, &recv);
+	print_recv(&msg, &recv);
 }
