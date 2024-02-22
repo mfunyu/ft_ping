@@ -23,13 +23,13 @@ bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 	recv->type = packet->icmphdr.type;
 	if (packet->icmphdr.type != ICMP_ECHOREPLY)
 	{
-		if (packet->un.error.icmphdr.un.echo.id != getpid())
+		if (packet->req_icmphdr.echo_id != getpid())
 			return (false);
 	}
-	else if (packet->icmphdr.un.echo.id != getpid())
+	else if (packet->icmphdr.echo_id != getpid())
 		return (false);
 
-	recv->sequence = packet->icmphdr.un.echo.sequence;
+	recv->sequence = packet->icmphdr.echo_sequence;
 	src_addr = (struct sockaddr_in*)msg->msg_name;
 
 	recv->len = total - sizeof(struct iphdr);

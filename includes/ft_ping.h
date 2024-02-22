@@ -10,6 +10,10 @@
 # define ICMP_DEFAULT_PACKET_SIZE	64
 # define ICMP_MAX_PACKET_SIZE		65400
 
+# define echo_id		un.echo.id
+# define echo_sequence	un.echo.sequence
+# define req_icmphdr	un.error.icmphdr
+
 /*
 **  0                   1                   2                   3
 **     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
