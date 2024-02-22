@@ -77,7 +77,7 @@ typedef struct	s_reply_data
 	int				len;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
-	struct timeval	tv_recv;
+	struct timeval	tv_reply;
 	size_t			triptime;
 	int				sequence;
 
@@ -88,10 +88,9 @@ extern e_status	g_status;
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
 void	init_send(t_icmp_send *send, t_args *args);
-void	init_recv(int sfd);
 
 void	handle_send(int sfd, t_icmp_send *send);
-void	handle_recv(int sfd, t_icmp_send *send);
+void	handle_reply(int sfd, t_icmp_send *send);
 
 void	icmp_echo_request_message(char *msg, size_t len);
 

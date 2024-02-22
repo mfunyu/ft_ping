@@ -66,7 +66,7 @@ void	main_loop(int sfd, t_icmp_send *send)
 			error_exit("select");
 		}
 		else if (ready)
-			handle_recv(sfd, send);
+			handle_reply(sfd, send);
 	}
 }
 
@@ -87,7 +87,6 @@ void	ft_ping(t_args *args)
 
 	sfd = create_raw_socket();
 	init_send(&send, args);
-	init_recv(sfd);
 	signal(SIGALRM, &sig_alarm);
 	signal(SIGINT, &sig_int);
 	printf("PING %s (%s): %ld data bytes\n", args->params[0], send.ip, send.len - sizeof(struct icmphdr));

@@ -5,11 +5,11 @@ SRCS	:= ft_ping.c \
 			error.c \
 			icmp.c \
 			socket.c \
-			handle_recv.c \
+			handle_reply.c \
 			handle_send.c \
 			init.c \
 			utils.c \
-			print_recv.c
+			print_reply.c
 
 # ---------------------------------------------------------------------------- #
 #                                     PATHS                                    #

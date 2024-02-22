@@ -26,13 +26,3 @@ void	init_send(t_icmp_send *send, t_args *args)
 	send->addr = host_to_addrinfo(args->params[0]);
 	get_ip_addr(send->addr, send->ip);
 }
-
-void	init_recv(int sfd)
-{
-	struct timeval	timeout;
-	timeout.tv_sec = 1;
-	timeout.tv_usec	= 0;
-
-	if (setsockopt(sfd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout)) < 0)
-		error_exit("socketopt error");
-}

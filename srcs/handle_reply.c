@@ -65,7 +65,7 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	return (recvmsg(sfd, &msg, MSG_DONTWAIT));
 }
 
-void	handle_recv(int sfd, t_icmp_send *send)
+void	handle_reply(int sfd, t_icmp_send *send)
 {
 	t_packet		packet;
 	ssize_t			ret;
@@ -78,7 +78,7 @@ void	handle_recv(int sfd, t_icmp_send *send)
 			return ;
 		error_exit("recvmsg error");
 	}
-	r_data.tv_recv = get_current_timestamp();
+	r_data.tv_reply = get_current_timestamp();
 	if (!_is_valid_packet(&packet))
 		return ;
 
@@ -86,7 +86,7 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	r_data.type = packet.icmphdr.type;
 	r_data.sequence = packet.icmphdr.echo_sequence;
 	resolve_source_info(&packet, &r_data);
-	r_data.triptime = calc_timetrip(&send->tv, &r_data.tv_recv);
+	r_data.triptime = calc_timetrip(&send->tv, &r_data.tv_reply);
 
 	print_reply(&r_data);
 }
