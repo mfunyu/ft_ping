@@ -11,23 +11,36 @@
 #include <netdb.h>
 #include <unistd.h>
 
-bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
+static bool	_is_valid_packet(t_packet *packet)
+{
+	static int	pid;
+
+	if (pid == 0)
+		pid = getpid();
+
+	/* ignore requests */
+	if (packet->icmphdr.type == ICMP_ECHO)
+		return (false);
+
+	/* ignore responses to other ping */
+	if (packet->icmphdr.type == ICMP_ECHOREPLY)
+	{
+		if (packet->icmphdr.echo_id != pid)
+			return (false);
+	}
+	else if (packet->req_icmphdr.echo_id != pid)
+		return (false);
+	return (true);
+}
+
+void	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 {
 	struct sockaddr_in	*src_addr;
 	t_packet			*packet;
 	int					ret;
 
 	packet = (t_packet *)msg->msg_iov->iov_base;
-	if (packet->icmphdr.type == ICMP_ECHO)
-		return (false);
 	recv->type = packet->icmphdr.type;
-	if (packet->icmphdr.type != ICMP_ECHOREPLY)
-	{
-		if (packet->req_icmphdr.echo_id != getpid())
-			return (false);
-	}
-	else if (packet->icmphdr.echo_id != getpid())
-		return (false);
 
 	recv->sequence = packet->icmphdr.echo_sequence;
 	src_addr = (struct sockaddr_in*)msg->msg_name;
@@ -40,7 +53,6 @@ bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 
 	printf("type: %d ", recv->type);
 	printf("ip: %s \n", recv->ip);
-	return (true);
 }
 
 int	receive_packet(int sfd, struct msghdr *msg)
@@ -74,8 +86,9 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	{
 		if (gettimeofday(&tv, NULL))
 			error_exit("gettimeofday error");
-		if (!analyse_packet(ret, &msg, &recv))
+		if (!_is_valid_packet((t_packet *)msg.msg_iov->iov_base))
 			return ;
+		analyse_packet(ret, &msg, &recv);
 		recv.triptime = (tv.tv_sec - send->tv.tv_sec) * 1000 * 1000;
 		recv.triptime += tv.tv_usec - send->tv.tv_usec;
 		print_recv(&msg, &recv);
