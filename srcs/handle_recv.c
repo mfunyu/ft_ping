@@ -55,16 +55,6 @@ void	resolve_source_info(t_packet *packet, t_icmp_recv *recv)
 	printf("ip: %s \n", recv->ip);
 }
 
-void	analyse_response(t_packet *packet, t_icmp_recv *recv, ssize_t total)
-{
-	recv->type = packet->icmphdr.type;
-	recv->sequence = packet->icmphdr.echo_sequence;
-	recv->len = total - sizeof(struct iphdr);
-
-	printf("type: %d ", recv->type);
-}
-
-
 static ssize_t	_recv_reply(int sfd, t_packet *packet)
 {
 	struct iovec	iov = {
@@ -96,8 +86,12 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	recv.tv_recv = get_current_timestamp();
 	if (!_is_valid_packet(&packet))
 		return ;
-	analyse_response(&packet, &recv, ret);
+
+	recv.len = ret - sizeof(struct iphdr);
+	recv.type = packet.icmphdr.type;
+	recv.sequence = packet.icmphdr.echo_sequence;
 	resolve_source_info(&packet, &recv);
 	recv.triptime = calc_timetrip(&send->tv, &recv.tv_recv);
+
 	print_recv(&recv);
 }
