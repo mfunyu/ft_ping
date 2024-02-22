@@ -61,17 +61,17 @@ void	calculate_timetrip(struct timeval *tv, t_icmp_send *send, t_icmp_recv *recv
 
 void	handle_recv(int sfd, t_icmp_send *send)
 {
-	char				buf[1024];
+	t_packet		packet;
 	struct sockaddr_in	src_addr;
 	struct iovec		iov = {
-		.iov_base = buf,
-		.iov_len = 1024
+		.iov_base = (void *)&packet,
+		.iov_len = sizeof(t_packet)
 	};
 	struct msghdr	msg = {
 		.msg_iov = &iov,
 		.msg_iovlen = 1,
 		.msg_name = &src_addr,
-		.msg_namelen = sizeof(src_addr)
+		.msg_namelen = sizeof(struct sockaddr_in),
 	};
 	ssize_t			ret;
 	struct timeval	tv;
@@ -87,10 +87,10 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	}
 	if (gettimeofday(&tv, NULL))
 		error_exit("gettimeofday error");
-	if (!_is_valid_packet((t_packet *)msg.msg_iov->iov_base))
+	if (!_is_valid_packet(&packet))
 		return ;
-	analyse_response((t_packet *)msg.msg_iov->iov_base, &recv, ret);
-	get_source_info((struct sockaddr_in *)msg.msg_name, &recv);
+	analyse_response(&packet, &recv, ret);
+	get_source_info(&src_addr, &recv);
 	calculate_timetrip(&tv, send, &recv);
 	print_recv(&msg, &recv);
 }
