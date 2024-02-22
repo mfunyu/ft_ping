@@ -44,6 +44,21 @@ typedef enum	s_status
 	INTERRUPT,
 }				e_status;
 
+typedef struct	s_packet
+{
+	struct iphdr	iphdr;
+	struct icmphdr	icmphdr;
+	union
+	{
+		char			data[ICMP_MAX_PACKET_SIZE];
+		struct
+		{
+			struct iphdr	iphdr;
+			struct icmphdr	icmphdr;
+		} error;
+	} un;
+}				t_packet;
+
 typedef struct	s_icmp_send
 {
 	int				len;

@@ -13,22 +13,23 @@
 
 bool	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
 {
-	struct icmphdr		*hdr;
 	struct sockaddr_in	*src_addr;
-	char				*content;
+	t_packet			*packet;
 	int					ret;
 
-	content = msg->msg_iov->iov_base;
-	hdr = (struct icmphdr *)(content + sizeof(struct iphdr));
-	if (hdr->type == ICMP_ECHO)
+	packet = (t_packet *)msg->msg_iov->iov_base;
+	if (packet->icmphdr.type == ICMP_ECHO)
 		return (false);
-	recv->type = hdr->type;
-	if (hdr->type != ICMP_ECHOREPLY)
-		hdr = (struct icmphdr *)((char *)hdr + sizeof(struct icmphdr) + sizeof(struct iphdr));
-	if (hdr->un.echo.id != getpid())
+	recv->type = packet->icmphdr.type;
+	if (packet->icmphdr.type != ICMP_ECHOREPLY)
+	{
+		if (packet->un.error.icmphdr.un.echo.id != getpid())
+			return (false);
+	}
+	else if (packet->icmphdr.un.echo.id != getpid())
 		return (false);
 
-	recv->sequence = hdr->un.echo.sequence;
+	recv->sequence = packet->icmphdr.un.echo.sequence;
 	src_addr = (struct sockaddr_in*)msg->msg_name;
 
 	recv->len = total - sizeof(struct iphdr);
