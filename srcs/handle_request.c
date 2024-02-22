@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include "utils.h"
 
-static void	_send_packet(int sfd, char *msg, t_icmp_send *send)
+static void	_send_request(int sfd, char *msg, t_icmp_send *send)
 {
 	int	ret;
 
@@ -15,12 +15,12 @@ static void	_send_packet(int sfd, char *msg, t_icmp_send *send)
 		error_exit("sendto error");
 }
 
-void	handle_send(int sfd, t_icmp_send *send)
+void	handle_request(int sfd, t_icmp_send *send)
 {
 	char	msg[ICMP_MAX_PACKET_SIZE];
 
 	icmp_echo_request_message(msg, send->len);
-	_send_packet(sfd, msg, send);
+	_send_request(sfd, msg, send);
 	send->tv = get_current_timestamp();
 	printf("send\n");
 	alarm(1);

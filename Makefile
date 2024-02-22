@@ -6,7 +6,7 @@ SRCS	:= ft_ping.c \
 			icmp.c \
 			socket.c \
 			handle_reply.c \
-			handle_send.c \
+			handle_request.c \
 			init.c \
 			utils.c \
 			print_reply.c

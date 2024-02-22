@@ -89,7 +89,7 @@ void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
 void	init_send(t_icmp_send *send, t_args *args);
 
-void	handle_send(int sfd, t_icmp_send *send);
+void	handle_request(int sfd, t_icmp_send *send);
 void	handle_reply(int sfd, t_icmp_send *send);
 
 void	icmp_echo_request_message(char *msg, size_t len);

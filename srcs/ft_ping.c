@@ -55,7 +55,7 @@ void	main_loop(int sfd, t_icmp_send *send)
 	while (g_status != INTERRUPT)
 	{
 		if (g_status == SEND)
-			handle_send(sfd, send);
+			handle_request(sfd, send);
 		FD_ZERO(&readfds);
 		FD_SET(sfd, &readfds);
 		ready = select(sfd + 1, &readfds, NULL, NULL, &timeout);
