@@ -19,10 +19,8 @@ static void	_print_stats(t_icmp_recv *recv)
 	printf(" time=%ld,%03ld ms", recv->triptime / 1000, recv->triptime % 1000);
 }
 
-void	print_recv(struct msghdr *msg, t_icmp_recv *recv)
+void	print_recv(t_icmp_recv *recv)
 {
-	(void)msg;
-
 	printf("%d bytes from", recv->len);
 	switch (recv->type)
 	{

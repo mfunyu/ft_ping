@@ -33,17 +33,21 @@ static bool	_is_valid_packet(t_packet *packet)
 	return (true);
 }
 
-void	get_source_info(t_packet *packet, t_icmp_recv *recv)
+void	resolve_source_info(t_packet *packet, t_icmp_recv *recv)
 {
-	int	ret;
-	struct sockaddr_in		in = {
+	const char			*result;
+	int					ret;
+	struct sockaddr_in	in = {
 		.sin_family = AF_INET,
-		.sin_addr = {packet->iphdr.saddr}
+		.sin_addr = {
+			.s_addr = packet->iphdr.saddr
+		}
 	};
 
-	const char *result = inet_ntop(AF_INET, &packet->iphdr.saddr, recv->ip, INET_ADDRSTRLEN);
+	result = inet_ntop(AF_INET, &packet->iphdr.saddr, recv->ip, INET_ADDRSTRLEN);
 	if (result == NULL)
 		error_exit("inet_ntop error");
+
 	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
 	if (ret)
 		printf("getnameinfo error: %s\n", gai_strerror(ret));
@@ -65,25 +69,29 @@ void	calculate_timetrip(struct timeval *tv, t_icmp_send *send, t_icmp_recv *recv
 	recv->triptime += tv->tv_usec - send->tv.tv_usec;
 }
 
+static ssize_t	_recv_reply(int sfd, t_packet *packet)
+{
+	struct iovec	iov = {
+		.iov_base		= (void *)packet,
+		.iov_len		= sizeof(t_packet),
+	};
+	struct msghdr	msg = {
+		.msg_name		= NULL,
+		.msg_namelen	= 0,
+		.msg_iov		= &iov,
+		.msg_iovlen		= 1,
+	};
+	return (recvmsg(sfd, &msg, MSG_DONTWAIT));
+}
+
 void	handle_recv(int sfd, t_icmp_send *send)
 {
 	t_packet		packet;
-	struct sockaddr_in	src_addr;
-	struct iovec		iov = {
-		.iov_base = (void *)&packet,
-		.iov_len = sizeof(t_packet)
-	};
-	struct msghdr	msg = {
-		.msg_iov = &iov,
-		.msg_iovlen = 1,
-		.msg_name = &src_addr,
-		.msg_namelen = sizeof(struct sockaddr_in),
-	};
 	ssize_t			ret;
 	struct timeval	tv;
 	t_icmp_recv		recv;
 
-	ret = recvmsg(sfd, &msg, MSG_DONTWAIT);
+	ret = _recv_reply(sfd, &packet);
 	if (ret < 0)
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
@@ -96,7 +104,7 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	if (!_is_valid_packet(&packet))
 		return ;
 	analyse_response(&packet, &recv, ret);
-	get_source_info(&packet, &recv);
+	resolve_source_info(&packet, &recv);
 	calculate_timetrip(&tv, send, &recv);
-	print_recv(&msg, &recv);
+	print_recv(&recv);
 }
