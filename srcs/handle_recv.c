@@ -33,12 +33,18 @@ static bool	_is_valid_packet(t_packet *packet)
 	return (true);
 }
 
-void	get_source_info(struct sockaddr_in *src_addr, t_icmp_recv *recv)
+void	get_source_info(t_packet *packet, t_icmp_recv *recv)
 {
 	int	ret;
+	struct sockaddr_in		in = {
+		.sin_family = AF_INET,
+		.sin_addr = {packet->iphdr.saddr}
+	};
 
-	memcpy(recv->ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
-	ret = getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
+	const char *result = inet_ntop(AF_INET, &packet->iphdr.saddr, recv->ip, INET_ADDRSTRLEN);
+	if (result == NULL)
+		error_exit("inet_ntop error");
+	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
 	if (ret)
 		printf("getnameinfo error: %s\n", gai_strerror(ret));
 	printf("ip: %s \n", recv->ip);
@@ -90,7 +96,7 @@ void	handle_recv(int sfd, t_icmp_send *send)
 	if (!_is_valid_packet(&packet))
 		return ;
 	analyse_response(&packet, &recv, ret);
-	get_source_info(&src_addr, &recv);
+	get_source_info(&packet, &recv);
 	calculate_timetrip(&tv, send, &recv);
 	print_recv(&msg, &recv);
 }
