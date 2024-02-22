@@ -53,6 +53,12 @@ void	analyse_response(t_packet *packet, t_icmp_recv *recv, ssize_t total)
 	printf("ip: %s \n", recv->ip);
 }
 
+void	calculate_timetrip(struct timeval *tv, t_icmp_send *send, t_icmp_recv *recv)
+{
+	recv->triptime = (tv->tv_sec - send->tv.tv_sec) * 1000 * 1000;
+	recv->triptime += tv->tv_usec - send->tv.tv_usec;
+}
+
 int	receive_packet(int sfd, struct msghdr *msg)
 {
 	char				buf[1024];
@@ -88,8 +94,7 @@ void	handle_recv(int sfd, t_icmp_send *send)
 			return ;
 		analyse_response((t_packet *)msg.msg_iov->iov_base, &recv, ret);
 		get_source_info((struct sockaddr_in *)msg.msg_name, &recv);
-		recv.triptime = (tv.tv_sec - send->tv.tv_sec) * 1000 * 1000;
-		recv.triptime += tv.tv_usec - send->tv.tv_usec;
+		calculate_timetrip(&tv, send, &recv);
 		print_recv(&msg, &recv);
 		return ;
 	}
