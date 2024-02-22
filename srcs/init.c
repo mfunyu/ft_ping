@@ -17,12 +17,13 @@ char	*get_ip_addr(struct addrinfo *addr, char *ip)
 }
 
 
-void	init_send(t_icmp_send *send, t_args *args)
+void	init(t_ping *ping, t_args *args)
 {
-	send->len = ICMP_DEFAULT_PACKET_SIZE;
+	ping->req_host = args->params[0];
+	ping->len = ICMP_DEFAULT_PACKET_SIZE;
 	if (args->flags[SIZE])
-		send->len = args->flags[SIZE] + sizeof(struct icmphdr);
+		ping->len = args->flags[SIZE] + sizeof(struct icmphdr);
 
-	send->addr = host_to_addrinfo(args->params[0]);
-	get_ip_addr(send->addr, send->ip);
+	ping->addr = host_to_addrinfo(args->params[0]);
+	get_ip_addr(ping->addr, ping->req_ip);
 }

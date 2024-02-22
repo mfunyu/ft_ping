@@ -63,13 +63,14 @@ typedef struct	s_packet
 	} un;
 }				t_packet;
 
-typedef struct	s_icmp_send
+typedef struct	s_ping
 {
-	int				len;
+	struct timeval	tv_request;
 	struct addrinfo	*addr;
-	struct timeval	tv;
-	char			ip[INET_ADDRSTRLEN];
-}				t_icmp_send;
+	char			*req_host;
+	char			req_ip[INET_ADDRSTRLEN];
+	int				len;
+}				t_ping;
 
 typedef struct	s_reply_data
 {
@@ -87,10 +88,10 @@ extern e_status	g_status;
 
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
-void	init_send(t_icmp_send *send, t_args *args);
+void	init(t_ping *ping, t_args *args);
 
-void	handle_request(int sfd, t_icmp_send *send);
-void	handle_reply(int sfd, t_icmp_send *send);
+void	handle_request(int sfd, t_ping *ping);
+void	handle_reply(int sfd, t_ping *ping);
 
 void	icmp_echo_request_message(char *msg, size_t len);
 

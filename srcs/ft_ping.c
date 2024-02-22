@@ -22,7 +22,7 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
 	printf("\
   -t, --ttl=N                specify N as time-to-live\n");
 	printf("\
-  -s, --size=NUMBER          send NUMBER data octets\n");
+  -s, --size=NUMBER          ping NUMBER data octets\n");
 # endif
 	printf("\n\
   -?, --help                 give this help list\n\n");
@@ -43,7 +43,7 @@ void	sig_int(int sig)
 	g_status = INTERRUPT;
 }
 
-void	main_loop(int sfd, t_icmp_send *send)
+void	main_loop(int sfd, t_ping *ping)
 {
 	struct timeval	timeout = {
 		.tv_sec = 0,
@@ -55,7 +55,7 @@ void	main_loop(int sfd, t_icmp_send *send)
 	while (g_status != INTERRUPT)
 	{
 		if (g_status == SEND)
-			handle_request(sfd, send);
+			handle_request(sfd, ping);
 		FD_ZERO(&readfds);
 		FD_SET(sfd, &readfds);
 		ready = select(sfd + 1, &readfds, NULL, NULL, &timeout);
@@ -66,13 +66,13 @@ void	main_loop(int sfd, t_icmp_send *send)
 			error_exit("select");
 		}
 		else if (ready)
-			handle_reply(sfd, send);
+			handle_reply(sfd, ping);
 	}
 }
 
-void	print_footer(char *host, t_icmp_send *send)
+void	print_footer(char *host, t_ping *ping)
 {
-	(void)send;
+	(void)ping;
 	printf("\n--- %s ping statistics ---\n", host);
 	printf("%d packets transmitted, %d packets received, %d%% packet loss\n",
 		0, 0, 0);
@@ -82,17 +82,17 @@ void	print_footer(char *host, t_icmp_send *send)
 
 void	ft_ping(t_args *args)
 {
-	int				sfd;
-	t_icmp_send		send;
+	int		sfd;
+	t_ping	ping;
 
 	sfd = create_raw_socket();
-	init_send(&send, args);
+	init(&ping, args);
 	signal(SIGALRM, &sig_alarm);
 	signal(SIGINT, &sig_int);
-	printf("PING %s (%s): %ld data bytes\n", args->params[0], send.ip, send.len - sizeof(struct icmphdr));
-	main_loop(sfd, &send);
-	print_footer(args->params[0], &send);
-	cleanup(send.addr, sfd);
+	printf("PING %s (%s): %ld data bytes\n", ping.req_host, ping.req_ip, ping.len - sizeof(struct icmphdr));
+	main_loop(sfd, &ping);
+	print_footer(ping.req_host, &ping);
+	cleanup(ping.addr, sfd);
 }
 
 void	check_arguments(t_args *args, int ac, char **av)
