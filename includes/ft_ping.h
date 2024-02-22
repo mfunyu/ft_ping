@@ -81,7 +81,7 @@ typedef struct	s_reply_data
 	struct timeval	tv_reply;
 	size_t			triptime;
 	int				sequence;
-
+	int				ttl;
 }				t_reply_data;
 
 extern e_status	g_status;

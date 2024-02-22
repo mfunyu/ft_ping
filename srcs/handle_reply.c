@@ -84,6 +84,7 @@ void	handle_reply(int sfd, t_ping *ping)
 
 	r_data.len = ret - sizeof(struct iphdr);
 	r_data.type = packet.icmphdr.type;
+	r_data.ttl = packet.iphdr.ttl;
 	r_data.sequence = packet.icmphdr.echo_sequence;
 	resolve_source_info(&packet, &r_data);
 	r_data.triptime = calc_timetrip(&ping->tv_request, &r_data.tv_reply);
