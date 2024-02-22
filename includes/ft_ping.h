@@ -71,17 +71,17 @@ typedef struct	s_icmp_send
 	char			ip[INET_ADDRSTRLEN];
 }				t_icmp_send;
 
-typedef struct	s_icmp_recv
+typedef struct	s_reply_data
 {
-	char			host[HOST_NAME_MAX];
+	int				type;
+	int				len;
 	char			ip[INET_ADDRSTRLEN];
+	char			host[HOST_NAME_MAX];
 	struct timeval	tv_recv;
 	size_t			triptime;
 	int				sequence;
-	int				len;
-	int				type;
 
-}				t_icmp_recv;
+}				t_reply_data;
 
 extern e_status	g_status;
 

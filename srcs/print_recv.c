@@ -12,28 +12,28 @@ void	print_icmp_error()
 	return ;
 }
 
-static void	_print_stats(t_icmp_recv *recv)
+static void	_print_stats(t_reply_data *r_data)
 {
-	printf(": icmp_seq=%d", recv->sequence);
+	printf(": icmp_seq=%d", r_data->sequence);
 	printf(" ttl=%d", 0);
-	printf(" time=%ld,%03ld ms", recv->triptime / 1000, recv->triptime % 1000);
+	printf(" time=%ld,%03ld ms", r_data->triptime / 1000, r_data->triptime % 1000);
 }
 
-void	print_recv(t_icmp_recv *recv)
+void	print_reply(t_reply_data *r_data)
 {
-	printf("%d bytes from", recv->len);
-	switch (recv->type)
+	printf("%d bytes from", r_data->len);
+	switch (r_data->type)
 	{
 		case ICMP_ECHOREPLY:
-			printf(" %s", recv->ip);
-			_print_stats(recv);
+			printf(" %s", r_data->ip);
+			_print_stats(r_data);
 			break;
 		case ICMP_DEST_UNREACH:
-			printf(" %s (%s)", recv->host, recv->ip);
+			printf(" %s (%s)", r_data->host, r_data->ip);
 			printf(": Destination Host Unreachable");
 			break;
 		case ICMP_TIME_EXCEEDED:
-			printf(" %s (%s)", recv->host, recv->ip);
+			printf(" %s (%s)", r_data->host, r_data->ip);
 			printf(": Time to live exceeded");
 			break;
 	}

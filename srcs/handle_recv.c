@@ -30,7 +30,7 @@ static bool	_is_valid_packet(t_packet *packet)
 	return (true);
 }
 
-void	resolve_source_info(t_packet *packet, t_icmp_recv *recv)
+void	resolve_source_info(t_packet *packet, t_reply_data *r_data)
 {
 	const char			*result;
 	int					ret;
@@ -41,14 +41,13 @@ void	resolve_source_info(t_packet *packet, t_icmp_recv *recv)
 		}
 	};
 
-	result = inet_ntop(AF_INET, &packet->iphdr.saddr, recv->ip, INET_ADDRSTRLEN);
+	result = inet_ntop(AF_INET, &packet->iphdr.saddr, r_data->ip, INET_ADDRSTRLEN);
 	if (result == NULL)
 		error_exit("inet_ntop error");
 
-	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
+	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), r_data->host, HOST_NAME_MAX, NULL, 0, 0);
 	if (ret)
 		error_exit_gai("getnameinfo error", ret);
-	printf("ip: %s \n", recv->ip);
 }
 
 static ssize_t	_recv_reply(int sfd, t_packet *packet)
@@ -70,7 +69,7 @@ void	handle_recv(int sfd, t_icmp_send *send)
 {
 	t_packet		packet;
 	ssize_t			ret;
-	t_icmp_recv		recv;
+	t_reply_data	r_data;
 
 	ret = _recv_reply(sfd, &packet);
 	if (ret < 0)
@@ -79,15 +78,15 @@ void	handle_recv(int sfd, t_icmp_send *send)
 			return ;
 		error_exit("recvmsg error");
 	}
-	recv.tv_recv = get_current_timestamp();
+	r_data.tv_recv = get_current_timestamp();
 	if (!_is_valid_packet(&packet))
 		return ;
 
-	recv.len = ret - sizeof(struct iphdr);
-	recv.type = packet.icmphdr.type;
-	recv.sequence = packet.icmphdr.echo_sequence;
-	resolve_source_info(&packet, &recv);
-	recv.triptime = calc_timetrip(&send->tv, &recv.tv_recv);
+	r_data.len = ret - sizeof(struct iphdr);
+	r_data.type = packet.icmphdr.type;
+	r_data.sequence = packet.icmphdr.echo_sequence;
+	resolve_source_info(&packet, &r_data);
+	r_data.triptime = calc_timetrip(&send->tv, &r_data.tv_recv);
 
-	print_recv(&recv);
+	print_reply(&r_data);
 }
