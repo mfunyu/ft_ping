@@ -33,23 +33,21 @@ static bool	_is_valid_packet(t_packet *packet)
 	return (true);
 }
 
-void	analyse_packet(ssize_t total, struct msghdr *msg, t_icmp_recv *recv)
+void	get_source_info(struct sockaddr_in *src_addr, t_icmp_recv *recv)
 {
-	struct sockaddr_in	*src_addr;
-	t_packet			*packet;
-	int					ret;
+	int	ret;
 
-	packet = (t_packet *)msg->msg_iov->iov_base;
-	recv->type = packet->icmphdr.type;
-
-	recv->sequence = packet->icmphdr.echo_sequence;
-	src_addr = (struct sockaddr_in*)msg->msg_name;
-
-	recv->len = total - sizeof(struct iphdr);
 	memcpy(recv->ip, inet_ntoa(src_addr->sin_addr), INET_ADDRSTRLEN);
 	ret = getnameinfo((struct sockaddr *)src_addr, sizeof(struct sockaddr_in), recv->host, HOST_NAME_MAX, NULL, 0, 0);
 	if (ret)
 		printf("getnameinfo error: %s\n", gai_strerror(ret));
+}
+
+void	analyse_response(t_packet *packet, t_icmp_recv *recv, ssize_t total)
+{
+	recv->type = packet->icmphdr.type;
+	recv->sequence = packet->icmphdr.echo_sequence;
+	recv->len = total - sizeof(struct iphdr);
 
 	printf("type: %d ", recv->type);
 	printf("ip: %s \n", recv->ip);
@@ -88,7 +86,8 @@ void	handle_recv(int sfd, t_icmp_send *send)
 			error_exit("gettimeofday error");
 		if (!_is_valid_packet((t_packet *)msg.msg_iov->iov_base))
 			return ;
-		analyse_packet(ret, &msg, &recv);
+		analyse_response((t_packet *)msg.msg_iov->iov_base, &recv, ret);
+		get_source_info((struct sockaddr_in *)msg.msg_name, &recv);
 		recv.triptime = (tv.tv_sec - send->tv.tv_sec) * 1000 * 1000;
 		recv.triptime += tv.tv_usec - send->tv.tv_usec;
 		print_recv(&msg, &recv);
