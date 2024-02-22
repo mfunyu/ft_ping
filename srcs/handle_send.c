@@ -4,6 +4,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include "utils.h"
 
 static void	_send_packet(int sfd, char *msg, t_icmp_send *send)
 {
@@ -20,8 +21,7 @@ void	handle_send(int sfd, t_icmp_send *send)
 
 	icmp_echo_request_message(msg, send->len);
 	_send_packet(sfd, msg, send);
-	if (gettimeofday(&send->tv, NULL))
-		error_exit("gettimeofday error");
+	send->tv = get_current_timestamp();
 	printf("send\n");
 	alarm(1);
 	g_status = NO_STATUS;

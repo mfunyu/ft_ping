@@ -8,6 +8,7 @@ SRCS	:= ft_ping.c \
 			handle_recv.c \
 			handle_send.c \
 			init.c \
+			utils.c \
 			print_recv.c
 
 # ---------------------------------------------------------------------------- #

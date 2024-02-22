@@ -75,6 +75,7 @@ typedef struct	s_icmp_recv
 {
 	char			host[HOST_NAME_MAX];
 	char			ip[INET_ADDRSTRLEN];
+	struct timeval	tv_recv;
 	size_t			triptime;
 	int				sequence;
 	int				len;
