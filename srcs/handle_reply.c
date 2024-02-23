@@ -7,7 +7,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <stdlib.h>
 
 static bool	_is_valid_packet(t_packet *packet)
 {
@@ -71,7 +70,6 @@ void	handle_reply(int sfd, t_ping *ping)
 	t_packet		packet;
 	ssize_t			ret;
 	t_reply_data	r_data;
-	struct timeval	*tv_reply;
 
 	ret = _recv_reply(sfd, &packet);
 	if (ret < 0)
@@ -80,7 +78,7 @@ void	handle_reply(int sfd, t_ping *ping)
 			return ;
 		error_exit("recvmsg error");
 	}
-	tv_reply = get_current_timestamp();
+	r_data.tv_reply = get_current_timestamp();
 	if (!_is_valid_packet(&packet))
 		return ;
 
@@ -89,7 +87,7 @@ void	handle_reply(int sfd, t_ping *ping)
 	r_data.ttl = packet.iphdr.ttl;
 	r_data.sequence = packet.icmphdr.echo_sequence;
 	resolve_source_info(&packet, &r_data);
-	r_data.triptime = calc_timetrip(ping, tv_reply);
-	free(tv_reply);
+	r_data.triptime = calc_timetrip(&ping->tv_request, &r_data.tv_reply);
+
 	print_reply(&r_data);
 }
