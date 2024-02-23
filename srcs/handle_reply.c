@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
+#include <string.h>
 
 static bool	_is_valid_packet(t_packet *packet)
 {
@@ -97,8 +98,11 @@ void	handle_reply(int sfd, t_ping *ping)
 	r_data.type = packet.icmphdr.type;
 	r_data.ttl = packet.iphdr.ttl;
 	r_data.sequence = packet.icmphdr.echo_sequence;
-	resolve_source_info(&packet, &r_data);
 	r_data.triptime = calc_timetrip(&ping->tv_request, &r_data.tv_reply);
-	store_stats(ping, r_data.triptime);
+	memcpy(r_data.ip, ping->req_ip, INET_ADDRSTRLEN);
+	if (r_data.type == ICMP_ECHOREPLY)
+		store_stats(ping, r_data.triptime);
+	else
+		resolve_source_info(&packet, &r_data);
 	print_reply(&r_data);
 }

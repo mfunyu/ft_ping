@@ -76,12 +76,14 @@ void	print_footer(t_ping *ping)
 	double	avg;
 	double	variance;
 
-	avg = ping->stats.sum / ping->stats.recieved;
-	variance = ping->stats.sum_sq / ping->stats.recieved - avg * avg;
-
-	printf("\n--- %s ping statistics ---\n", ping->req_host);
+	printf("--- %s ping statistics ---\n", ping->req_host);
 	printf("%zu packets transmitted, %zu packets received, %zu%% packet loss\n",
 		ping->transmitted, ping->stats.recieved, (ping->transmitted - ping->stats.recieved) * 100 / ping->transmitted);
+	if (ping->stats.recieved == 0)
+		return ;
+
+	avg = ping->stats.sum / ping->stats.recieved;
+	variance = ping->stats.sum_sq / ping->stats.recieved - avg * avg;
 	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
 		ping->stats.min, avg, ping->stats.max, calc_sqrt(variance, 0.0005));
 }
