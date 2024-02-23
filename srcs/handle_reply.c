@@ -50,9 +50,9 @@ void	resolve_source_info(t_packet *packet, t_reply_data *r_data)
 		error_exit_gai("getnameinfo error", ret);
 }
 
-static void	store_stats(t_ping *ping, size_t triptime)
+static void	store_stats(t_ping *ping, double triptime)
 {
-	ping->stats.count++;
+	ping->stats.recieved++;
 	ping->stats.sum += triptime;
 	ping->stats.sum_sq += triptime * triptime;
 	if (ping->stats.min == 0 || triptime < ping->stats.min)

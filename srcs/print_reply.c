@@ -16,7 +16,7 @@ static void	_print_stats(t_reply_data *r_data)
 {
 	printf(": icmp_seq=%d", r_data->sequence);
 	printf(" ttl=%d", r_data->ttl);
-	printf(" time=%ld,%03ld ms", r_data->triptime / 1000, r_data->triptime % 1000);
+	printf(" time=%.3f ms", r_data->triptime);
 }
 
 void	print_reply(t_reply_data *r_data)

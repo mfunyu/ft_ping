@@ -1,5 +1,6 @@
 #include "ft_ping.h"
 #include "error.h"
+#include "utils.h"
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -70,14 +71,19 @@ void	main_loop(int sfd, t_ping *ping)
 	}
 }
 
-void	print_footer(char *host, t_ping *ping)
+void	print_footer(t_ping *ping)
 {
-	(void)ping;
-	printf("\n--- %s ping statistics ---\n", host);
-	printf("%d packets transmitted, %d packets received, %d%% packet loss\n",
-		0, 0, 0);
+	double	avg;
+	double	variance;
+
+	avg = ping->stats.sum / ping->stats.recieved;
+	variance = ping->stats.sum_sq / ping->stats.recieved - avg * avg;
+
+	printf("\n--- %s ping statistics ---\n", ping->req_host);
+	printf("%zu packets transmitted, %zu packets received, %zu%% packet loss\n",
+		ping->transmitted, ping->stats.recieved, (ping->transmitted - ping->stats.recieved) * 100 / ping->transmitted);
 	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
-		0.0, 0.0, 0.0, 0.0);
+		ping->stats.min, avg, ping->stats.max, calc_sqrt(variance, 0.0005));
 }
 
 void	ft_ping(t_args *args)
@@ -91,7 +97,7 @@ void	ft_ping(t_args *args)
 	signal(SIGINT, &sig_int);
 	printf("PING %s (%s): %ld data bytes\n", ping.req_host, ping.req_ip, ping.len - sizeof(struct icmphdr));
 	main_loop(sfd, &ping);
-	print_footer(ping.req_host, &ping);
+	print_footer(&ping);
 	cleanup(ping.addr, sfd);
 }
 

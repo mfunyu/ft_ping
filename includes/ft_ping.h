@@ -65,21 +65,22 @@ typedef struct	s_packet
 
 typedef struct	s_stat
 {
-	size_t	count;
-	size_t	sum;
-	size_t	sum_sq;
-	size_t	min;
-	size_t	max;
+	size_t	recieved;
+	double	sum;
+	double	sum_sq;
+	double	min;
+	double	max;
 }				t_stat;
 
 typedef struct	s_ping
 {
 	struct timeval	tv_request;
 	struct addrinfo	*addr;
-	t_stat	stats;
+	t_stat			stats;
 	char			*req_host;
 	char			req_ip[INET_ADDRSTRLEN];
 	int				len;
+	size_t			transmitted;
 }				t_ping;
 
 typedef struct	s_reply_data
@@ -89,7 +90,7 @@ typedef struct	s_reply_data
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
 	struct timeval	tv_reply;
-	size_t			triptime;
+	double			triptime;
 	int				sequence;
 	int				ttl;
 }				t_reply_data;
@@ -103,7 +104,7 @@ void	init(t_ping *ping, t_args *args);
 void	handle_request(int sfd, t_ping *ping);
 void	handle_reply(int sfd, t_ping *ping);
 
-void	icmp_echo_request_message(char *msg, size_t len);
+void	icmp_echo_request_message(char *msg, size_t len, int sequence);
 
 struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);

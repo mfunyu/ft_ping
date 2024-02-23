@@ -61,9 +61,8 @@ void	icmp_resuqest_print(char *msg, size_t len)
 	printf("\n");
 }
 
-void	icmp_echo_request_message(char *msg, size_t len)
+void	icmp_echo_request_message(char *msg, size_t len, int sequence)
 {
-	static int		sequence = 0;
 	static int		id;
 	struct icmphdr	header;
 
