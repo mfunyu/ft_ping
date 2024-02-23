@@ -1,8 +1,8 @@
 #include "ft_ping.h"
 #include "error.h"
 #include <arpa/inet.h>
+#include <string.h>
 #include <netdb.h>
-
 
 char	*get_ip_addr(struct addrinfo *addr, char *ip)
 {
@@ -19,6 +19,8 @@ char	*get_ip_addr(struct addrinfo *addr, char *ip)
 
 void	init(t_ping *ping, t_args *args)
 {
+	memset(ping, 0, sizeof(t_ping));
+
 	ping->req_host = args->params[0];
 	ping->len = ICMP_DEFAULT_PACKET_SIZE;
 	if (args->flags[SIZE])

@@ -63,10 +63,20 @@ typedef struct	s_packet
 	} un;
 }				t_packet;
 
+typedef struct	s_stat
+{
+	size_t	count;
+	size_t	sum;
+	size_t	sum_sq;
+	size_t	min;
+	size_t	max;
+}				t_stat;
+
 typedef struct	s_ping
 {
 	struct timeval	tv_request;
 	struct addrinfo	*addr;
+	t_stat	stats;
 	char			*req_host;
 	char			req_ip[INET_ADDRSTRLEN];
 	int				len;

@@ -50,6 +50,17 @@ void	resolve_source_info(t_packet *packet, t_reply_data *r_data)
 		error_exit_gai("getnameinfo error", ret);
 }
 
+static void	store_stats(t_ping *ping, size_t triptime)
+{
+	ping->stats.count++;
+	ping->stats.sum += triptime;
+	ping->stats.sum_sq += triptime * triptime;
+	if (ping->stats.min == 0 || triptime < ping->stats.min)
+		ping->stats.min = triptime;
+	if (triptime > ping->stats.max)
+		ping->stats.max = triptime;
+}
+
 static ssize_t	_recv_reply(int sfd, t_packet *packet)
 {
 	struct iovec	iov = {
@@ -88,6 +99,6 @@ void	handle_reply(int sfd, t_ping *ping)
 	r_data.sequence = packet.icmphdr.echo_sequence;
 	resolve_source_info(&packet, &r_data);
 	r_data.triptime = calc_timetrip(&ping->tv_request, &r_data.tv_reply);
-
+	store_stats(ping, r_data.triptime);
 	print_reply(&r_data);
 }
