@@ -23,7 +23,7 @@ void	init(t_ping *ping, t_args *args)
 	ping->len = ICMP_DEFAULT_PACKET_SIZE;
 	if (args->flags[SIZE])
 		ping->len = args->flags[SIZE] + sizeof(struct icmphdr);
-
+	ping->req_timestamps = NULL;
 	ping->addr = host_to_addrinfo(args->params[0]);
 	get_ip_addr(ping->addr, ping->req_ip);
 }

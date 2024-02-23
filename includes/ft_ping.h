@@ -2,6 +2,7 @@
 # define FT_PING_H
 
 # include "parser.h"
+# include "libft.h"
 # include <stdint.h>
 # include <stddef.h>
 # include <limits.h>
@@ -65,7 +66,7 @@ typedef struct	s_packet
 
 typedef struct	s_ping
 {
-	struct timeval	tv_request;
+	t_list			*req_timestamps;
 	struct addrinfo	*addr;
 	char			*req_host;
 	char			req_ip[INET_ADDRSTRLEN];
