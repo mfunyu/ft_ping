@@ -2,13 +2,10 @@
 #include <sys/time.h>
 #include "error.h"
 
-struct timeval	get_current_timestamp(void)
+void	get_current_timestamp(struct timeval *tv)
 {
-	struct timeval	tv;
-
-	if (gettimeofday(&tv, NULL))
+	if (gettimeofday(tv, NULL))
 		error_exit("gettimeofday error");
-	return (tv);
 }
 
 double	calc_time_diff(struct timeval *tv1, struct timeval *tv2)

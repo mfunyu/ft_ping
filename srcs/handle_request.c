@@ -25,7 +25,7 @@ void	handle_request(int sfd, t_ping *ping)
 	icmp_add_checksum(msg, ping->len);
 
 	_send_request(sfd, msg, ping);
-	ping->tv_request = get_current_timestamp();
+	get_current_timestamp(&ping->tv_request);
 	ping->num_xmit++;
 	printf("ping\n");
 	alarm(1);

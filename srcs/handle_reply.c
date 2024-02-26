@@ -98,7 +98,7 @@ void	handle_reply(int sfd, t_ping *ping)
 			return ;
 		error_exit("recvmsg error");
 	}
-	tv = get_current_timestamp();
+	get_current_timestamp(&tv);
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
 
