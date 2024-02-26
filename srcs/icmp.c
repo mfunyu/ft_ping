@@ -1,4 +1,5 @@
 #include "ft_ping.h"
+#include "utils.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>
@@ -47,7 +48,7 @@ void	icmp_add_timestamp(char *msg)
 {
 	struct timeval	tv;
 
-	gettimeofday(&tv, NULL);
+	tv = get_current_timestamp();
 	memcpy(msg + sizeof(struct icmphdr), &tv, sizeof(tv));
 }
 
