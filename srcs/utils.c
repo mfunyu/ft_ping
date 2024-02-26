@@ -11,13 +11,13 @@ struct timeval	get_current_timestamp(void)
 	return (tv);
 }
 
-double	calc_timetrip(struct timeval *tv_start, struct timeval *tv_end)
+double	calc_time_diff(struct timeval *tv1, struct timeval *tv2)
 {
-	double	triptime;
+	double	diff;
 
-	triptime = (tv_end->tv_sec - tv_start->tv_sec) * 1000;
-	triptime += ((double)tv_end->tv_usec - (double)tv_start->tv_usec) / 1000;
-	return (triptime);
+	diff = (tv2->tv_sec - tv1->tv_sec) * 1000;
+	diff += ((double)tv2->tv_usec - (double)tv1->tv_usec) / 1000;
+	return (diff);
 }
 
 double	calc_sqrt(double x, double precision)

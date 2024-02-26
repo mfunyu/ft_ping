@@ -56,6 +56,19 @@ static void	store_stats(t_ping *ping, double triptime)
 		ping->stats.max = triptime;
 }
 
+static double	_calc_triptime(t_packet *packet, struct timeval *tv_reply)
+{
+	uint8_t			data[sizeof(struct timeval)];
+	double			triptime;
+	struct timeval	*tv_request;
+
+	// avoid alignment issues
+	memcpy(data, packet->icmpdata, sizeof(struct timeval));
+	tv_request = (struct timeval *)data;
+	triptime = calc_time_diff(tv_request, tv_reply);
+	return (triptime);
+}
+
 static ssize_t	_recv_reply(int sfd, t_packet *packet)
 {
 	struct iovec	iov = {
@@ -75,6 +88,7 @@ void	handle_reply(int sfd, t_ping *ping)
 {
 	t_packet		packet;
 	ssize_t			ret;
+	struct timeval	tv;
 	t_reply_data	r_data;
 
 	ret = _recv_reply(sfd, &packet);
@@ -84,7 +98,7 @@ void	handle_reply(int sfd, t_ping *ping)
 			return ;
 		error_exit("recvmsg error");
 	}
-	r_data.tv_reply = get_current_timestamp();
+	tv = get_current_timestamp();
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
 
@@ -92,7 +106,7 @@ void	handle_reply(int sfd, t_ping *ping)
 	r_data.type = packet.icmphdr.type;
 	r_data.ttl = packet.iphdr.ttl;
 	r_data.sequence = ntohs(packet.icmphdr.echo_sequence);
-	r_data.triptime = calc_timetrip(&ping->tv_request, &r_data.tv_reply);
+	r_data.triptime = _calc_triptime(&packet, &tv);
 	memcpy(r_data.ip, ping->req_ip, INET_ADDRSTRLEN);
 	if (r_data.type == ICMP_ECHOREPLY)
 		store_stats(ping, r_data.triptime);

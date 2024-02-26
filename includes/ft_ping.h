@@ -12,7 +12,6 @@
 
 # define echo_id		un.echo.id
 # define echo_sequence	un.echo.sequence
-# define req_icmphdr	un.error.icmphdr
 
 /*
 **  0                   1                   2                   3
@@ -62,6 +61,8 @@ typedef struct	s_packet
 			struct icmphdr	icmphdr;
 		} error;
 	} un;
+# define req_icmphdr	un.error.icmphdr
+# define icmpdata		un.data
 }				t_packet;
 
 typedef struct	s_stat
