@@ -1,7 +1,6 @@
 #include "ft_ping.h"
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/time.h>
 #include <netinet/ip_icmp.h>
 
@@ -54,7 +53,7 @@ void	icmp_add_timestamp(char *msg)
 	memcpy(msg + sizeof(struct icmphdr), &otime, sizeof(otime));
 }
 
-void	icmp_set_icmphdr(char *msg, size_t sequence)
+void	icmp_set_icmphdr(char *msg, int ident, int seqno)
 {
 	struct icmphdr	*header;
 
@@ -62,6 +61,6 @@ void	icmp_set_icmphdr(char *msg, size_t sequence)
 	header->type = ICMP_ECHO;
 	header->code = 0;
 	header->checksum = 0;
-	header->un.echo.id = getpid();
-	header->un.echo.sequence = sequence;
+	header->un.echo.id = htons(ident);
+	header->un.echo.sequence = htons(seqno);
 }

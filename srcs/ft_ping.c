@@ -78,7 +78,7 @@ void	print_footer(t_ping *ping)
 
 	printf("--- %s ping statistics ---\n", ping->req_host);
 	printf("%zu packets transmitted, %zu packets received, %zu%% packet loss\n",
-		ping->transmitted, ping->stats.recieved, (ping->transmitted - ping->stats.recieved) * 100 / ping->transmitted);
+		ping->num_xmit, ping->stats.recieved, (ping->num_xmit - ping->stats.recieved) * 100 / ping->num_xmit);
 	if (ping->stats.recieved == 0)
 		return ;
 

@@ -3,6 +3,7 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <netdb.h>
+#include <unistd.h>
 
 char	*get_ip_addr(struct addrinfo *addr, char *ip)
 {
@@ -28,4 +29,5 @@ void	init(t_ping *ping, t_args *args)
 
 	ping->addr = host_to_addrinfo(args->params[0]);
 	get_ip_addr(ping->addr, ping->req_ip);
+	ping->ident = getpid();
 }

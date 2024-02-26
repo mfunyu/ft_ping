@@ -6,16 +6,10 @@
 #include "utils.h"
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <unistd.h>
 #include <string.h>
 
-static bool	_is_valid_packet(t_packet *packet)
+static bool	_is_valid_packet(t_packet *packet, int ident)
 {
-	static int	pid;
-
-	if (pid == 0)
-		pid = getpid();
-
 	/* ignore requests */
 	if (packet->icmphdr.type == ICMP_ECHO)
 		return (false);
@@ -23,10 +17,10 @@ static bool	_is_valid_packet(t_packet *packet)
 	/* ignore responses to other ping */
 	if (packet->icmphdr.type == ICMP_ECHOREPLY)
 	{
-		if (packet->icmphdr.echo_id != pid)
+		if (packet->icmphdr.echo_id != htons(ident))
 			return (false);
 	}
-	else if (packet->req_icmphdr.echo_id != pid)
+	else if (packet->req_icmphdr.echo_id != htons(ident))
 		return (false);
 	return (true);
 }
@@ -91,13 +85,13 @@ void	handle_reply(int sfd, t_ping *ping)
 		error_exit("recvmsg error");
 	}
 	r_data.tv_reply = get_current_timestamp();
-	if (!_is_valid_packet(&packet))
+	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
 
 	r_data.len = ret - sizeof(struct iphdr);
 	r_data.type = packet.icmphdr.type;
 	r_data.ttl = packet.iphdr.ttl;
-	r_data.sequence = packet.icmphdr.echo_sequence;
+	r_data.sequence = ntohs(packet.icmphdr.echo_sequence);
 	r_data.triptime = calc_timetrip(&ping->tv_request, &r_data.tv_reply);
 	memcpy(r_data.ip, ping->req_ip, INET_ADDRSTRLEN);
 	if (r_data.type == ICMP_ECHOREPLY)

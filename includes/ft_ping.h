@@ -83,7 +83,8 @@ typedef struct	s_ping
 	char			*req_host;
 	char			req_ip[INET_ADDRSTRLEN];
 	int				len;
-	size_t			transmitted;
+	size_t			num_xmit;
+	int				ident;
 }				t_ping;
 
 typedef struct	s_reply_data
@@ -107,7 +108,7 @@ void	init(t_ping *ping, t_args *args);
 void	handle_request(int sfd, t_ping *ping);
 void	handle_reply(int sfd, t_ping *ping);
 
-void	icmp_set_icmphdr(char *msg, size_t sequence);
+void	icmp_set_icmphdr(char *msg, int ident, int seqno);
 void	icmp_add_timestamp(char *msg);
 void	icmp_set_data(char *msg, size_t total_len);
 void	icmp_add_checksum(char *msg, size_t len);
