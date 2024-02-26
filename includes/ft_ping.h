@@ -104,7 +104,7 @@ void	init(t_ping *ping, t_args *args);
 void	handle_request(int sfd, t_ping *ping);
 void	handle_reply(int sfd, t_ping *ping);
 
-void	icmp_echo_request_message(char *msg, size_t len, int sequence);
+void	icmp_create_requestmsg(char *msg, size_t len, int sequence);
 
 struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);
