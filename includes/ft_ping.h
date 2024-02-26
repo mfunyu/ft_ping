@@ -76,7 +76,6 @@ typedef struct	s_stat
 
 typedef struct	s_ping
 {
-	struct timeval	tv_request;
 	struct addrinfo	*addr;
 	t_stat			stats;
 	char			*req_host;
@@ -92,7 +91,6 @@ typedef struct	s_reply_data
 	int				len;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
-	struct timeval	tv_reply;
 	double			triptime;
 	int				sequence;
 	int				ttl;
