@@ -41,6 +41,9 @@
 **   } un;
 ** };
 */
+
+typedef uint32_t	n_time;
+
 typedef enum	s_status
 {
 	NO_STATUS,
@@ -104,7 +107,9 @@ void	init(t_ping *ping, t_args *args);
 void	handle_request(int sfd, t_ping *ping);
 void	handle_reply(int sfd, t_ping *ping);
 
-void	icmp_create_requestmsg(char *msg, size_t len, int sequence);
+void	icmp_set_icmphdr(char *msg, size_t sequence);
+void	icmp_add_timestamp(char *msg);
+void	icmp_set_data(char *msg, size_t total_len);
 void	icmp_add_checksum(char *msg, size_t len);
 
 struct addrinfo	*host_to_addrinfo(char const *hostname);

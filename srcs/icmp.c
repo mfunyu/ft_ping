@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <netinet/ip_icmp.h>
 
 static uint16_t	_icmp_calc_checksum(char *msg, size_t len)
@@ -21,18 +22,6 @@ static uint16_t	_icmp_calc_checksum(char *msg, size_t len)
 	return (~sum);
 }
 
-static void	_icmp_set_data(char *msg, size_t start, size_t total_len)
-{
-	size_t	i;
-
-	i = 0;
-	while (start + i < total_len)
-	{
-		msg[start + i] = i % 256;
-		i++;
-	}
-}
-
 void	icmp_add_checksum(char *msg, size_t len)
 {
 	struct icmphdr	*header;
@@ -41,16 +30,38 @@ void	icmp_add_checksum(char *msg, size_t len)
 	header->checksum = _icmp_calc_checksum(msg, len);
 }
 
-void	icmp_create_requestmsg(char *msg, size_t len, int sequence)
+void	icmp_set_data(char *msg, size_t total_len)
 {
-	struct icmphdr	header = {
-		.type = ICMP_ECHO,
-		.code = 0,
-		.checksum = 0,
-		.un.echo.id = getpid(),
-		.un.echo.sequence = sequence,
-	};
+	size_t	start;
+	size_t	i;
 
-	memcpy(msg, &header, sizeof(header));
-	_icmp_set_data(msg, sizeof(struct icmphdr), len);
+	start = sizeof(struct icmphdr) + sizeof(n_time);
+	i = 0;
+	while (start + i < total_len)
+	{
+		msg[start + i] = i % 256;
+		i++;
+	}
+}
+
+void	icmp_add_timestamp(char *msg)
+{
+	struct timeval	tv;
+	n_time			otime;
+
+	gettimeofday(&tv, NULL);
+	otime = htonl((tv.tv_sec % (60 * 60 * 24)) * 1000 + tv.tv_usec / 1000);
+	memcpy(msg + sizeof(struct icmphdr), &otime, sizeof(otime));
+}
+
+void	icmp_set_icmphdr(char *msg, size_t sequence)
+{
+	struct icmphdr	*header;
+
+	header = (struct icmphdr *)msg;
+	header->type = ICMP_ECHO;
+	header->code = 0;
+	header->checksum = 0;
+	header->un.echo.id = getpid();
+	header->un.echo.sequence = sequence;
 }
