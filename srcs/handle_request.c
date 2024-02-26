@@ -20,6 +20,7 @@ void	handle_request(int sfd, t_ping *ping)
 	char	msg[ICMP_MAX_PACKET_SIZE];
 
 	icmp_create_requestmsg(msg, ping->len, ping->transmitted++);
+	icmp_add_checksum(msg, ping->len);
 	_send_request(sfd, msg, ping);
 	ping->tv_request = get_current_timestamp();
 	printf("ping\n");

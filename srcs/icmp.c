@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <netinet/ip_icmp.h>
 
-uint16_t	icmp_calc_checksum(char *msg, size_t len)
+static uint16_t	_icmp_calc_checksum(char *msg, size_t len)
 {
 	size_t		i;
 	uint32_t	sum;
@@ -21,16 +21,24 @@ uint16_t	icmp_calc_checksum(char *msg, size_t len)
 	return (~sum);
 }
 
-static void	_icmp_set_data(char *msg, size_t start, size_t len)
+static void	_icmp_set_data(char *msg, size_t start, size_t total_len)
 {
 	size_t	i;
 
-	i = start;
-	while (i < len)
+	i = 0;
+	while (start + i < total_len)
 	{
-		msg[i] = i % 256;
+		msg[start + i] = i % 256;
 		i++;
 	}
+}
+
+void	icmp_add_checksum(char *msg, size_t len)
+{
+	struct icmphdr	*header;
+
+	header = (struct icmphdr *)msg;
+	header->checksum = _icmp_calc_checksum(msg, len);
 }
 
 void	icmp_create_requestmsg(char *msg, size_t len, int sequence)
@@ -45,7 +53,4 @@ void	icmp_create_requestmsg(char *msg, size_t len, int sequence)
 
 	memcpy(msg, &header, sizeof(header));
 	_icmp_set_data(msg, sizeof(struct icmphdr), len);
-	header.checksum = icmp_calc_checksum(msg, len);
-
-	memcpy(msg, &header, sizeof(header));
 }

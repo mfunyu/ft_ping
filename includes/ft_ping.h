@@ -105,6 +105,7 @@ void	handle_request(int sfd, t_ping *ping);
 void	handle_reply(int sfd, t_ping *ping);
 
 void	icmp_create_requestmsg(char *msg, size_t len, int sequence);
+void	icmp_add_checksum(char *msg, size_t len);
 
 struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);
