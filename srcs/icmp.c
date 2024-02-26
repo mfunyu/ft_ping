@@ -34,7 +34,7 @@ void	icmp_set_data(char *msg, size_t total_len)
 	size_t	start;
 	size_t	i;
 
-	start = sizeof(struct icmphdr) + sizeof(n_time);
+	start = sizeof(struct icmphdr) + sizeof(struct timeval);
 	i = 0;
 	while (start + i < total_len)
 	{
@@ -46,11 +46,9 @@ void	icmp_set_data(char *msg, size_t total_len)
 void	icmp_add_timestamp(char *msg)
 {
 	struct timeval	tv;
-	n_time			otime;
 
 	gettimeofday(&tv, NULL);
-	otime = htonl((tv.tv_sec % (60 * 60 * 24)) * 1000 + tv.tv_usec / 1000);
-	memcpy(msg + sizeof(struct icmphdr), &otime, sizeof(otime));
+	memcpy(msg + sizeof(struct icmphdr), &tv, sizeof(tv));
 }
 
 void	icmp_set_icmphdr(char *msg, int ident, int seqno)

@@ -42,8 +42,6 @@
 ** };
 */
 
-typedef uint32_t	n_time;
-
 typedef enum	s_status
 {
 	NO_STATUS,
