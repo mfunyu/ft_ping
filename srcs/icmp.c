@@ -18,8 +18,9 @@ static uint16_t	_icmp_calc_checksum(char *msg, size_t len)
 		sum += words[i++];
 	if (len % 2)
 		sum += words[len / 2];
-	sum = (sum & 0xffff) + (sum >> 16);
-	return (~sum);
+	while (sum >> 16)
+		sum = (sum & 0xffff) + (sum >> 16); /* add carry */
+	return (~sum); /* one's complement */
 }
 
 void	icmp_add_checksum(char *msg, size_t len)
