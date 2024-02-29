@@ -53,31 +53,31 @@ struct timeval	_set_timeout(struct timeval last)
 	return (timeout);
 }
 
-void	main_loop(int sfd, t_ping *ping)
+void	main_loop(t_ping *ping)
 {
 	struct timeval	interval;
 	struct timeval	last;
 	int 			ready;
 	fd_set			readfds;
 
-	handle_request(sfd, ping);
+	handle_request(ping);
 	get_current_timestamp(&last);
 	while (!g_stop)
 	{
 		FD_ZERO(&readfds);
-		FD_SET(sfd, &readfds);
+		FD_SET(ping->sfd, &readfds);
 		interval = _set_timeout(last);
-		ready = select(sfd + 1, &readfds, NULL, NULL, &interval);
+		ready = select(ping->sfd + 1, &readfds, NULL, NULL, &interval);
 		if (ready < 0)
 		{
 			if (errno != EINTR)
 				error_exit("select");
 		}
 		else if (ready)
-			handle_reply(sfd, ping);
+			handle_reply(ping);
 		else
 		{
-			handle_request(sfd, ping);
+			handle_request(ping);
 			get_current_timestamp(&last);
 		}
 	}
@@ -102,16 +102,15 @@ void	print_footer(t_ping *ping)
 
 void	ft_ping(t_args *args)
 {
-	int		sfd;
 	t_ping	ping;
 
-	sfd = create_raw_socket();
 	init(&ping, args);
+	ping.sfd = create_raw_socket();
 	signal(SIGINT, &sig_int);
 	printf("PING %s (%s): %ld data bytes\n", ping.req_host, ping.req_ip, ping.len - sizeof(struct icmphdr));
-	main_loop(sfd, &ping);
+	main_loop(&ping);
 	print_footer(&ping);
-	cleanup(ping.addr, sfd);
+	cleanup(&ping);
 }
 
 void	check_arguments(t_args *args, int ac, char **av)

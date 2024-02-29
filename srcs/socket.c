@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "error.h"
+#include "ft_ping.h"
 
 struct addrinfo	*host_to_addrinfo(char const *hostname)
 {
@@ -40,8 +41,8 @@ int create_raw_socket(void)
 	return (sfd);
 }
 
-void	cleanup(struct addrinfo *addr, int sfd)
+void	cleanup(t_ping *ping)
 {
-	freeaddrinfo(addr);
-	close(sfd);
+	freeaddrinfo(ping->addr);
+	close(ping->sfd);
 }

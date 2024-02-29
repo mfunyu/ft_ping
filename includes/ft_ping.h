@@ -71,6 +71,7 @@ typedef struct	s_stat
 
 typedef struct	s_ping
 {
+	int				sfd;
 	struct addrinfo	*addr;
 	t_stat			stats;
 	char			*req_host;
@@ -95,8 +96,8 @@ void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);
 void	init(t_ping *ping, t_args *args);
 
-void	handle_request(int sfd, t_ping *ping);
-void	handle_reply(int sfd, t_ping *ping);
+void	handle_request(t_ping *ping);
+void	handle_reply(t_ping *ping);
 
 uint16_t	icmp_calc_checksum(char *msg, size_t len);
 void	icmp_set_icmphdr(char *msg, int ident, int seqno);
@@ -106,6 +107,6 @@ void	icmp_add_checksum(char *msg, size_t len);
 
 struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);
-void			cleanup(struct addrinfo *addr, int sfd);
+void			cleanup(t_ping *ping);
 
 #endif /* FT_PING_H */

@@ -85,14 +85,14 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	return (recvmsg(sfd, &msg, MSG_DONTWAIT));
 }
 
-void	handle_reply(int sfd, t_ping *ping)
+void	handle_reply(t_ping *ping)
 {
 	t_packet		packet;
 	ssize_t			ret;
 	struct timeval	tv;
 	t_reply_data	r_data;
 
-	ret = _recv_reply(sfd, &packet);
+	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)
 	{
 		if (errno == EAGAIN || errno == EWOULDBLOCK)
