@@ -102,8 +102,15 @@ void	handle_reply(t_ping *ping)
 	get_current_timestamp(&tv);
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
-	if (icmp_calc_checksum((char *)&packet.icmphdr, ret - sizeof(struct iphdr)) != 0)
-		return ;
+
+	resolve_source_info(&packet, &r_data);
+	if (packet.icmphdr.type == ICMP_ECHOREPLY)
+	{
+		if (icmp_calc_checksum((char *)&packet.icmphdr, ret - sizeof(struct iphdr)) != 0)
+			return ;
+		if (strncmp(ping->req_ip, r_data.ip, INET_ADDRSTRLEN) != 0)
+			return ;
+	}
 
 	r_data.len = ret - sizeof(struct iphdr);
 	r_data.type = packet.icmphdr.type;
@@ -112,8 +119,5 @@ void	handle_reply(t_ping *ping)
 	r_data.triptime = _calc_triptime(&packet, tv);
 	if (r_data.type == ICMP_ECHOREPLY)
 		store_stats(ping, r_data.triptime);
-	resolve_source_info(&packet, &r_data);
-	if (strncmp(ping->req_ip, r_data.ip, INET_ADDRSTRLEN) != 0)
-		return ;
 	print_reply(&r_data);
 }
