@@ -59,6 +59,16 @@ test_loss () {
 	exe sudo tc qdisc del dev enp0s3 root
 }
 
+test_corrupt () {
+	discription [+] Create corrupted packets
+	exe sudo tc qdisc add dev enp0s3 root netem corrupt 50%
+
+	run_test $1
+
+	discription [-] Remove the corruption setting from the network interface
+	exe sudo tc qdisc del dev enp0s3 root
+}
+
 run () {
 	header ========[[ $@ ]]=========
 	"$@"

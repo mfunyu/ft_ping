@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include <netinet/ip_icmp.h>
 
-static uint16_t	_icmp_calc_checksum(char *msg, size_t len)
+uint16_t	icmp_calc_checksum(char *msg, size_t len)
 {
 	size_t		i;
 	uint32_t	sum;
@@ -28,7 +28,7 @@ void	icmp_add_checksum(char *msg, size_t len)
 	struct icmphdr	*header;
 
 	header = (struct icmphdr *)msg;
-	header->checksum = _icmp_calc_checksum(msg, len);
+	header->checksum = icmp_calc_checksum(msg, len);
 }
 
 void	icmp_set_data(char *msg, size_t total_len)

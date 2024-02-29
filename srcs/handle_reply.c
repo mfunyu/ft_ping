@@ -102,6 +102,8 @@ void	handle_reply(int sfd, t_ping *ping)
 	get_current_timestamp(&tv);
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
+	if (icmp_calc_checksum((char *)&packet.icmphdr, ret - sizeof(struct iphdr)) != 0)
+		return ;
 
 	r_data.len = ret - sizeof(struct iphdr);
 	r_data.type = packet.icmphdr.type;

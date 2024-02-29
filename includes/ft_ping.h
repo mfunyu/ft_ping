@@ -98,6 +98,7 @@ void	init(t_ping *ping, t_args *args);
 void	handle_request(int sfd, t_ping *ping);
 void	handle_reply(int sfd, t_ping *ping);
 
+uint16_t	icmp_calc_checksum(char *msg, size_t len);
 void	icmp_set_icmphdr(char *msg, int ident, int seqno);
 void	icmp_add_timestamp(char *msg);
 void	icmp_set_data(char *msg, size_t total_len);
