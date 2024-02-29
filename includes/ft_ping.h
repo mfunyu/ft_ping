@@ -41,12 +41,6 @@
 ** };
 */
 
-typedef enum	s_status
-{
-	NO_STATUS,
-	INTERRUPT,
-}				e_status;
-
 typedef struct	s_packet
 {
 	struct iphdr	iphdr;
@@ -94,8 +88,6 @@ typedef struct	s_reply_data
 	int				sequence;
 	int				ttl;
 }				t_reply_data;
-
-extern e_status	g_status;
 
 void	parse_args(t_args *args, int ac, char **av);
 void	print_args(t_args args);

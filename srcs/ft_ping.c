@@ -9,7 +9,7 @@
 #include <signal.h>
 #include <errno.h>
 
-e_status g_status = NO_STATUS;
+volatile bool	g_stop = false;
 
 void	help(void)
 {
@@ -35,7 +35,7 @@ for any corresponding short options.\n\n");
 void	sig_int(int sig)
 {
 	(void)sig;
-	g_status = INTERRUPT;
+	g_stop = true;
 }
 
 struct timeval	_set_timeout(struct timeval last)
@@ -65,7 +65,7 @@ void	main_loop(int sfd, t_ping *ping)
 
 	handle_request(sfd, ping);
 	get_current_timestamp(&last);
-	while (g_status != INTERRUPT)
+	while (!g_stop)
 	{
 		FD_ZERO(&readfds);
 		FD_SET(sfd, &readfds);
@@ -75,7 +75,6 @@ void	main_loop(int sfd, t_ping *ping)
 		{
 			if (errno != EINTR)
 				error_exit("select");
-			printf("Interrupted system call\n");
 		}
 		else if (ready)
 			handle_reply(sfd, ping);
