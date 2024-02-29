@@ -9,7 +9,7 @@
 #include <signal.h>
 #include <errno.h>
 
-e_status g_status = SEND;
+e_status g_status = NO_STATUS;
 
 void	help(void)
 {
@@ -32,12 +32,6 @@ for any corresponding short options.\n\n");
 	printf("Report bugs to: <htttps://github.com/mfunyu/ft_ping/issues>\n");
 }
 
-void	sig_alarm(int sig)
-{
-	(void)sig;
-	g_status = SEND;
-}
-
 void	sig_int(int sig)
 {
 	(void)sig;
@@ -50,7 +44,7 @@ struct timeval	_set_timeout(struct timeval last)
 	struct timeval	timeout;
 	struct timeval	interval = {
 		.tv_sec = 0,
-		.tv_usec = 10000,
+		.tv_usec = 1000000,
 	};
 
 	get_current_timestamp(&now);
@@ -69,6 +63,7 @@ void	main_loop(int sfd, t_ping *ping)
 	int 			ready;
 	fd_set			readfds;
 
+	handle_request(sfd, ping);
 	get_current_timestamp(&last);
 	while (g_status != INTERRUPT)
 	{
@@ -83,12 +78,12 @@ void	main_loop(int sfd, t_ping *ping)
 			printf("Interrupted system call\n");
 		}
 		else if (ready)
-		{
 			handle_reply(sfd, ping);
+		else
+		{
+			handle_request(sfd, ping);
 			get_current_timestamp(&last);
 		}
-		if (g_status == SEND)
-			handle_request(sfd, ping);
 	}
 }
 
@@ -116,7 +111,6 @@ void	ft_ping(t_args *args)
 
 	sfd = create_raw_socket();
 	init(&ping, args);
-	signal(SIGALRM, &sig_alarm);
 	signal(SIGINT, &sig_int);
 	printf("PING %s (%s): %ld data bytes\n", ping.req_host, ping.req_ip, ping.len - sizeof(struct icmphdr));
 	main_loop(sfd, &ping);

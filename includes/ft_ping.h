@@ -44,7 +44,6 @@
 typedef enum	s_status
 {
 	NO_STATUS,
-	SEND,
 	INTERRUPT,
 }				e_status;
 

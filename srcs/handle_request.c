@@ -2,7 +2,6 @@
 #include "error.h"
 #include <stdio.h>
 #include <netdb.h>
-#include <unistd.h>
 #include <sys/time.h>
 #include "utils.h"
 
@@ -27,7 +26,5 @@ void	handle_request(int sfd, t_ping *ping)
 	_send_request(sfd, msg, ping);
 	ping->num_xmit++;
 	printf("ping\n");
-	alarm(1);
-	g_status = NO_STATUS;
 }
 
