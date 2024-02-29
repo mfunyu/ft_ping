@@ -44,21 +44,18 @@ struct timeval	_set_timeout(struct timeval last)
 	struct timeval	timeout;
 	struct timeval	interval = {
 		.tv_sec = 0,
-		.tv_usec = 1000000,
+		.tv_usec = PING_DEFAULT_INTERVAL_S * 1000000,
 	};
 
 	get_current_timestamp(&now);
 	timeout = calc_time_sub(last, now);
 	timeout = calc_time_sub(timeout, interval);
-	// printf("now: %ld.%06ld\n", now.tv_sec, now.tv_usec);
-	// printf("last: %ld.%06ld\n", last.tv_sec, last.tv_usec);
-	//printf("timeout: %ld.%06ld\n", timeout.tv_sec, timeout.tv_usec);
 	return (timeout);
 }
 
 void	main_loop(int sfd, t_ping *ping)
 {
-	struct timeval	timeout;
+	struct timeval	interval;
 	struct timeval	last;
 	int 			ready;
 	fd_set			readfds;
@@ -69,8 +66,8 @@ void	main_loop(int sfd, t_ping *ping)
 	{
 		FD_ZERO(&readfds);
 		FD_SET(sfd, &readfds);
-		timeout = _set_timeout(last);
-		ready = select(sfd + 1, &readfds, NULL, NULL, &timeout);
+		interval = _set_timeout(last);
+		ready = select(sfd + 1, &readfds, NULL, NULL, &interval);
 		if (ready < 0)
 		{
 			if (errno != EINTR)

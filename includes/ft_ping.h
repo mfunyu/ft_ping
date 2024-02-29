@@ -10,6 +10,8 @@
 # define ICMP_DEFAULT_PACKET_SIZE	64
 # define ICMP_MAX_PACKET_SIZE		65400
 
+# define PING_DEFAULT_INTERVAL_S	1 /* second */
+
 # define echo_id		un.echo.id
 # define echo_sequence	un.echo.sequence
 
