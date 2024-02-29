@@ -110,10 +110,10 @@ void	handle_reply(t_ping *ping)
 	r_data.ttl = packet.iphdr.ttl;
 	r_data.sequence = ntohs(packet.icmphdr.echo_sequence);
 	r_data.triptime = _calc_triptime(&packet, tv);
-	memcpy(r_data.ip, ping->req_ip, INET_ADDRSTRLEN);
 	if (r_data.type == ICMP_ECHOREPLY)
 		store_stats(ping, r_data.triptime);
-	else
-		resolve_source_info(&packet, &r_data);
+	resolve_source_info(&packet, &r_data);
+	if (strncmp(ping->req_ip, r_data.ip, INET_ADDRSTRLEN) != 0)
+		return ;
 	print_reply(&r_data);
 }
