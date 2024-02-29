@@ -4,7 +4,12 @@ SRCS	:= ft_ping.c \
 			parser.c \
 			error.c \
 			icmp.c \
-			socket.c
+			socket.c \
+			handle_reply.c \
+			handle_request.c \
+			init.c \
+			utils.c \
+			print_reply.c
 
 # ---------------------------------------------------------------------------- #
 #                                     PATHS                                    #

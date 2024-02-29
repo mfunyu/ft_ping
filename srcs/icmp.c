@@ -1,47 +1,66 @@
 #include "ft_ping.h"
-#include "libft.h"
+#include "utils.h"
+#include <stdio.h>
+#include <string.h>
+#include <sys/time.h>
+#include <netinet/ip_icmp.h>
 
 uint16_t	icmp_calc_checksum(char *msg, size_t len)
 {
 	size_t		i;
 	uint32_t	sum;
-	uint16_t	checksum;
+	uint16_t	*words;
 
-	while (i < len / sizeof(uint16_t))
-	{
-		sum += (uint16_t)msg[i];
-		if (sum > 0xffff)
-			sum = (sum & 0xffff) + 1;
-		i++;
-	}
-	checksum = ~sum;
-	return (checksum);
+	i = 0;
+	sum = 0;
+	words = (uint16_t *)msg;
+	while (i < len / 2)
+		sum += words[i++];
+	if (len % 2)
+		sum += words[len / 2];
+	while (sum >> 16)
+		sum = (sum & 0xffff) + (sum >> 16); /* add carry */
+	return (~sum); /* one's complement */
 }
 
-void	icmp_add_data(char *msg, size_t len)
+void	icmp_add_checksum(char *msg, size_t len)
 {
+	struct icmphdr	*header;
+
+	header = (struct icmphdr *)msg;
+	header->checksum = icmp_calc_checksum(msg, len);
+}
+
+void	icmp_set_data(char *msg, size_t total_len)
+{
+	size_t	start;
 	size_t	i;
 
-	i = sizeof(t_icmp_header);
-	while (i < len)
+	start = sizeof(struct icmphdr) + sizeof(struct timeval);
+	i = 0;
+	while (start + i < total_len)
 	{
-		msg[i] = '*';
+		msg[start + i] = i % 256;
 		i++;
 	}
 }
 
-void	icmp_echo_request_message(char *msg, size_t len)
+void	icmp_add_timestamp(char *msg)
 {
-	t_icmp_header	header;
+	struct timeval	tv;
 
-	header.type = ICMP_ECHO_REQUEST;
-	header.code = 0;
-	header.checksum = 0;
-	header.identifier = 0;
-	header.sequence_number = 0;
+	get_current_timestamp(&tv);
+	memcpy(msg + sizeof(struct icmphdr), &tv, sizeof(tv));
+}
 
-	ft_memcpy(msg, &header, sizeof(header));
-	icmp_add_data(msg, len);
-	header.checksum = icmp_calc_checksum(msg, len);
-	ft_memcpy(msg, &header, sizeof(header));
+void	icmp_set_icmphdr(char *msg, int ident, int seqno)
+{
+	struct icmphdr	*header;
+
+	header = (struct icmphdr *)msg;
+	header->type = ICMP_ECHO;
+	header->code = 0;
+	header->checksum = 0;
+	header->un.echo.id = htons(ident);
+	header->un.echo.sequence = htons(seqno);
 }
