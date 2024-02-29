@@ -44,30 +44,51 @@ void	sig_int(int sig)
 	g_status = INTERRUPT;
 }
 
-void	main_loop(int sfd, t_ping *ping)
+struct timeval	_set_timeout(struct timeval last)
 {
-	struct timeval	timeout = {
+	struct timeval	now;
+	struct timeval	timeout;
+	struct timeval	interval = {
 		.tv_sec = 0,
 		.tv_usec = 10000,
 	};
+
+	get_current_timestamp(&now);
+	timeout = calc_time_sub(last, now);
+	timeout = calc_time_sub(timeout, interval);
+	// printf("now: %ld.%06ld\n", now.tv_sec, now.tv_usec);
+	// printf("last: %ld.%06ld\n", last.tv_sec, last.tv_usec);
+	//printf("timeout: %ld.%06ld\n", timeout.tv_sec, timeout.tv_usec);
+	return (timeout);
+}
+
+void	main_loop(int sfd, t_ping *ping)
+{
+	struct timeval	timeout;
+	struct timeval	last;
 	int 			ready;
 	fd_set			readfds;
 
+	get_current_timestamp(&last);
 	while (g_status != INTERRUPT)
 	{
-		if (g_status == SEND)
-			handle_request(sfd, ping);
 		FD_ZERO(&readfds);
 		FD_SET(sfd, &readfds);
+		timeout = _set_timeout(last);
 		ready = select(sfd + 1, &readfds, NULL, NULL, &timeout);
 		if (ready < 0)
 		{
-			if (errno == EINTR)
-				continue;
-			error_exit("select");
+			if (errno != EINTR)
+				error_exit("select");
+			printf("Interrupted system call\n");
 		}
 		else if (ready)
+		{
 			handle_reply(sfd, ping);
+			get_current_timestamp(&last);
+		}
+		if (g_status == SEND)
+			handle_request(sfd, ping);
 	}
 }
 
