@@ -42,13 +42,13 @@ static struct sockaddr	_get_sockaddr_by_hostname(char const *hostname)
 
 void	init(t_ping *ping, t_args *args)
 {
-	ping->req_host = args->params[0];
+	ping->dst_hostname = args->params[0];
 	ping->len = ICMP_DEFAULT_PACKET_SIZE;
 	if (args->flags[SIZE])
 		ping->len = args->flags[SIZE] + sizeof(struct icmphdr);
 
 	ping->dst_addr = _get_sockaddr_by_hostname(args->params[0]);
-	get_ip_addr(&ping->dst_addr, ping->req_ip);
+	get_ip_addr(&ping->dst_addr, ping->dst_ip);
 	ping->ident = getpid();
 	ping->sfd = create_raw_socket();
 }

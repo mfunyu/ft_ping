@@ -108,7 +108,7 @@ void	handle_reply(t_ping *ping)
 	{
 		if (icmp_calc_checksum((char *)&packet.icmphdr, ret - sizeof(struct iphdr)) != 0)
 			return ;
-		if (strncmp(ping->req_ip, r_data.ip, INET_ADDRSTRLEN) != 0)
+		if (strncmp(ping->dst_ip, r_data.ip, INET_ADDRSTRLEN) != 0)
 			return ;
 	}
 

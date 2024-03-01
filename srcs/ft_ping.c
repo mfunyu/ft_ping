@@ -88,7 +88,7 @@ void	print_footer(t_ping *ping)
 	double	avg;
 	double	variance;
 
-	printf("--- %s ping statistics ---\n", ping->req_host);
+	printf("--- %s ping statistics ---\n", ping->dst_hostname);
 	printf("%zu packets transmitted, %zu packets received, %zu%% packet loss\n",
 		ping->num_xmit, ping->stats.recieved, (ping->num_xmit - ping->stats.recieved) * 100 / ping->num_xmit);
 	if (ping->stats.recieved == 0)
@@ -106,7 +106,7 @@ void	ft_ping(t_args *args)
 
 	init(&ping, args);
 	signal(SIGINT, &sig_int);
-	printf("PING %s (%s): %ld data bytes\n", ping.req_host, ping.req_ip, ping.len - sizeof(struct icmphdr));
+	printf("PING %s (%s): %ld data bytes\n", ping.dst_hostname, ping.dst_ip, ping.len - sizeof(struct icmphdr));
 	main_loop(&ping);
 	print_footer(&ping);
 	cleanup(&ping);

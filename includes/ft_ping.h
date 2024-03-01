@@ -74,8 +74,8 @@ typedef struct	s_ping
 	int				sfd;
 	struct sockaddr	dst_addr;
 	t_stat			stats;
-	char			*req_host;
-	char			req_ip[INET_ADDRSTRLEN];
+	char			*dst_hostname;
+	char			dst_ip[INET_ADDRSTRLEN];
 	int				len;
 	size_t			num_xmit;
 	int				ident;
