@@ -86,11 +86,23 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	return (recvmsg(sfd, &msg, MSG_DONTWAIT));
 }
 
+static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret)
+{
+	struct timeval	tv_recv;
+
+	tv_recv = get_current_time();
+	echo_data->type = packet->icmphdr.type;
+	echo_data->len = ret - sizeof(struct iphdr);
+	resolve_source_info(packet, echo_data);
+	echo_data->ttl = packet->iphdr.ttl;
+	echo_data->sequence = ntohs(packet->icmphdr.echo_sequence);
+	echo_data->triptime = _calc_triptime(packet, tv_recv);
+}
+
 void	ping_recv(t_ping *ping)
 {
 	t_packet		packet;
 	ssize_t			ret;
-	struct timeval	tv_recv;
 	t_echo_data		echo_data;
 
 	ret = _recv_reply(ping->sfd, &packet);
@@ -100,12 +112,11 @@ void	ping_recv(t_ping *ping)
 			return ;
 		error_exit("recvmsg error");
 	}
-	tv_recv = get_current_time();
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
 
-	resolve_source_info(&packet, &echo_data);
-	if (packet.icmphdr.type == ICMP_ECHOREPLY)
+	_set_echo_data(&echo_data, &packet, ret);
+	if (echo_data.type == ICMP_ECHOREPLY)
 	{
 		if (icmp_calc_checksum((char *)&packet.icmphdr, ret - sizeof(struct iphdr)) != 0)
 			return ;
@@ -113,12 +124,8 @@ void	ping_recv(t_ping *ping)
 			return ;
 	}
 
-	echo_data.len = ret - sizeof(struct iphdr);
-	echo_data.type = packet.icmphdr.type;
-	echo_data.ttl = packet.iphdr.ttl;
-	echo_data.sequence = ntohs(packet.icmphdr.echo_sequence);
-	echo_data.triptime = _calc_triptime(&packet, tv_recv);
 	if (echo_data.type == ICMP_ECHOREPLY)
 		store_stats(ping, echo_data.triptime);
+
 	print_reply(&echo_data);
 }
