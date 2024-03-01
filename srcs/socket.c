@@ -9,28 +9,6 @@
 #include "error.h"
 #include "ft_ping.h"
 
-struct addrinfo	*host_to_addrinfo(char const *hostname)
-{
-	int				s;
-	struct addrinfo	*result;
-	struct addrinfo	hints;
-
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_RAW;
-	hints.ai_protocol = IPPROTO_ICMP;
-
-	s = getaddrinfo(hostname, NULL, &hints, &result);
-	if (s != 0)
-	{
-		if (s == -2)
-			error_exit("unknown host");
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
-		exit(EXIT_FAILURE);
-	}
-	return (result);
-}
-
 int create_raw_socket(void)
 {
 	int	sfd;
