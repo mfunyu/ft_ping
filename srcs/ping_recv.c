@@ -99,7 +99,7 @@ void	ping_recv(t_ping *ping)
 			return ;
 		error_exit("recvmsg error");
 	}
-	get_current_timestamp(&tv);
+	tv = get_current_time();
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
 

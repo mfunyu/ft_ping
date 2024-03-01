@@ -49,7 +49,7 @@ void	icmp_add_timestamp(char *msg)
 {
 	struct timeval	tv;
 
-	get_current_timestamp(&tv);
+	tv = get_current_time();
 	memcpy(msg + sizeof(struct icmphdr), &tv, sizeof(tv));
 }
 

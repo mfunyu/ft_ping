@@ -2,10 +2,13 @@
 #include <sys/time.h>
 #include "error.h"
 
-void	get_current_timestamp(struct timeval *tv)
+struct timeval	get_current_time(void)
 {
-	if (gettimeofday(tv, NULL))
+	struct timeval	tv;
+
+	if (gettimeofday(&tv, NULL))
 		error_exit("gettimeofday error");
+	return (tv);
 }
 
 void	calc_time_normalize(struct timeval *tv)

@@ -27,7 +27,7 @@ static void	_set_timeout(struct timeval *timeout, struct timeval last)
 		.tv_usec = PING_DEFAULT_INTERVAL_S * 1000000,
 	};
 
-	get_current_timestamp(&now);
+	now = get_current_time();
 	tmp = calc_time_sub(last, now);
 	*timeout = calc_time_sub(tmp, interval);
 }
@@ -41,7 +41,7 @@ static void	_ping_run(t_ping *ping)
 
 	print_header(*ping);
 	ping_send(ping);
-	get_current_timestamp(&last);
+	last = get_current_time();
 	while (!g_stop)
 	{
 		FD_ZERO(&readfds);
@@ -58,7 +58,7 @@ static void	_ping_run(t_ping *ping)
 		else
 		{
 			ping_send(ping);
-			get_current_timestamp(&last);
+			last = get_current_time();
 		}
 	}
 	print_footer(*ping);
