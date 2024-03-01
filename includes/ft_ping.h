@@ -72,7 +72,7 @@ typedef struct	s_stat
 typedef struct	s_ping
 {
 	int				sfd;
-	struct addrinfo	*addr;
+	struct sockaddr	dst_addr;
 	t_stat			stats;
 	char			*req_host;
 	char			req_ip[INET_ADDRSTRLEN];
@@ -105,7 +105,6 @@ void	icmp_add_timestamp(char *msg);
 void	icmp_set_data(char *msg, size_t total_len);
 void	icmp_add_checksum(char *msg, size_t len);
 
-struct addrinfo	*host_to_addrinfo(char const *hostname);
 int				create_raw_socket(void);
 void			cleanup(t_ping *ping);
 

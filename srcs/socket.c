@@ -21,6 +21,5 @@ int create_raw_socket(void)
 
 void	cleanup(t_ping *ping)
 {
-	freeaddrinfo(ping->addr);
 	close(ping->sfd);
 }

@@ -8,8 +8,8 @@
 static void	_send_request(char *msg, t_ping *ping)
 {
 	int	ret;
-	
-	ret = sendto(ping->sfd, msg, ping->len, 0, ping->addr->ai_addr, ping->addr->ai_addrlen);
+
+	ret = sendto(ping->sfd, msg, ping->len, 0, &ping->dst_addr, INET_ADDRSTRLEN);
 	if (ret == -1)
 		error_exit("sendto error");
 }
