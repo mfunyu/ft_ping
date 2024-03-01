@@ -24,7 +24,7 @@ static bool	_is_valid_packet(t_packet *packet, int ident)
 	return (true);
 }
 
-static void	store_stats(t_ping *ping, double triptime)
+static void	_store_stats(t_ping *ping, double triptime)
 {
 	ping->stats.recieved++;
 	ping->stats.sum += triptime;
@@ -61,7 +61,15 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 		.msg_iov		= &iov,
 		.msg_iovlen		= 1,
 	};
-	return (recvmsg(sfd, &msg, MSG_DONTWAIT));
+	ssize_t			ret;
+
+	ret = recvmsg(sfd, &msg, MSG_DONTWAIT);
+	if (ret < 0)
+	{
+		if (errno != EAGAIN && errno != EWOULDBLOCK)
+			error_exit("recvmsg error");
+	}
+	return (ret);
 }
 
 static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret)
@@ -86,11 +94,7 @@ void	ping_recv(t_ping *ping)
 
 	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)
-	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-			return ;
-		error_exit("recvmsg error");
-	}
+		return ;
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
 
@@ -104,7 +108,7 @@ void	ping_recv(t_ping *ping)
 	}
 
 	if (echo_data.type == ICMP_ECHOREPLY)
-		store_stats(ping, echo_data.triptime);
+		_store_stats(ping, echo_data.triptime);
 
 	print_reply(&echo_data);
 }
