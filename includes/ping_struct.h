@@ -78,9 +78,9 @@ typedef struct	s_echo_data
 	int				len;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
-	double			triptime;
 	int				sequence;
 	int				ttl;
+	double			triptime;
 }				t_echo_data;
 
 #endif /* PING_STRUCT_H */

@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include "print.h"
 #include "utils.h"
-#include <arpa/inet.h>
-#include <netdb.h>
 #include <string.h>
 
 static bool	_is_valid_packet(t_packet *packet, int ident)
@@ -24,26 +22,6 @@ static bool	_is_valid_packet(t_packet *packet, int ident)
 	else if (packet->req_icmphdr.echo_id != htons(ident))
 		return (false);
 	return (true);
-}
-
-void	resolve_source_info(t_packet *packet, t_echo_data *echo_data)
-{
-	const char			*result;
-	int					ret;
-	struct sockaddr_in	in = {
-		.sin_family = AF_INET,
-		.sin_addr = {
-			.s_addr = packet->iphdr.saddr
-		}
-	};
-
-	result = inet_ntop(AF_INET, &packet->iphdr.saddr, echo_data->ip, INET_ADDRSTRLEN);
-	if (result == NULL)
-		error_exit("inet_ntop error");
-
-	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), echo_data->host, HOST_NAME_MAX, NULL, 0, 0);
-	if (ret)
-		error_exit_gai("getnameinfo error", ret);
 }
 
 static void	store_stats(t_ping *ping, double triptime)
@@ -93,9 +71,10 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 	tv_recv = get_current_time();
 	echo_data->type = packet->icmphdr.type;
 	echo_data->len = ret - sizeof(struct iphdr);
-	resolve_source_info(packet, echo_data);
-	echo_data->ttl = packet->iphdr.ttl;
+	set_hostname_by_in_addr(echo_data->host, packet->iphdr.saddr);
+	set_ip_by_in_addr(echo_data->ip, packet->iphdr.saddr);
 	echo_data->sequence = ntohs(packet->icmphdr.echo_sequence);
+	echo_data->ttl = packet->iphdr.ttl;
 	echo_data->triptime = _calc_triptime(packet, tv_recv);
 }
 
