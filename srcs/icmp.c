@@ -1,5 +1,5 @@
 #include "ft_ping.h"
-#include "utils_time.h"
+#include "utils.h"
 #include <stdio.h>
 #include <string.h>
 #include <sys/time.h>

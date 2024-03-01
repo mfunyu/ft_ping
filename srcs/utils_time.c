@@ -60,15 +60,3 @@ struct timeval	get_timeout_time(struct timeval interval, struct timeval last)
 	rest = sub_time(passed, interval);
 	return (rest);
 }
-
-double	calc_sqrt(double x, double precision)
-{
-	double 	root;
-
-	if (x < precision)
-		return (0);
-	root = x / 2;
-	while (root * root - x > precision)
-		root = (root + x / root) / 2;
-	return (root);
-}

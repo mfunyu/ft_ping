@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "ft_ping.h"
-#include "utils_time.h"
+#include "utils.h"
 
 void	print_help(void)
 {
@@ -28,15 +28,15 @@ void	print_header(t_ping ping)
 	printf("PING %s (%s): %ld data bytes\n", ping.dst_hostname, ping.dst_ip, ping.len - sizeof(struct icmphdr));
 }
 
-static void	_print_stat(t_stat stats)
+static void	_print_stats(t_stat stats)
 {
 	double	avg;
-	double	variance;
+	double	stddev;
 
-	avg = stats.sum / stats.recieved;
-	variance = stats.sum_sq / stats.recieved - avg * avg;
+	avg = calc_avg(stats.sum, stats.recieved);
+	stddev = calc_stddev(stats.sum, stats.sum_sq, stats.recieved);
 	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
-		stats.min, avg, stats.max, calc_sqrt(variance, 0.0005));
+		stats.min, avg, stats.max, stddev);
 }
 
 void	print_footer(t_ping ping)
@@ -46,5 +46,5 @@ void	print_footer(t_ping ping)
 		ping.num_xmit, ping.stats.recieved, (ping.num_xmit - ping.stats.recieved) * 100 / ping.num_xmit);
 
 	if (ping.stats.recieved)
-		_print_stat(ping.stats);
+		_print_stats(ping.stats);
 }

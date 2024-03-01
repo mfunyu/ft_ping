@@ -1,6 +1,6 @@
 #include "ft_ping.h"
 #include "error.h"
-#include "utils_time.h"
+#include "utils.h"
 #include "print.h"
 #include <stdio.h>
 #include <unistd.h>

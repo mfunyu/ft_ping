@@ -8,6 +8,7 @@ SRCS	:= ft_ping.c \
 			ping_send.c \
 			init.c \
 			utils_time.c \
+			utils_math.c \
 			print_reply.c \
 			print_data.c
 

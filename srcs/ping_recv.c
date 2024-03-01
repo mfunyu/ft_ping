@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include "print.h"
-#include "utils_time.h"
+#include "utils.h"
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
@@ -49,7 +49,7 @@ static void	store_stats(t_ping *ping, double triptime)
 {
 	ping->stats.recieved++;
 	ping->stats.sum += triptime;
-	ping->stats.sum_sq += triptime * triptime;
+	ping->stats.sum_sq += calc_square(triptime);
 	if (ping->stats.min == 0 || triptime < ping->stats.min)
 		ping->stats.min = triptime;
 	if (triptime > ping->stats.max)
