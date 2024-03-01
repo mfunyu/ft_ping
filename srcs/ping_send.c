@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include "utils.h"
 
-static void	_send_request(char *msg, t_ping *ping)
+static void	_send_echo(char *msg, t_ping *ping)
 {
 	int	ret;
 
@@ -14,7 +14,7 @@ static void	_send_request(char *msg, t_ping *ping)
 		error_exit("sendto error");
 }
 
-void	handle_request(t_ping *ping)
+void	ping_send(t_ping *ping)
 {
 	char	msg[ICMP_MAX_PACKET_SIZE];
 
@@ -23,7 +23,7 @@ void	handle_request(t_ping *ping)
 	icmp_add_timestamp(msg);
 	icmp_add_checksum(msg, ping->len);
 
-	_send_request(msg, ping);
+	_send_echo(msg, ping);
 	ping->num_xmit++;
 	printf("ping\n");
 }

@@ -41,7 +41,7 @@ static void	_ping_run(t_ping *ping)
 	fd_set			readfds;
 
 	print_header(*ping);
-	handle_request(ping);
+	ping_send(ping);
 	get_current_timestamp(&last);
 	while (!g_stop)
 	{
@@ -55,10 +55,10 @@ static void	_ping_run(t_ping *ping)
 				error_exit("select");
 		}
 		else if (ready)
-			handle_reply(ping);
+			ping_recv(ping);
 		else
 		{
-			handle_request(ping);
+			ping_send(ping);
 			get_current_timestamp(&last);
 		}
 	}

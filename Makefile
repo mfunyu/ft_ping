@@ -4,8 +4,8 @@ SRCS	:= ft_ping.c \
 			parser.c \
 			error.c \
 			icmp.c \
-			handle_reply.c \
-			handle_request.c \
+			ping_recv.c \
+			ping_send.c \
 			init.c \
 			utils.c \
 			print_reply.c \

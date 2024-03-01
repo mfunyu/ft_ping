@@ -96,8 +96,8 @@ void	parse_args(t_args *args, int ac, char **av);
 
 void	ping_init(t_ping *ping, t_args *args);
 
-void	handle_request(t_ping *ping);
-void	handle_reply(t_ping *ping);
+void	ping_send(t_ping *ping);
+void	ping_recv(t_ping *ping);
 
 uint16_t	icmp_calc_checksum(char *msg, size_t len);
 void	icmp_set_icmphdr(char *msg, int ident, int seqno);
