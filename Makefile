@@ -8,7 +8,8 @@ SRCS	:= ft_ping.c \
 			handle_request.c \
 			init.c \
 			utils.c \
-			print_reply.c
+			print_reply.c \
+			print_data.c
 
 # ---------------------------------------------------------------------------- #
 #                                     PATHS                                    #
