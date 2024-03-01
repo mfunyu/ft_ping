@@ -7,23 +7,6 @@
 #include "utils.h"
 #include <string.h>
 
-static bool	_is_valid_packet(t_packet *packet, int ident)
-{
-	/* ignore requests */
-	if (packet->icmphdr.type == ICMP_ECHO)
-		return (false);
-
-	/* ignore responses to other ping */
-	if (packet->icmphdr.type == ICMP_ECHOREPLY)
-	{
-		if (packet->icmphdr.echo_id != htons(ident))
-			return (false);
-	}
-	else if (packet->req_icmphdr.echo_id != htons(ident))
-		return (false);
-	return (true);
-}
-
 static void	_store_stats(t_ping *ping, double triptime)
 {
 	ping->stats.recieved++;
@@ -45,8 +28,41 @@ static double	_calc_triptime(t_packet *packet, struct timeval tv_reply)
 	memcpy(data, packet->icmpdata, sizeof(struct timeval));
 	tv_request = (struct timeval *)data;
 	triptime = diff_time(*tv_request, tv_reply);
-	printf("tv_request: %ld.%06ld\n", tv_request->tv_sec, tv_request->tv_usec);
 	return (triptime);
+}
+
+static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret)
+{
+	struct timeval	tv_recv;
+
+	tv_recv = get_current_time();
+	echo_data->type = packet->icmphdr.type;
+	echo_data->len = ret - sizeof(struct iphdr);
+	set_hostname_by_in_addr(echo_data->host, packet->iphdr.saddr);
+	set_ip_by_in_addr(echo_data->ip, packet->iphdr.saddr);
+	if (echo_data->type == ICMP_ECHOREPLY)
+	{
+		echo_data->sequence = ntohs(packet->icmphdr.echo_sequence);
+		echo_data->ttl = packet->iphdr.ttl;
+		echo_data->triptime = _calc_triptime(packet, tv_recv);
+	}
+}
+
+static bool	_is_valid_packet(t_packet *packet, int ident)
+{
+	/* ignore requests */
+	if (packet->icmphdr.type == ICMP_ECHO)
+		return (false);
+
+	/* ignore responses to other ping */
+	if (packet->icmphdr.type == ICMP_ECHOREPLY)
+	{
+		if (packet->icmphdr.echo_id != htons(ident))
+			return (false);
+	}
+	else if (packet->req_icmphdr.echo_id != htons(ident))
+		return (false);
+	return (true);
 }
 
 static ssize_t	_recv_reply(int sfd, t_packet *packet)
@@ -72,19 +88,6 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	return (ret);
 }
 
-static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret)
-{
-	struct timeval	tv_recv;
-
-	tv_recv = get_current_time();
-	echo_data->type = packet->icmphdr.type;
-	echo_data->len = ret - sizeof(struct iphdr);
-	set_hostname_by_in_addr(echo_data->host, packet->iphdr.saddr);
-	set_ip_by_in_addr(echo_data->ip, packet->iphdr.saddr);
-	echo_data->sequence = ntohs(packet->icmphdr.echo_sequence);
-	echo_data->ttl = packet->iphdr.ttl;
-	echo_data->triptime = _calc_triptime(packet, tv_recv);
-}
 
 void	ping_recv(t_ping *ping)
 {
