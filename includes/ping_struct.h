@@ -72,7 +72,7 @@ typedef struct	s_ping
 	struct timeval	interval;
 }				t_ping;
 
-typedef struct	s_reply_data
+typedef struct	s_echo_data
 {
 	int				type;
 	int				len;
@@ -81,6 +81,6 @@ typedef struct	s_reply_data
 	double			triptime;
 	int				sequence;
 	int				ttl;
-}				t_reply_data;
+}				t_echo_data;
 
 #endif /* PING_STRUCT_H */

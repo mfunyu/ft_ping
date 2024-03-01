@@ -26,7 +26,7 @@ static bool	_is_valid_packet(t_packet *packet, int ident)
 	return (true);
 }
 
-void	resolve_source_info(t_packet *packet, t_reply_data *r_data)
+void	resolve_source_info(t_packet *packet, t_echo_data *echo_data)
 {
 	const char			*result;
 	int					ret;
@@ -37,11 +37,11 @@ void	resolve_source_info(t_packet *packet, t_reply_data *r_data)
 		}
 	};
 
-	result = inet_ntop(AF_INET, &packet->iphdr.saddr, r_data->ip, INET_ADDRSTRLEN);
+	result = inet_ntop(AF_INET, &packet->iphdr.saddr, echo_data->ip, INET_ADDRSTRLEN);
 	if (result == NULL)
 		error_exit("inet_ntop error");
 
-	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), r_data->host, HOST_NAME_MAX, NULL, 0, 0);
+	ret = getnameinfo((struct sockaddr *)&in, sizeof(struct sockaddr_in), echo_data->host, HOST_NAME_MAX, NULL, 0, 0);
 	if (ret)
 		error_exit_gai("getnameinfo error", ret);
 }
@@ -90,8 +90,8 @@ void	ping_recv(t_ping *ping)
 {
 	t_packet		packet;
 	ssize_t			ret;
-	struct timeval	tv;
-	t_reply_data	r_data;
+	struct timeval	tv_recv;
+	t_echo_data		echo_data;
 
 	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)
@@ -100,25 +100,25 @@ void	ping_recv(t_ping *ping)
 			return ;
 		error_exit("recvmsg error");
 	}
-	tv = get_current_time();
+	tv_recv = get_current_time();
 	if (!_is_valid_packet(&packet, ping->ident))
 		return ;
 
-	resolve_source_info(&packet, &r_data);
+	resolve_source_info(&packet, &echo_data);
 	if (packet.icmphdr.type == ICMP_ECHOREPLY)
 	{
 		if (icmp_calc_checksum((char *)&packet.icmphdr, ret - sizeof(struct iphdr)) != 0)
 			return ;
-		if (strncmp(ping->dst_ip, r_data.ip, INET_ADDRSTRLEN) != 0)
+		if (strncmp(ping->dst_ip, echo_data.ip, INET_ADDRSTRLEN) != 0)
 			return ;
 	}
 
-	r_data.len = ret - sizeof(struct iphdr);
-	r_data.type = packet.icmphdr.type;
-	r_data.ttl = packet.iphdr.ttl;
-	r_data.sequence = ntohs(packet.icmphdr.echo_sequence);
-	r_data.triptime = _calc_triptime(&packet, tv);
-	if (r_data.type == ICMP_ECHOREPLY)
-		store_stats(ping, r_data.triptime);
-	print_reply(&r_data);
+	echo_data.len = ret - sizeof(struct iphdr);
+	echo_data.type = packet.icmphdr.type;
+	echo_data.ttl = packet.iphdr.ttl;
+	echo_data.sequence = ntohs(packet.icmphdr.echo_sequence);
+	echo_data.triptime = _calc_triptime(&packet, tv_recv);
+	if (echo_data.type == ICMP_ECHOREPLY)
+		store_stats(ping, echo_data.triptime);
+	print_reply(&echo_data);
 }
