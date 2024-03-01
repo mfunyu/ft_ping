@@ -1,7 +1,8 @@
 #include "ft_ping.h"
 #include "ping_struct.h"
-#include "error.h"
+#include "ping_error.h"
 #include "utils.h"
+#include "parser.h"
 #include <unistd.h>
 
 static int _create_socket(void)

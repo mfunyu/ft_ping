@@ -2,7 +2,7 @@
 #include <string.h>
 #include <netdb.h>
 #include <limits.h>
-#include "error.h"
+#include "ping_error.h"
 
 void	set_ip_by_sockaddr(char *ip, struct sockaddr const *addr)
 {

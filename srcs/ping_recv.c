@@ -1,11 +1,12 @@
 #include "ft_ping.h"
 #include "ping_struct.h"
-#include "error.h"
+#include "ping_error.h"
+#include "ping_print.h"
+#include "utils.h"
 #include <errno.h>
 #include <stdio.h>
-#include "print.h"
-#include "utils.h"
 #include <string.h>
+#include <stdbool.h>
 
 static void	_store_stats(t_ping *ping, double triptime)
 {
@@ -99,9 +100,9 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 
 void	ping_recv(t_ping *ping)
 {
-	t_packet		packet;
-	ssize_t			ret;
-	t_echo_data		echo_data;
+	t_packet	packet;
+	ssize_t		ret;
+	t_echo_data	echo_data;
 
 	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)

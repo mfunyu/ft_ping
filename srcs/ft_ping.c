@@ -1,13 +1,13 @@
 #include "ft_ping.h"
 #include "ping_struct.h"
-#include "error.h"
+#include "ping_error.h"
 #include "utils.h"
-#include "print.h"
+#include "parser.h"
+#include "ping_print.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <stdlib.h>
-#include <netinet/ip_icmp.h>
-#include <sys/time.h>
 #include <signal.h>
 #include <errno.h>
 

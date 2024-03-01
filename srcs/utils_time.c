@@ -1,6 +1,6 @@
 #include <stddef.h>
 #include <sys/time.h>
-#include "error.h"
+#include "ping_error.h"
 
 struct timeval	get_current_time(void)
 {

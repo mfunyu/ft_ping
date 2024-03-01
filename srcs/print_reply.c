@@ -4,7 +4,7 @@
 #include <netinet/ip_icmp.h>
 #include "ft_ping.h"
 #include "ping_struct.h"
-#include "error.h"
+#include "ping_error.h"
 
 void	print_icmp_error()
 {
