@@ -73,9 +73,9 @@ typedef struct	s_ping
 {
 	int				sfd;
 	struct sockaddr	dst_addr;
-	t_stat			stats;
 	char			*dst_hostname;
 	char			dst_ip[INET_ADDRSTRLEN];
+	t_stat			stats;
 	int				len;
 	size_t			num_xmit;
 	int				ident;
@@ -93,8 +93,8 @@ typedef struct	s_reply_data
 }				t_reply_data;
 
 void	parse_args(t_args *args, int ac, char **av);
-void	print_args(t_args args);
-void	init(t_ping *ping, t_args *args);
+
+void	ping_init(t_ping *ping, t_args *args);
 
 void	handle_request(t_ping *ping);
 void	handle_reply(t_ping *ping);

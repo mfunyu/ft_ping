@@ -33,13 +33,14 @@ struct timeval	_set_timeout(struct timeval last)
 	return (timeout);
 }
 
-void	main_loop(t_ping *ping)
+static void	_ping_run(t_ping *ping)
 {
 	struct timeval	interval;
 	struct timeval	last;
 	int 			ready;
 	fd_set			readfds;
 
+	print_header(*ping);
 	handle_request(ping);
 	get_current_timestamp(&last);
 	while (!g_stop)
@@ -61,21 +62,10 @@ void	main_loop(t_ping *ping)
 			get_current_timestamp(&last);
 		}
 	}
+	print_footer(*ping);
 }
 
-void	ft_ping(t_args *args)
-{
-	t_ping	ping = {0};
-
-	init(&ping, args);
-	signal(SIGINT, &sig_int);
-	print_header(ping);
-	main_loop(&ping);
-	print_footer(ping);
-	close(ping.sfd);
-}
-
-void	handle_args(t_args *args, int ac, char **av)
+static void	_handle_args(t_args *args, int ac, char **av)
 {
 	if (ac <= 1)
 		error_exit_usage("missing host operand");
@@ -92,8 +82,11 @@ void	handle_args(t_args *args, int ac, char **av)
 int	main(int ac, char **av)
 {
 	t_args	args = {0};
+	t_ping	ping = {0};
 
-	handle_args(&args, ac, av);
-	ft_ping(&args);
+	_handle_args(&args, ac, av);
+	ping_init(&ping, &args);
+	signal(SIGINT, &sig_int);
+	_ping_run(&ping);
 	return (0);
 }

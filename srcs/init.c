@@ -47,7 +47,7 @@ static int _create_socket(void)
 	return (sfd);
 }
 
-void	init(t_ping *ping, t_args *args)
+void	ping_init(t_ping *ping, t_args *args)
 {
 	ping->dst_hostname = args->params[0];
 	ping->len = ICMP_DEFAULT_PACKET_SIZE;
