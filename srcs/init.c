@@ -17,10 +17,11 @@ char	*get_ip_addr(struct sockaddr *addr, char *ip)
 	return (ip);
 }
 
-void	host_to_addrinfo(char const *hostname, struct sockaddr *addr)
+static struct sockaddr	_get_sockaddr_by_hostname(char const *hostname)
 {
 	int				ret;
 	struct addrinfo	*result;
+	struct sockaddr	addr;
 	struct addrinfo	hints = {
 		.ai_family = AF_INET,
 		.ai_socktype = SOCK_RAW,
@@ -34,10 +35,10 @@ void	host_to_addrinfo(char const *hostname, struct sockaddr *addr)
 			error_exit("unknown host");
 		error_exit_gai("getaddrinfo error", ret);
 	}
-	memcpy(addr, result->ai_addr, INET_ADDRSTRLEN);
+	memcpy(&addr, result->ai_addr, sizeof(struct sockaddr));
 	freeaddrinfo(result);
+	return (addr);
 }
-
 
 void	init(t_ping *ping, t_args *args)
 {
@@ -46,7 +47,7 @@ void	init(t_ping *ping, t_args *args)
 	if (args->flags[SIZE])
 		ping->len = args->flags[SIZE] + sizeof(struct icmphdr);
 
-	host_to_addrinfo(args->params[0], &ping->dst_addr);
+	ping->dst_addr = _get_sockaddr_by_hostname(args->params[0]);
 	get_ip_addr(&ping->dst_addr, ping->req_ip);
 	ping->ident = getpid();
 	ping->sfd = create_raw_socket();
