@@ -18,6 +18,15 @@ static void	_store_stats(t_ping *ping, double triptime)
 		ping->stats.max = triptime;
 }
 
+static bool	_is_valid_packet(t_packet *packet, t_ping *ping, t_echo_data *echo_data)
+{
+	if (icmp_calc_checksum((char *)&packet->icmphdr, echo_data->icmplen) != 0)
+		return (false);
+	if (strncmp(ping->dst_ip, echo_data->ip, INET_ADDRSTRLEN) != 0)
+		return (false);
+	return (true);
+}
+
 static double	_calc_triptime(t_packet *packet, struct timeval tv_reply)
 {
 	uint8_t			data[sizeof(struct timeval)];
@@ -48,7 +57,7 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 	}
 }
 
-static bool	_is_valid_packet(t_packet *packet, int ident)
+static bool	_is_reply(t_packet *packet, int ident)
 {
 	/* ignore requests */
 	if (packet->icmphdr.type == ICMP_ECHO)
@@ -88,7 +97,6 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	return (ret);
 }
 
-
 void	ping_recv(t_ping *ping)
 {
 	t_packet		packet;
@@ -98,20 +106,16 @@ void	ping_recv(t_ping *ping)
 	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)
 		return ;
-	if (!_is_valid_packet(&packet, ping->ident))
+	if (!_is_reply(&packet, ping->ident))
 		return ;
 
 	_set_echo_data(&echo_data, &packet, ret);
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
-		if (icmp_calc_checksum((char *)&packet.icmphdr, ret - sizeof(struct iphdr)) != 0)
+		if (!_is_valid_packet(&packet, ping, &echo_data))
 			return ;
-		if (strncmp(ping->dst_ip, echo_data.ip, INET_ADDRSTRLEN) != 0)
-			return ;
-	}
-
-	if (echo_data.type == ICMP_ECHOREPLY)
 		_store_stats(ping, echo_data.triptime);
+	}
 
 	print_reply(&echo_data);
 }
