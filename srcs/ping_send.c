@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <netdb.h>
 #include <sys/time.h>
-#include "utils.h"
+#include "utils_time.h"
 
 static void	_send_echo(char *msg, t_ping *ping)
 {

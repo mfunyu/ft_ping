@@ -79,6 +79,7 @@ typedef struct	s_ping
 	int				len;
 	size_t			num_xmit;
 	int				ident;
+	struct timeval	interval;
 }				t_ping;
 
 typedef struct	s_reply_data

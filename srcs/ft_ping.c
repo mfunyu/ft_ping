@@ -1,6 +1,6 @@
 #include "ft_ping.h"
 #include "error.h"
-#include "utils.h"
+#include "utils_time.h"
 #include "print.h"
 #include <stdio.h>
 #include <unistd.h>
@@ -18,20 +18,6 @@ void	sig_int(int sig)
 	g_stop = true;
 }
 
-static void	_set_timeout(struct timeval *timeout, struct timeval last)
-{
-	struct timeval	now;
-	struct timeval	tmp;
-	struct timeval	interval = {
-		.tv_sec = 0,
-		.tv_usec = PING_DEFAULT_INTERVAL_S * 1000000,
-	};
-
-	now = get_current_time();
-	tmp = calc_time_sub(last, now);
-	*timeout = calc_time_sub(tmp, interval);
-}
-
 static void	_ping_run(t_ping *ping)
 {
 	struct timeval	interval;
@@ -46,7 +32,7 @@ static void	_ping_run(t_ping *ping)
 	{
 		FD_ZERO(&readfds);
 		FD_SET(ping->sfd, &readfds);
-		_set_timeout(&interval, last);
+		interval = get_timeout_time(ping->interval, last);
 		ready = select(ping->sfd + 1, &readfds, NULL, NULL, &interval);
 		if (ready < 0)
 		{

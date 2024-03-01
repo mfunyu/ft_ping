@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include "ft_ping.h"
-#include "utils.h"
+#include "utils_time.h"
 
 void	print_help(void)
 {

@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include "print.h"
-#include "utils.h"
+#include "utils_time.h"
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <string.h>
@@ -65,7 +65,7 @@ static double	_calc_triptime(t_packet *packet, struct timeval tv_reply)
 	// avoid alignment issues
 	memcpy(data, packet->icmpdata, sizeof(struct timeval));
 	tv_request = (struct timeval *)data;
-	triptime = calc_time_diff(*tv_request, tv_reply);
+	triptime = diff_time(*tv_request, tv_reply);
 	printf("tv_request: %ld.%06ld\n", tv_request->tv_sec, tv_request->tv_usec);
 	return (triptime);
 }

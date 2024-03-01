@@ -57,5 +57,7 @@ void	ping_init(t_ping *ping, t_args *args)
 	_set_sockaddr_by_hostname(&ping->dst_addr, ping->dst_hostname);
 	_set_ip_by_sockaddr(ping->dst_ip, &ping->dst_addr);
 	ping->ident = getpid();
+	ping->interval.tv_sec = 0;
+	ping->interval.tv_usec = PING_DEFAULT_INTERVAL_S * 1000000;
 	ping->sfd = _create_socket();
 }

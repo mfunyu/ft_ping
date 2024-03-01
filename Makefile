@@ -7,7 +7,7 @@ SRCS	:= ft_ping.c \
 			ping_recv.c \
 			ping_send.c \
 			init.c \
-			utils.c \
+			utils_time.c \
 			print_reply.c \
 			print_data.c
 
