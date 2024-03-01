@@ -6,7 +6,7 @@
 # include <stddef.h>
 # include <limits.h>
 
-# define ICMP_DEFAULT_PACKET_SIZE	64
+# define ICMP_DEFAULT_DATA_SIZE	64 - sizeof(struct icmphdr)
 # define ICMP_MAX_PACKET_SIZE		65400
 
 # define PING_DEFAULT_INTERVAL_S	1 /* second */

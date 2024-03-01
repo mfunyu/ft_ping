@@ -17,9 +17,10 @@ static int _create_socket(void)
 void	ping_init(t_ping *ping, t_args *args)
 {
 	ping->dst_hostname = args->params[0];
-	ping->len = ICMP_DEFAULT_PACKET_SIZE;
+	ping->datalen = ICMP_DEFAULT_DATA_SIZE;
 	if (args->flags[SIZE])
-		ping->len = args->flags[SIZE] + sizeof(struct icmphdr);
+		ping->datalen = args->flags[SIZE];
+	ping->icmplen = sizeof(struct icmphdr) + ping->datalen;
 
 	set_sockaddr_by_hostname(&ping->dst_addr, ping->dst_hostname);
 	set_ip_by_sockaddr(ping->dst_ip, &ping->dst_addr);

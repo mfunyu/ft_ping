@@ -66,7 +66,8 @@ typedef struct	s_ping
 	char			*dst_hostname;
 	char			dst_ip[INET_ADDRSTRLEN];
 	t_stat			stats;
-	int				len;
+	int				icmplen;
+	int				datalen;
 	size_t			num_xmit;
 	int				ident;
 	struct timeval	interval;
@@ -75,7 +76,7 @@ typedef struct	s_ping
 typedef struct	s_echo_data
 {
 	int				type;
-	int				len;
+	int				icmplen;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
 	int				sequence;

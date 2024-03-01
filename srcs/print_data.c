@@ -26,7 +26,7 @@ for any corresponding short options.\n\n");
 
 void	print_header(t_ping ping)
 {
-	printf("PING %s (%s): %ld data bytes\n", ping.dst_hostname, ping.dst_ip, ping.len - sizeof(struct icmphdr));
+	printf("PING %s (%s): %d data bytes\n", ping.dst_hostname, ping.dst_ip, ping.datalen);
 }
 
 static void	_print_stats(t_stat stats)

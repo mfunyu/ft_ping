@@ -22,7 +22,7 @@ static void	_print_stats(t_echo_data *echo_data)
 
 void	print_reply(t_echo_data *echo_data)
 {
-	printf("%d bytes from", echo_data->len);
+	printf("%d bytes from", echo_data->icmplen);
 	switch (echo_data->type)
 	{
 	case ICMP_ECHOREPLY:
