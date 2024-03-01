@@ -109,7 +109,7 @@ void	ft_ping(t_args *args)
 	printf("PING %s (%s): %ld data bytes\n", ping.dst_hostname, ping.dst_ip, ping.len - sizeof(struct icmphdr));
 	main_loop(&ping);
 	print_footer(&ping);
-	cleanup(&ping);
+	close(ping.sfd);
 }
 
 void	handle_args(t_args *args, int ac, char **av)

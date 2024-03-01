@@ -37,6 +37,16 @@ static void	_set_sockaddr_by_hostname(struct sockaddr *addr, char const *hostnam
 	freeaddrinfo(result);
 }
 
+static int _create_socket(void)
+{
+	int	sfd;
+
+	sfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
+	if (sfd == -1)
+		error_exit("socket error");
+	return (sfd);
+}
+
 void	init(t_ping *ping, t_args *args)
 {
 	ping->dst_hostname = args->params[0];
@@ -47,5 +57,5 @@ void	init(t_ping *ping, t_args *args)
 	_set_sockaddr_by_hostname(&ping->dst_addr, ping->dst_hostname);
 	_set_ip_by_sockaddr(ping->dst_ip, &ping->dst_addr);
 	ping->ident = getpid();
-	ping->sfd = create_raw_socket();
+	ping->sfd = _create_socket();
 }

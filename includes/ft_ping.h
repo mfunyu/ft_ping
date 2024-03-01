@@ -105,7 +105,4 @@ void	icmp_add_timestamp(char *msg);
 void	icmp_set_data(char *msg, size_t total_len);
 void	icmp_add_checksum(char *msg, size_t len);
 
-int				create_raw_socket(void);
-void			cleanup(t_ping *ping);
-
 #endif /* FT_PING_H */
