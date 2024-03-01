@@ -33,14 +33,14 @@ void	icmp_add_checksum(char *msg, size_t len)
 
 void	icmp_set_data(char *msg, size_t total_len)
 {
-	size_t	start;
+	size_t	offset;
 	size_t	i;
 
-	start = sizeof(struct icmphdr) + sizeof(struct timeval);
+	offset = sizeof(struct icmphdr) + sizeof(struct timeval);
 	i = 0;
-	while (start + i < total_len)
+	while (offset + i < total_len)
 	{
-		msg[start + i] = i % 256;
+		msg[offset + i] = i % 256;
 		i++;
 	}
 }
