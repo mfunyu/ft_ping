@@ -3,6 +3,7 @@
 #include <sys/time.h>
 #include <netinet/ip_icmp.h>
 #include "ft_ping.h"
+#include "ping_struct.h"
 #include "error.h"
 
 void	print_icmp_error()

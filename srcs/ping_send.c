@@ -1,4 +1,5 @@
 #include "ft_ping.h"
+#include "ping_struct.h"
 #include "error.h"
 #include <stdio.h>
 #include <netdb.h>

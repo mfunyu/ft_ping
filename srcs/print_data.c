@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "ft_ping.h"
+#include "ping_struct.h"
 #include "utils.h"
 
 void	print_help(void)
