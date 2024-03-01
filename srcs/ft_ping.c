@@ -18,19 +18,18 @@ void	sig_int(int sig)
 	g_stop = true;
 }
 
-struct timeval	_set_timeout(struct timeval last)
+static void	_set_timeout(struct timeval *timeout, struct timeval last)
 {
 	struct timeval	now;
-	struct timeval	timeout;
+	struct timeval	tmp;
 	struct timeval	interval = {
 		.tv_sec = 0,
 		.tv_usec = PING_DEFAULT_INTERVAL_S * 1000000,
 	};
 
 	get_current_timestamp(&now);
-	timeout = calc_time_sub(last, now);
-	timeout = calc_time_sub(timeout, interval);
-	return (timeout);
+	tmp = calc_time_sub(last, now);
+	*timeout = calc_time_sub(tmp, interval);
 }
 
 static void	_ping_run(t_ping *ping)
@@ -47,7 +46,7 @@ static void	_ping_run(t_ping *ping)
 	{
 		FD_ZERO(&readfds);
 		FD_SET(ping->sfd, &readfds);
-		interval = _set_timeout(last);
+		_set_timeout(&interval, last);
 		ready = select(ping->sfd + 1, &readfds, NULL, NULL, &interval);
 		if (ready < 0)
 		{
