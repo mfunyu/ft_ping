@@ -23,17 +23,19 @@ static void	_ping_run(t_ping *ping)
 	struct timeval	interval;
 	struct timeval	last;
 	int 			ready;
+	int 			fd_max;
 	fd_set			readfds;
 
 	print_header(*ping);
 	ping_send(ping);
+	fd_max = ping->sfd + 1;
 	last = get_current_time();
 	while (!g_stop)
 	{
 		FD_ZERO(&readfds);
 		FD_SET(ping->sfd, &readfds);
 		interval = get_timeout_time(ping->interval, last);
-		ready = select(ping->sfd + 1, &readfds, NULL, NULL, &interval);
+		ready = select(fd_max, &readfds, NULL, NULL, &interval);
 		if (ready < 0)
 		{
 			if (errno != EINTR)
