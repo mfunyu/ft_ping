@@ -1,5 +1,5 @@
 #include "parser.h"
-#include "error.h"
+#include "ping_error.h"
 #include "libft.h"
 #include "ft_ping.h"
 #include <stddef.h>

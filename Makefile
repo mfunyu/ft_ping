@@ -1,15 +1,17 @@
 NAME	:= ft_ping
 
 SRCS	:= ft_ping.c \
-			parser.c \
-			error.c \
 			icmp.c \
-			socket.c \
-			handle_reply.c \
-			handle_request.c \
-			init.c \
-			utils.c \
-			print_reply.c
+			parser.c \
+			ping_error.c \
+			ping_init.c \
+			ping_recv.c \
+			ping_send.c \
+			utils_time.c \
+			utils_math.c \
+			utils_inet.c \
+			print_reply.c \
+			print_data.c
 
 # ---------------------------------------------------------------------------- #
 #                                     PATHS                                    #
