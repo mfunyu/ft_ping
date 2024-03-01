@@ -21,21 +21,20 @@ char	*get_ip_addr(struct addrinfo *addr, char *ip)
 
 struct addrinfo	*host_to_addrinfo(char const *hostname)
 {
-	int				s;
+	int				ret;
 	struct addrinfo	*result;
-	struct addrinfo	hints;
+	struct addrinfo	hints = {
+		.ai_family = AF_INET,
+		.ai_socktype = SOCK_RAW,
+		.ai_protocol = IPPROTO_ICMP
+	};
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_INET;
-	hints.ai_socktype = SOCK_RAW;
-	hints.ai_protocol = IPPROTO_ICMP;
-
-	s = getaddrinfo(hostname, NULL, &hints, &result);
-	if (s != 0)
+	ret = getaddrinfo(hostname, NULL, &hints, &result);
+	if (ret)
 	{
-		if (s == -2)
+		if (ret == EAI_NONAME)
 			error_exit("unknown host");
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
 		exit(EXIT_FAILURE);
 	}
 	return (result);
