@@ -17,11 +17,8 @@ char	*get_ip_addr(struct addrinfo *addr, char *ip)
 	return (ip);
 }
 
-
 void	init(t_ping *ping, t_args *args)
 {
-	memset(ping, 0, sizeof(t_ping));
-
 	ping->req_host = args->params[0];
 	ping->len = ICMP_DEFAULT_PACKET_SIZE;
 	if (args->flags[SIZE])
@@ -30,4 +27,5 @@ void	init(t_ping *ping, t_args *args)
 	ping->addr = host_to_addrinfo(args->params[0]);
 	get_ip_addr(ping->addr, ping->req_ip);
 	ping->ident = getpid();
+	ping->sfd = create_raw_socket();
 }

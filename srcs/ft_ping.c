@@ -102,10 +102,9 @@ void	print_footer(t_ping *ping)
 
 void	ft_ping(t_args *args)
 {
-	t_ping	ping;
+	t_ping	ping = {0};
 
 	init(&ping, args);
-	ping.sfd = create_raw_socket();
 	signal(SIGINT, &sig_int);
 	printf("PING %s (%s): %ld data bytes\n", ping.req_host, ping.req_ip, ping.len - sizeof(struct icmphdr));
 	main_loop(&ping);
@@ -113,7 +112,7 @@ void	ft_ping(t_args *args)
 	cleanup(&ping);
 }
 
-void	check_arguments(t_args *args, int ac, char **av)
+void	handle_args(t_args *args, int ac, char **av)
 {
 	if (ac <= 1)
 		error_exit_usage("missing host operand");
@@ -125,14 +124,13 @@ void	check_arguments(t_args *args, int ac, char **av)
 	}
 	if (!args->params[0])
 		error_exit_usage("missing host operand");
-	//print_args(args);
 }
 
 int	main(int ac, char **av)
 {
 	t_args	args = {0};
 
-	check_arguments(&args, ac, av);
+	handle_args(&args, ac, av);
 	ft_ping(&args);
 	return (0);
 }
