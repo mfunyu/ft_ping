@@ -4,8 +4,6 @@
 #include <string.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
 
 char	*get_ip_addr(struct addrinfo *addr, char *ip)
 {
@@ -34,8 +32,7 @@ struct addrinfo	*host_to_addrinfo(char const *hostname)
 	{
 		if (ret == EAI_NONAME)
 			error_exit("unknown host");
-		fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(ret));
-		exit(EXIT_FAILURE);
+		error_exit_gai("getaddrinfo error", ret);
 	}
 	return (result);
 }
