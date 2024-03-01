@@ -1,12 +1,12 @@
 NAME	:= ft_ping
 
 SRCS	:= ft_ping.c \
-			parser.c \
-			error.c \
 			icmp.c \
+			parser.c \
+			ping_error.c \
+			ping_init.c \
 			ping_recv.c \
 			ping_send.c \
-			init.c \
 			utils_time.c \
 			utils_math.c \
 			print_reply.c \
