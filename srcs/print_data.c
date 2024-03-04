@@ -26,7 +26,10 @@ for any corresponding short options.\n\n");
 
 void	print_header(t_ping ping)
 {
-	printf("PING %s (%s): %d data bytes\n", ping.dst_hostname, ping.dst_ip, ping.datalen);
+	printf("PING %s (%s): %d data bytes", ping.dst_hostname, ping.dst_ip, ping.datalen);
+	if (ping.verbose)
+		printf(", id 0x%04x = %d", ping.ident, ping.ident);
+	printf("\n");
 }
 
 static void	_print_stats(t_stat stats)

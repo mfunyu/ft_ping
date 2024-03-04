@@ -22,6 +22,9 @@ void	ping_init(t_ping *ping, t_args *args)
 	if (args->flags[SIZE])
 		ping->datalen = args->flags[SIZE];
 	ping->icmplen = sizeof(struct icmphdr) + ping->datalen;
+	ping->verbose = false;
+	if (args->flags[VERBOSE])
+		ping->verbose = true;
 
 	set_sockaddr_by_hostname(&ping->dst_addr, ping->dst_hostname);
 	set_ip_by_sockaddr(ping->dst_ip, &ping->dst_addr);

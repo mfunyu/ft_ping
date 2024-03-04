@@ -2,6 +2,7 @@
 # define PING_STRUCT_H
 
 # include <netinet/ip_icmp.h>
+# include <stdbool.h>
 
 /*
 **  0                   1                   2                   3
@@ -65,6 +66,7 @@ typedef struct	s_ping
 	struct sockaddr	dst_addr;
 	char			*dst_hostname;
 	char			dst_ip[INET_ADDRSTRLEN];
+	bool			verbose;
 	t_stat			stats;
 	int				icmplen;
 	int				datalen;
