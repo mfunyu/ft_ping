@@ -32,12 +32,16 @@ static void	_print_icmp_code(int type, int code)
 
 static void	_print_ip_header(struct iphdr *iphdr)
 {
-	uint16_t	*ptr;
+	uint8_t	*ptr;
 
-	ptr = (uint16_t *)iphdr;
 	printf("IP Hdr Dump:\n");
-	for (size_t i = 0; i < sizeof(struct iphdr) / sizeof(uint8_t); i++)
-		printf(" %04x", *(ptr + i));
+	ptr = (uint8_t *)iphdr;
+	for (size_t i = 0; i < sizeof(struct iphdr); i++)
+	{
+		printf("%02x", *(ptr + i));
+		if (i % 2)
+			printf(" ");
+	}
 	printf("\n");
 	printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n");
 	printf(" %1x  %1x  %02x", iphdr->version, iphdr->ihl, iphdr->tos);
