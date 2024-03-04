@@ -78,6 +78,7 @@ typedef struct	s_ping
 typedef struct	s_echo_data
 {
 	int				type;
+	int				code;
 	int				icmplen;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];

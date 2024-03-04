@@ -47,6 +47,7 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 
 	tv_recv = get_current_time();
 	echo_data->type = packet->icmphdr.type;
+	echo_data->code = packet->icmphdr.code;
 	echo_data->icmplen = ret - sizeof(struct iphdr);
 	set_hostname_by_in_addr(echo_data->host, packet->iphdr.saddr);
 	set_ip_by_in_addr(echo_data->ip, packet->iphdr.saddr);

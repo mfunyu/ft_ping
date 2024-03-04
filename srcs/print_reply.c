@@ -6,6 +6,33 @@
 #include "ping_struct.h"
 #include "ping_error.h"
 
+struct icmp_desc
+{
+	int		type;
+	int		code;
+	char	*diag;
+} icmp_desc[] = {
+	{ICMP_DEST_UNREACH, ICMP_HOST_UNREACH, "Destination Host Unreachable"},
+	{ICMP_TIME_EXCEEDED, ICMP_EXC_TTL, "Time to live exceeded"},
+};
+
+static void	_print_icmp_code(int type, int code)
+{
+	size_t				i;
+
+	i = 0;
+	while (i < sizeof(icmp_desc) / sizeof(icmp_desc[0]))
+	{
+		if (icmp_desc[i].type == type && icmp_desc[i].code == code)
+		{
+			printf("%s", icmp_desc[i].diag);
+			return ;
+		}
+		i++;
+	}
+	printf ("Unknown Code: %d", code);
+}
+
 void	print_icmp_error()
 {
 	printf("IP Hdr Dump:\n");
@@ -29,13 +56,9 @@ void	print_reply(t_echo_data *echo_data)
 		printf(" %s", echo_data->ip);
 		_print_stats(echo_data);
 		break;
-	case ICMP_DEST_UNREACH:
-		printf(" %s (%s)", echo_data->host, echo_data->ip);
-		printf(": Destination Host Unreachable");
-		break;
-	case ICMP_TIME_EXCEEDED:
-		printf(" %s (%s)", echo_data->host, echo_data->ip);
-		printf(": Time to live exceeded");
+	default:
+		printf(" %s (%s) : ", echo_data->host, echo_data->ip);
+		_print_icmp_code(echo_data->type, echo_data->code);
 		break;
 	}
 	printf("\n");
