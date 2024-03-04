@@ -26,6 +26,5 @@ void	ping_send(t_ping *ping)
 
 	_send_echo(msg, ping);
 	ping->num_xmit++;
-	printf("ping\n");
 }
 
