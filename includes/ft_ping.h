@@ -12,6 +12,7 @@
 # define FRAGMENT_OFFSET_BITS		13
 # define FRAGMENT_OFFSET_MASK		((1 << FRAGMENT_OFFSET_BITS) - 1)
 # define FRAGMENT_OFFSET(frag_off)	((frag_off) & FRAGMENT_OFFSET_MASK)
+# define IPHDR_ALIGNMENT_BITS		2
 
 # define PING_DEFAULT_INTERVAL_S	1 /* second */
 

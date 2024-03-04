@@ -54,6 +54,22 @@ static void	_print_ip_header(struct iphdr *iphdr)
 	printf(" %04x", ntohs(iphdr->check));
 	printf(" %s ", inet_ntoa(*(struct in_addr *)&iphdr->saddr));
 	printf(" %s ", inet_ntoa(*(struct in_addr *)&iphdr->daddr));
+	printf("\n");
+}
+
+static void	_print_ip_data(struct iphdr *iphdr, struct icmphdr *icmphdr)
+{
+	int		hdr_len;
+
+	_print_ip_header(iphdr);
+	printf("ICMP:");
+	printf(" type %u", icmphdr->type);
+	printf(", code %u", icmphdr->code);
+	hdr_len = iphdr->ihl << IPHDR_ALIGNMENT_BITS;
+	printf(", size %u", ntohs(iphdr->tot_len) - hdr_len);
+	printf(", id 0x%04x", ntohs(icmphdr->un.echo.id));
+	printf(", seq 0x%04x", ntohs(icmphdr->un.echo.sequence));
+	printf("\n");
 }
 
 static void	_print_stats(t_echo_data *echo_data)
@@ -61,6 +77,7 @@ static void	_print_stats(t_echo_data *echo_data)
 	printf(": icmp_seq=%d", echo_data->echo_sequence);
 	printf(" ttl=%d", echo_data->echo_ttl);
 	printf(" time=%.3f ms", echo_data->echo_triptime);
+	printf("\n");
 }
 
 void	print_reply(t_echo_data *echo_data, bool verbose)
@@ -76,10 +93,7 @@ void	print_reply(t_echo_data *echo_data, bool verbose)
 		printf(" %s (%s) : ", echo_data->host, echo_data->ip);
 		_print_icmp_code(echo_data->type, echo_data->code);
 		if (verbose)
-		{
-			_print_ip_header(&echo_data->un.error.iphdr);
-		}
+			_print_ip_data(&echo_data->req_iphdr, &echo_data->req_icmphdr);
 		break;
 	}
-	printf("\n");
 }
