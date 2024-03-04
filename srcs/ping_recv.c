@@ -119,5 +119,5 @@ void	ping_recv(t_ping *ping)
 		_store_stats(ping, echo_data.echo_triptime);
 	}
 
-	print_reply(&echo_data);
+	print_reply(&echo_data, ping->verbose);
 }

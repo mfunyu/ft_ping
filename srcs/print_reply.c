@@ -33,7 +33,7 @@ static void	_print_icmp_code(int type, int code)
 	printf ("Unknown Code: %d", code);
 }
 
-void	print_icmp_error()
+static void	_print_ip_header()
 {
 	printf("IP Hdr Dump:\n");
 	// TODO: print ip header dump
@@ -47,7 +47,7 @@ static void	_print_stats(t_echo_data *echo_data)
 	printf(" time=%.3f ms", echo_data->echo_triptime);
 }
 
-void	print_reply(t_echo_data *echo_data)
+void	print_reply(t_echo_data *echo_data, bool verbose)
 {
 	printf("%d bytes from", echo_data->icmplen);
 	switch (echo_data->type)
@@ -59,6 +59,8 @@ void	print_reply(t_echo_data *echo_data)
 	default:
 		printf(" %s (%s) : ", echo_data->host, echo_data->ip);
 		_print_icmp_code(echo_data->type, echo_data->code);
+		if (verbose)
+			_print_ip_header();
 		break;
 	}
 	printf("\n");
