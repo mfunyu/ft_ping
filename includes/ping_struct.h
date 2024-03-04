@@ -33,6 +33,8 @@
 */
 # define echo_id		un.echo.id
 # define echo_sequence	un.echo.sequence
+# define echo_ttl		un.echo.ttl
+# define echo_triptime	un.echo.triptime
 
 typedef struct	s_packet
 {
@@ -82,9 +84,20 @@ typedef struct	s_echo_data
 	int				icmplen;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
-	int				sequence;
-	int				ttl;
-	double			triptime;
+	union
+	{
+		struct
+		{
+			int		sequence;
+			int		ttl;
+			double	triptime;
+		} echo;
+		struct
+		{
+			struct iphdr	iphdr;
+			struct icmphdr	icmphdr;
+		} error;
+	} un;
 }				t_echo_data;
 
 #endif /* PING_STRUCT_H */

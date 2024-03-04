@@ -42,9 +42,9 @@ void	print_icmp_error()
 
 static void	_print_stats(t_echo_data *echo_data)
 {
-	printf(": icmp_seq=%d", echo_data->sequence);
-	printf(" ttl=%d", echo_data->ttl);
-	printf(" time=%.3f ms", echo_data->triptime);
+	printf(": icmp_seq=%d", echo_data->echo_sequence);
+	printf(" ttl=%d", echo_data->echo_ttl);
+	printf(" time=%.3f ms", echo_data->echo_triptime);
 }
 
 void	print_reply(t_echo_data *echo_data)
