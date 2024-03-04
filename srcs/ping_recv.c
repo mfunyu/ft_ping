@@ -57,6 +57,11 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 		echo_data->echo_ttl = packet->iphdr.ttl;
 		echo_data->echo_triptime = _calc_triptime(packet, tv_recv);
 	}
+	else
+	{
+		echo_data->un.error.iphdr = packet->req_iphdr;
+		echo_data->un.error.icmphdr = packet->req_icmphdr;
+	}
 }
 
 static bool	_is_reply(t_packet *packet, int ident)

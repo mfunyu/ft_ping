@@ -8,6 +8,11 @@
 # define ICMP_DEFAULT_DATA_SIZE		64 - sizeof(struct icmphdr)
 # define ICMP_MAX_PACKET_SIZE		65400
 
+/* ip header */
+# define FRAGMENT_OFFSET_BITS		13
+# define FRAGMENT_OFFSET_MASK		((1 << FRAGMENT_OFFSET_BITS) - 1)
+# define FRAGMENT_OFFSET(frag_off)	((frag_off) & FRAGMENT_OFFSET_MASK)
+
 # define PING_DEFAULT_INTERVAL_S	1 /* second */
 
 typedef struct s_args	t_args;

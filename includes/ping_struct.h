@@ -49,6 +49,7 @@ typedef struct	s_packet
 			struct icmphdr	icmphdr;
 		} error;
 	} un;
+# define req_iphdr		un.error.iphdr
 # define req_icmphdr	un.error.icmphdr
 # define icmpdata		un.data
 }				t_packet;

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <sys/time.h>
+#include <arpa/inet.h>
 #include <netinet/ip_icmp.h>
 #include "ft_ping.h"
 #include "ping_struct.h"
@@ -18,26 +19,37 @@ struct icmp_desc
 
 static void	_print_icmp_code(int type, int code)
 {
-	size_t				i;
-
-	i = 0;
-	while (i < sizeof(icmp_desc) / sizeof(icmp_desc[0]))
+	for (size_t i = 0; i < sizeof(icmp_desc) / sizeof(icmp_desc[0]); i++)
 	{
 		if (icmp_desc[i].type == type && icmp_desc[i].code == code)
 		{
-			printf("%s", icmp_desc[i].diag);
+			printf("%s\n", icmp_desc[i].diag);
 			return ;
 		}
-		i++;
 	}
-	printf ("Unknown Code: %d", code);
+	printf ("Unknown Code: %d\n", code);
 }
 
-static void	_print_ip_header()
+static void	_print_ip_header(struct iphdr *iphdr)
 {
+	uint16_t	*ptr;
+
+	ptr = (uint16_t *)iphdr;
 	printf("IP Hdr Dump:\n");
-	// TODO: print ip header dump
-	return ;
+	for (size_t i = 0; i < sizeof(struct iphdr) / sizeof(uint8_t); i++)
+		printf(" %04x", *(ptr + i));
+	printf("\n");
+	printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n");
+	printf(" %1x  %1x  %02x", iphdr->version, iphdr->ihl, iphdr->tos);
+	printf(" %04x", ntohs(iphdr->tot_len));
+	printf(" %04x", ntohs(iphdr->id));
+	printf("   %1x", ntohs(iphdr->frag_off) >> FRAGMENT_OFFSET_BITS);
+	printf(" %04x", FRAGMENT_OFFSET(ntohs(iphdr->frag_off)));
+	printf("  %02x", iphdr->ttl);
+	printf("  %02x", iphdr->protocol);
+	printf(" %04x", ntohs(iphdr->check));
+	printf(" %s ", inet_ntoa(*(struct in_addr *)&iphdr->saddr));
+	printf(" %s ", inet_ntoa(*(struct in_addr *)&iphdr->daddr));
 }
 
 static void	_print_stats(t_echo_data *echo_data)
@@ -60,7 +72,9 @@ void	print_reply(t_echo_data *echo_data, bool verbose)
 		printf(" %s (%s) : ", echo_data->host, echo_data->ip);
 		_print_icmp_code(echo_data->type, echo_data->code);
 		if (verbose)
-			_print_ip_header();
+		{
+			_print_ip_header(&echo_data->un.error.iphdr);
+		}
 		break;
 	}
 	printf("\n");
