@@ -48,9 +48,9 @@
   - https://datatracker.ietf.org/doc/html/rfc1122
   - Section: [Timestamp Option](https://datatracker.ietf.org/doc/html/rfc1122#:~:text=is%20OPTIONAL.%0A%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20(e)-,Timestamp%20Option,-Implementation%20of%20originating)
 
-## Tests
+# Tests
 
-### Traffic Controle (`tc`)
+## Traffic Controle (`tc`)
 
 > ! Under ssh environment, these changes will make the connection unstable.
 > Highly recommended to run directly on the machine.
@@ -100,9 +100,7 @@
   $> ping google.com
   ```
 
-### Dynamic Injection (`LD_PRELOAD`)
-
-#### Dublicated id (pid)
+## Dynamic Injection (`LD_PRELOAD`)
 
 Create `fakepid.c`
 ```c
@@ -125,3 +123,55 @@ gcc -shared fakepid.c -o lib_fakepid.so
 ```
 sudo LD_PRELOAD=./lib_fakepid.so ping google.com
 ```
+
+### Duplicated id (pid)
+
+#### Same destination
+- How
+  ```
+  sudo LD_PRELOAD=./lib_fakepid.so ping google.com
+  ```
+  ```
+  sudo LD_PRELOAD=./lib_fakepid.so ping google.com
+  ```
+
+- Expect: Duplication detection
+  ```shell
+  $> sudo LD_PRELOAD=./lib_fakepid.so ping google.com
+  ...
+  64 bytes from 142.250.179.110: icmp_seq=0 ttl=63 time=7,476 ms (DUP!)
+  64 bytes from 142.250.179.110: icmp_seq=4 ttl=63 time=8,242 ms
+  64 bytes from 142.250.179.110: icmp_seq=1 ttl=63 time=7,581 ms (DUP!)
+  64 bytes from 142.250.179.110: icmp_seq=5 ttl=63 time=8,101 ms
+  ...
+  --- google.com ping statistics ---
+  8 packets transmitted, 8 packets received, +4 duplicates, 0% packet loss
+  ```
+  ```shell
+  $> sudo LD_PRELOAD=./lib_fakepid.so ping google.com
+  ...
+  64 bytes from 142.250.179.110: icmp_seq=4 ttl=63 time=8,128 ms
+  64 bytes from 142.250.179.110: icmp_seq=1 ttl=63 time=7,925 ms
+  64 bytes from 142.250.179.110: icmp_seq=5 ttl=63 time=7,988 ms
+  64 bytes from 142.250.179.110: icmp_seq=2 ttl=63 time=8,697 ms
+  4 packets transmitted, 7 packets received, -- somebody is printing forged packets!
+  ```
+
+#### Different destinations
+- How
+  ```
+  sudo LD_PRELOAD=./lib_fakepid.so ping google.com
+  ```
+  ```
+  sudo LD_PRELOAD=./lib_fakepid.so ping localhost
+  ```
+
+- Expect: Both packets are captured, Duplication detection
+  ```
+  $> sudo LD_PRELOAD=./lib_fakepid.so ping localhost
+  ...
+  64 bytes from 142.250.179.110: icmp_seq=0 ttl=63 time=7,209 ms (DUP!)
+  64 bytes from 127.0.0.1: icmp_seq=3 ttl=64 time=0,115 ms
+  64 bytes from 142.250.179.110: icmp_seq=1 ttl=63 time=7,698 ms (DUP!)
+  64 bytes from 127.0.0.1: icmp_seq=4 ttl=64 time=0,114 ms
+  ```
