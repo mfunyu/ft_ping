@@ -44,7 +44,9 @@
 - Internet Controle Message Protocol (ICMP) RFC792
   - https://datatracker.ietf.org/doc/html/rfc792
 
--
+- Requirements for Internet Hosts -- Communication Layers RFC1122
+  - https://datatracker.ietf.org/doc/html/rfc1122
+  - Section: [Timestamp Option](https://datatracker.ietf.org/doc/html/rfc1122#:~:text=is%20OPTIONAL.%0A%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20(e)-,Timestamp%20Option,-Implementation%20of%20originating)
 
 ## Tests
 
