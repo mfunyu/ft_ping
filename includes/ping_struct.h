@@ -2,6 +2,7 @@
 # define PING_STRUCT_H
 
 # include <netinet/ip_icmp.h>
+# include <stdbool.h>
 
 /*
 **  0                   1                   2                   3
@@ -32,6 +33,8 @@
 */
 # define echo_id		un.echo.id
 # define echo_sequence	un.echo.sequence
+# define echo_ttl		un.echo.ttl
+# define echo_triptime	un.echo.triptime
 
 typedef struct	s_packet
 {
@@ -46,6 +49,7 @@ typedef struct	s_packet
 			struct icmphdr	icmphdr;
 		} error;
 	} un;
+# define req_iphdr		un.error.iphdr
 # define req_icmphdr	un.error.icmphdr
 # define icmpdata		un.data
 }				t_packet;
@@ -65,6 +69,7 @@ typedef struct	s_ping
 	struct sockaddr	dst_addr;
 	char			*dst_hostname;
 	char			dst_ip[INET_ADDRSTRLEN];
+	bool			verbose;
 	t_stat			stats;
 	int				icmplen;
 	int				datalen;
@@ -76,12 +81,24 @@ typedef struct	s_ping
 typedef struct	s_echo_data
 {
 	int				type;
+	int				code;
 	int				icmplen;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
-	int				sequence;
-	int				ttl;
-	double			triptime;
+	union
+	{
+		struct
+		{
+			int		sequence;
+			int		ttl;
+			double	triptime;
+		} echo;
+		struct
+		{
+			struct iphdr	iphdr;
+			struct icmphdr	icmphdr;
+		} error;
+	} un;
 }				t_echo_data;
 
 #endif /* PING_STRUCT_H */

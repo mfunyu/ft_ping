@@ -47,14 +47,20 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 
 	tv_recv = get_current_time();
 	echo_data->type = packet->icmphdr.type;
+	echo_data->code = packet->icmphdr.code;
 	echo_data->icmplen = ret - sizeof(struct iphdr);
 	set_hostname_by_in_addr(echo_data->host, packet->iphdr.saddr);
 	set_ip_by_in_addr(echo_data->ip, packet->iphdr.saddr);
 	if (echo_data->type == ICMP_ECHOREPLY)
 	{
-		echo_data->sequence = ntohs(packet->icmphdr.echo_sequence);
-		echo_data->ttl = packet->iphdr.ttl;
-		echo_data->triptime = _calc_triptime(packet, tv_recv);
+		echo_data->echo_sequence = ntohs(packet->icmphdr.echo_sequence);
+		echo_data->echo_ttl = packet->iphdr.ttl;
+		echo_data->echo_triptime = _calc_triptime(packet, tv_recv);
+	}
+	else
+	{
+		echo_data->un.error.iphdr = packet->req_iphdr;
+		echo_data->un.error.icmphdr = packet->req_icmphdr;
 	}
 }
 
@@ -115,8 +121,8 @@ void	ping_recv(t_ping *ping)
 	{
 		if (!_is_valid_packet(&packet, ping, &echo_data))
 			return ;
-		_store_stats(ping, echo_data.triptime);
+		_store_stats(ping, echo_data.echo_triptime);
 	}
 
-	print_reply(&echo_data);
+	print_reply(&echo_data, ping->verbose);
 }
