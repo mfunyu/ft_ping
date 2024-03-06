@@ -3,6 +3,8 @@
 
 # include <netinet/ip_icmp.h>
 # include <stdbool.h>
+# include <limits.h>
+# include "ft_ping.h"
 
 /*
 **  0                   1                   2                   3
@@ -42,7 +44,7 @@ typedef struct	s_packet
 	struct icmphdr	icmphdr;
 	union
 	{
-		char			data[ICMP_MAX_PACKET_SIZE];
+		char			data[PING_MAX_DATALEN];
 		struct
 		{
 			struct iphdr	iphdr;

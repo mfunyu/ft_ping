@@ -1,5 +1,5 @@
-#include "ft_ping.h"
 #include "ping_struct.h"
+#include "ping_icmp.h"
 #include "ping_error.h"
 #include "ping_print.h"
 #include "utils.h"
@@ -17,15 +17,6 @@ static void	_store_stats(t_ping *ping, double triptime)
 		ping->stats.min = triptime;
 	if (triptime > ping->stats.max)
 		ping->stats.max = triptime;
-}
-
-static bool	_is_valid_packet(t_packet *packet, t_ping *ping, t_echo_data *echo_data)
-{
-	if (icmp_calc_checksum((char *)&packet->icmphdr, echo_data->icmplen) != 0)
-		return (false);
-	if (strncmp(ping->dst_ip, echo_data->ip, INET_ADDRSTRLEN) != 0)
-		return (false);
-	return (true);
 }
 
 static double	_calc_triptime(t_packet *packet, struct timeval tv_reply)
@@ -119,7 +110,7 @@ void	ping_recv(t_ping *ping)
 	_set_echo_data(&echo_data, &packet, ret);
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
-		if (!_is_valid_packet(&packet, ping, &echo_data))
+		if (!icmp_is_correct_checksum(&packet.icmphdr, echo_data.icmplen))
 			return ;
 		_store_stats(ping, echo_data.echo_triptime);
 	}

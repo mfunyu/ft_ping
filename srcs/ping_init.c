@@ -18,7 +18,7 @@ static int _create_socket(void)
 void	ping_init(t_ping *ping, t_args *args)
 {
 	ping->dst_hostname = args->params[0];
-	ping->datalen = ICMP_DEFAULT_DATA_SIZE;
+	ping->datalen = PING_DEFAULT_DATALEN;
 	if (args->flags[SIZE])
 		ping->datalen = args->flags[SIZE];
 	ping->icmplen = sizeof(struct icmphdr) + ping->datalen;

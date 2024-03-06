@@ -57,7 +57,7 @@ static int	_parse_value(char *value, int idx)
 	switch (g_options[idx].flag)
 	{
 		case SIZE:
-			if (error || ret < 0 || ICMP_MAX_PACKET_SIZE <= ret)
+			if (error || ret < 0 || PING_MAX_DATALEN < ret)
 				error_exit("option value too big");
 			break;
 		default:
