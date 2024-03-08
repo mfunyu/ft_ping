@@ -9,15 +9,14 @@
 #include <stdbool.h>
 #include <arpa/inet.h>
 
-static void	_store_stats(t_ping *ping, double triptime)
+static void	_store_stats(t_stat *stats, double triptime)
 {
-	ping->num_recv++;
-	ping->stats.sum += triptime;
-	ping->stats.sum_sq += calc_square(triptime);
-	if (ping->stats.min == 0 || triptime < ping->stats.min)
-		ping->stats.min = triptime;
-	if (triptime > ping->stats.max)
-		ping->stats.max = triptime;
+	stats->sum += triptime;
+	stats->sum_sq += calc_square(triptime);
+	if (stats->min == 0 || triptime < stats->min)
+		stats->min = triptime;
+	if (triptime > stats->max)
+		stats->max = triptime;
 }
 
 static double	_calc_triptime(t_packet *packet, struct timeval tv_reply)
@@ -120,9 +119,10 @@ void	ping_recv(t_ping *ping)
 	_set_echo_data(&echo_data, &packet, ret);
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
+		ping->num_recv++;
 		if (!icmp_is_correct_checksum(&packet.icmphdr, echo_data.icmplen))
 			fprintf(stderr, "checksum mismatch from %s\n", echo_data.ip);
-		_store_stats(ping, echo_data.echo_triptime);
+		_store_stats(&ping->stats, echo_data.echo_triptime);
 	}
 
 	print_reply(&echo_data, ping->verbose);
