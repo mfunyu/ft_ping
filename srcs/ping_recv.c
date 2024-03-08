@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <arpa/inet.h>
 
 static void	_store_stats(t_ping *ping, double triptime)
 {
@@ -111,7 +112,7 @@ void	ping_recv(t_ping *ping)
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
 		if (!icmp_is_correct_checksum(&packet.icmphdr, echo_data.icmplen))
-			return ;
+			fprintf(stderr, "checksum mismatch from %s\n", echo_data.ip);
 		_store_stats(ping, echo_data.echo_triptime);
 	}
 
