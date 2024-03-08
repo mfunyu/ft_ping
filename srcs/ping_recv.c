@@ -58,18 +58,22 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 
 static bool	_is_reply(t_packet *packet, int ident)
 {
+	switch (packet->icmphdr.type)
+	{
 	/* ignore requests */
-	if (packet->icmphdr.type == ICMP_ECHO)
+	case ICMP_ECHO:
 		return (false);
 
 	/* ignore responses to other ping */
-	if (packet->icmphdr.type == ICMP_ECHOREPLY)
-	{
+	case ICMP_ECHOREPLY:
 		if (packet->icmphdr.echo_id != htons(ident))
 			return (false);
+		break;
+
+	default:
+		if (packet->req_icmphdr.echo_id != htons(ident))
+			return (false);
 	}
-	else if (packet->req_icmphdr.echo_id != htons(ident))
-		return (false);
 	return (true);
 }
 
