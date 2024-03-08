@@ -32,13 +32,13 @@ void	print_header(t_ping ping)
 	printf("\n");
 }
 
-static void	_print_stats(t_stat stats)
+static void	_print_stats(t_stat stats, size_t num_recv)
 {
 	double	avg;
 	double	stddev;
 
-	avg = calc_avg(stats.sum, stats.recieved);
-	stddev = calc_stddev(stats.sum, stats.sum_sq, stats.recieved);
+	avg = calc_avg(stats.sum, num_recv);
+	stddev = calc_stddev(stats.sum, stats.sum_sq, num_recv);
 	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
 		stats.min, avg, stats.max, stddev);
 }
@@ -47,8 +47,8 @@ void	print_footer(t_ping ping)
 {
 	printf("--- %s ping statistics ---\n", ping.dst_hostname);
 	printf("%zu packets transmitted, %zu packets received, %zu%% packet loss\n",
-		ping.num_xmit, ping.stats.recieved, (ping.num_xmit - ping.stats.recieved) * 100 / ping.num_xmit);
+		ping.num_xmit, ping.num_recv, (ping.num_xmit - ping.num_recv) * 100 / ping.num_xmit);
 
-	if (ping.stats.recieved)
-		_print_stats(ping.stats);
+	if (ping.num_recv)
+		_print_stats(ping.stats, ping.num_recv);
 }

@@ -11,7 +11,7 @@
 
 static void	_store_stats(t_ping *ping, double triptime)
 {
-	ping->stats.recieved++;
+	ping->num_recv++;
 	ping->stats.sum += triptime;
 	ping->stats.sum_sq += calc_square(triptime);
 	if (ping->stats.min == 0 || triptime < ping->stats.min)

@@ -58,7 +58,6 @@ typedef struct	s_packet
 
 typedef struct	s_stat
 {
-	size_t	recieved;
 	double	sum;
 	double	sum_sq;
 	double	min;
@@ -76,6 +75,7 @@ typedef struct	s_ping
 	int				icmplen;
 	int				datalen;
 	size_t			num_xmit;
+	size_t			num_recv;
 	int				ident;
 	struct timeval	interval;
 }				t_ping;
