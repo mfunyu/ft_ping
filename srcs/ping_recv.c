@@ -56,8 +56,10 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 	}
 }
 
-static bool	_is_reply(t_packet *packet, int ident)
+static bool	_is_reply(t_packet *packet, t_ping *ping)
 {
+	struct sockaddr_in	*addr;
+
 	switch (packet->icmphdr.type)
 	{
 	/* ignore requests */
@@ -66,12 +68,15 @@ static bool	_is_reply(t_packet *packet, int ident)
 
 	/* ignore responses to other ping */
 	case ICMP_ECHOREPLY:
-		if (packet->icmphdr.echo_id != htons(ident))
+		if (packet->icmphdr.echo_id != htons(ping->ident))
 			return (false);
 		break;
 
 	default:
-		if (packet->req_icmphdr.echo_id != htons(ident))
+		if (packet->req_icmphdr.echo_id != htons(ping->ident))
+			return (false);
+		addr = (struct sockaddr_in *)&ping->dst_addr;
+		if (packet->req_iphdr.daddr != addr->sin_addr.s_addr)
 			return (false);
 	}
 	return (true);
@@ -109,7 +114,7 @@ void	ping_recv(t_ping *ping)
 	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)
 		return ;
-	if (!_is_reply(&packet, ping->ident))
+	if (!_is_reply(&packet, ping))
 		return ;
 
 	_set_echo_data(&echo_data, &packet, ret);
