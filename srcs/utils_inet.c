@@ -12,7 +12,7 @@ void	set_ip_by_sockaddr(char *ip, struct sockaddr const *addr)
 	addr_in = (struct sockaddr_in const *)addr;
 	ret = inet_ntop(AF_INET, &addr_in->sin_addr, ip, INET_ADDRSTRLEN);
 	if (!ret)
-		error_exit("inet_ntop error");
+		error_exit_strerr("inet_ntop error");
 }
 
 void	set_ip_by_in_addr(char *ip, in_addr_t saddr)
@@ -21,7 +21,7 @@ void	set_ip_by_in_addr(char *ip, in_addr_t saddr)
 
 	ret = inet_ntop(AF_INET, &saddr, ip, INET_ADDRSTRLEN);
 	if (!ret)
-		error_exit("inet_ntop error");
+		error_exit_strerr("inet_ntop error");
 }
 
 void	set_hostname_by_in_addr(char *hostname, in_addr_t saddr)

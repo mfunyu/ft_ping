@@ -40,7 +40,7 @@ static void	_ping_run(t_ping *ping)
 		if (ready < 0)
 		{
 			if (errno != EINTR)
-				error_exit("select");
+				error_exit_strerr("select");
 		}
 		else if (ready)
 			ping_recv(ping);

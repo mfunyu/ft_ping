@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "parser.h"
 #include <unistd.h>
+#include <errno.h>
 
 static int _create_socket(void)
 {
@@ -11,7 +12,11 @@ static int _create_socket(void)
 
 	sfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (sfd == -1)
-		error_exit("socket error");
+	{
+		if (errno == EPERM)
+			error_exit("Lacking privilege for icmp socket.");
+		error_exit_strerr("socket error");
+	}
 	return (sfd);
 }
 

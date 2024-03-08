@@ -12,12 +12,18 @@ void	error_exit_usage(char *msg)
 	exit(EXIT_FAILURE);
 }
 
-void	error_exit(char *msg)
+void	error_exit_strerr(char *msg)
 {
 	fprintf(stderr, "ft_ping: %s", msg);
 	if (errno)
 		fprintf(stderr, " - %s", strerror(errno));
 	fprintf(stderr, "\n");
+	exit(EXIT_FAILURE);
+}
+
+void	error_exit(char *msg)
+{
+	fprintf(stderr, "ft_ping: %s\n", msg);
 	exit(EXIT_FAILURE);
 }
 

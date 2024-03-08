@@ -90,7 +90,7 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	if (ret < 0)
 	{
 		if (errno != EAGAIN && errno != EWOULDBLOCK)
-			error_exit("recvmsg error");
+			error_exit_strerr("recvmsg error");
 	}
 	return (ret);
 }
