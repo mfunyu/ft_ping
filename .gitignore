@@ -3,6 +3,7 @@
 !*.h
 !includes/
 !srcs/
+!test/
 !Makefile
 !Dockerfile
 !*.git*
