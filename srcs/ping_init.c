@@ -30,6 +30,7 @@ void	ping_init(t_ping *ping, t_args *args)
 	ping->verbose = false;
 	if (args->flags[VERBOSE])
 		ping->verbose = true;
+	ping->ping_count = args->flags[COUNT];
 
 	set_sockaddr_by_hostname(&ping->dst_addr, ping->dst_hostname);
 	set_ip_by_sockaddr(ping->dst_ip, &ping->dst_addr);

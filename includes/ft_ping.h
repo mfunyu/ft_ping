@@ -11,6 +11,7 @@
 # define PING_MAX_DATALEN			65535 - MAXIPLEN - MAXICMPLEN
 # define PING_DEFAULT_INTERVAL_S	1 /* second */
 # define PING_SEQ_TABLE_SIZE		128
+# define PING_MAXWAIT				10 /* seconds */
 
 /* ip header */
 # define FRAGMENT_OFFSET_BITS		13

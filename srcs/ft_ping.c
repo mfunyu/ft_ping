@@ -26,7 +26,9 @@ static void	_ping_run(t_ping *ping)
 	int 			ready;
 	int 			fd_max;
 	fd_set			readfds;
+	bool			finishing;
 
+	finishing = false;
 	print_header(*ping);
 	ping_send(ping);
 	fd_max = ping->sfd + 1;
@@ -46,7 +48,15 @@ static void	_ping_run(t_ping *ping)
 			ping_recv(ping);
 		else
 		{
-			ping_send(ping);
+			if (!ping->ping_count || ping->num_xmit < ping->ping_count)
+				ping_send(ping);
+			else if (finishing)
+				break;
+			else
+			{
+				finishing = true;
+				ping->interval.tv_sec = PING_MAXWAIT;
+			}
 			last = get_current_time();
 		}
 	}

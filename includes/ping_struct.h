@@ -74,6 +74,7 @@ typedef struct	s_ping
 	t_stat			stats;
 	int				icmplen;
 	int				datalen;
+	size_t			ping_count;
 	size_t			num_xmit; /* Numbers of transmitted packets */
 	size_t			num_recv; /* Numbers of received packets */
 	size_t			num_dup; /* Numbers of duplicated packets */
