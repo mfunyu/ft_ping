@@ -104,6 +104,33 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	return (ret);
 }
 
+static bool	_is_seq_duplicated(int sequence, t_ping *ping)
+{
+	int	index;
+	int	shift;
+
+	if ((size_t)sequence > ping->num_xmit)
+		return (false);
+	index = sequence % 64;
+	shift = sequence / 64;
+	/* dup if flag is already set */
+	return (ping->seq_table[index] & (1 << shift));
+}
+
+static void	_set_seq_table(int sequence, t_ping *ping)
+{
+	int	index;
+	int	shift;
+
+	/* ignore unsent sequence */
+	if ((size_t)sequence > ping->num_xmit)
+		return ;
+	index = sequence % 64;
+	shift = sequence / 64;
+	/* set flag */
+	ping->seq_table[index] |= (1 << shift);
+}
+
 void	ping_recv(t_ping *ping)
 {
 	t_packet	packet;
@@ -119,9 +146,18 @@ void	ping_recv(t_ping *ping)
 	_set_echo_data(&echo_data, &packet, ret);
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
-		ping->num_recv++;
 		if (!icmp_is_correct_checksum(&packet.icmphdr, echo_data.icmplen))
 			fprintf(stderr, "checksum mismatch from %s\n", echo_data.ip);
+		if (_is_seq_duplicated(echo_data.echo_sequence, ping))
+		{
+			ping->num_dup++;
+			printf("(DUP!)");
+		}
+		else
+		{
+			ping->num_recv++;
+			_set_seq_table(echo_data.echo_sequence, ping);
+		}
 		_store_stats(&ping->stats, echo_data.echo_triptime);
 	}
 
