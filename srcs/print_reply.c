@@ -38,9 +38,9 @@ static void	_print_ip_header(struct iphdr *iphdr)
 	ptr = (uint8_t *)iphdr;
 	for (size_t i = 0; i < sizeof(struct iphdr); i++)
 	{
-		printf("%02x", *(ptr + i));
-		if (i % 2)
+		if (i % 2 == 0)
 			printf(" ");
+		printf("%02x", *(ptr + i));
 	}
 	printf("\n");
 	printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n");
@@ -92,7 +92,7 @@ void	print_reply(t_echo_data *echo_data, bool verbose, bool is_dup)
 		_print_stats(echo_data, is_dup);
 		break;
 	default:
-		printf(" %s (%s) : ", echo_data->host, echo_data->ip);
+		printf(" %s (%s): ", echo_data->host, echo_data->ip);
 		_print_icmp_code(echo_data->type, echo_data->code);
 		if (verbose)
 			_print_ip_data(&echo_data->req_iphdr, &echo_data->req_icmphdr);
