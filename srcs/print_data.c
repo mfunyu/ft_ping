@@ -46,8 +46,17 @@ static void	_print_stats(t_stat stats, size_t num_recv)
 void	print_footer(t_ping ping)
 {
 	printf("--- %s ping statistics ---\n", ping.dst_hostname);
-	printf("%zu packets transmitted, %zu packets received, %zu%% packet loss\n",
-		ping.num_xmit, ping.num_recv, (ping.num_xmit - ping.num_recv) * 100 / ping.num_xmit);
+	printf("%zu packets transmitted, %zu packets received,",
+		ping.num_xmit, ping.num_recv);
+	if (ping.num_dup)
+		printf(" +%zu duplicates,", ping.num_dup);
+	if (ping.num_xmit >= ping.num_recv)
+		printf(" %zu%% packet loss",
+			(ping.num_xmit - ping.num_recv) * 100 / ping.num_xmit);
+	else
+		printf(" -- somebody is printing forged packets!");
+
+	printf("\n");
 
 	if (ping.num_recv)
 		_print_stats(ping.stats, ping.num_recv);

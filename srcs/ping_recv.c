@@ -136,6 +136,7 @@ void	ping_recv(t_ping *ping)
 	t_packet	packet;
 	ssize_t		ret;
 	t_echo_data	echo_data;
+	bool		is_dup;
 
 	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)
@@ -144,6 +145,7 @@ void	ping_recv(t_ping *ping)
 		return ;
 
 	_set_echo_data(&echo_data, &packet, ret);
+	is_dup = false;
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
 		if (!icmp_is_correct_checksum(&packet.icmphdr, echo_data.icmplen))
@@ -151,7 +153,7 @@ void	ping_recv(t_ping *ping)
 		if (_is_seq_duplicated(echo_data.echo_sequence, ping))
 		{
 			ping->num_dup++;
-			printf("(DUP!)");
+			is_dup = true;
 		}
 		else
 		{
@@ -161,5 +163,5 @@ void	ping_recv(t_ping *ping)
 		_store_stats(&ping->stats, echo_data.echo_triptime);
 	}
 
-	print_reply(&echo_data, ping->verbose);
+	print_reply(&echo_data, ping->verbose, is_dup);
 }

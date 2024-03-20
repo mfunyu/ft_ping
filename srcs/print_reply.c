@@ -72,22 +72,24 @@ static void	_print_ip_data(struct iphdr *iphdr, struct icmphdr *icmphdr)
 	printf("\n");
 }
 
-static void	_print_stats(t_echo_data *echo_data)
+static void	_print_stats(t_echo_data *echo_data, bool is_dup)
 {
 	printf(": icmp_seq=%d", echo_data->echo_sequence);
 	printf(" ttl=%d", echo_data->echo_ttl);
 	printf(" time=%.3f ms", echo_data->echo_triptime);
+	if (is_dup)
+		printf(" (DUP!)");
 	printf("\n");
 }
 
-void	print_reply(t_echo_data *echo_data, bool verbose)
+void	print_reply(t_echo_data *echo_data, bool verbose, bool is_dup)
 {
 	printf("%d bytes from", echo_data->icmplen);
 	switch (echo_data->type)
 	{
 	case ICMP_ECHOREPLY:
 		printf(" %s", echo_data->ip);
-		_print_stats(echo_data);
+		_print_stats(echo_data, is_dup);
 		break;
 	default:
 		printf(" %s (%s) : ", echo_data->host, echo_data->ip);
