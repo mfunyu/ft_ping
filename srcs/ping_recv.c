@@ -40,7 +40,6 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 	echo_data->type = packet->icmphdr.type;
 	echo_data->code = packet->icmphdr.code;
 	echo_data->icmplen = ret - sizeof(struct iphdr);
-	set_hostname_by_in_addr(echo_data->host, packet->iphdr.saddr);
 	set_ip_by_in_addr(echo_data->ip, packet->iphdr.saddr);
 	if (echo_data->type == ICMP_ECHOREPLY)
 	{
@@ -162,6 +161,8 @@ void	ping_recv(t_ping *ping)
 		}
 		_store_stats(&ping->stats, echo_data.echo_triptime);
 	}
+	else
+		set_hostname_by_in_addr(echo_data.host, packet.iphdr.saddr);
 
 	print_reply(&echo_data, ping->verbose, is_dup);
 }
