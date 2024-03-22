@@ -71,6 +71,13 @@ re		: fclean
 bonus	:
 	make BONUS=1
 
+docker :
+	docker build . -t c_ft_ping
+	docker run -d --cap-add=NET_ADMIN -v ./:/workdir --name i_ft_ping c_ft_ping
+
+conn	:
+	docker exec -it i_ft_ping /bin/bash
+
 # ---------------------------------------------------------------------------- #
 #                                    DOCKER                                    #
 # ---------------------------------------------------------------------------- #
