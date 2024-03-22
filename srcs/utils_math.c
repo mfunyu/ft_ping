@@ -1,4 +1,7 @@
 #include <stddef.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <ctype.h>
 
 double	calc_square(double x)
 {
@@ -30,4 +33,37 @@ double	calc_stddev(double sum, double sum_sq, size_t n)
 	avg = calc_avg(sum, n);
 	variance = sum_sq / n - calc_square(avg);
 	return (calc_sqrt(variance, 0.0005));
+}
+
+static bool	is_space(const char c)
+{
+	return (c == ' ' || c == '\n' || c == '\t'
+		|| c == '\v' || c == '\f' || c == '\r');
+}
+
+int	ft_atoi_check(const char *n, int *error)
+{
+	long long	nb;
+	int			sign;
+
+	*error = true;
+	while (is_space(*n))
+		n++;
+	sign = 1;
+	if (*n == '-' || *n == '+')
+		sign *= 44 - *n++;
+	nb = 0;
+	while (isdigit(*n))
+	{
+		*error = false;
+		nb = nb * 10 + (*n++ - '0');
+		if (nb * sign < INT_MIN || INT_MAX < nb * sign)
+		{
+			*error = true;
+			return (0);
+		}
+	}
+	if (*n != '\0')
+		*error = true;
+	return ((int)(nb * sign));
 }

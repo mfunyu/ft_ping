@@ -1,10 +1,11 @@
 #include "parser.h"
 #include "ping_error.h"
-#include "libft.h"
 #include "ft_ping.h"
+#include "utils.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <unistd.h>
 
@@ -85,7 +86,7 @@ static int	_match_long_option(char *option)
 
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		c = ft_strlen("--");
+		c = strlen("--");
 		while (option[c] && g_options[i].long_option[c] == option[c])
 			c++;
 		if (!option[c] || option[c] == '=')
@@ -102,7 +103,7 @@ static bool	_parse_short_option(char **av, t_args *args)
 	t_flags	flag;
 
 	option = av[0];
-	for (int j = 1; j < (int)ft_strlen(option); j++)
+	for (int j = 1; j < (int)strlen(option); j++)
 	{
 		idx = _match_short_option(option[j]);
 		flag = g_options[idx].flag;
@@ -130,15 +131,15 @@ static bool	_parse_long_option(char **av, t_args *args)
 	t_flags	flag;
 
 	option = av[0];
-	if (ft_strlen(option) <= 2)
+	if (strlen(option) <= 2)
 		return (false);
 	idx = _match_long_option(option);
 	flag = g_options[idx].flag;
-	if (ft_strchr(option, '='))
+	if (strchr(option, '='))
 	{
 		if (!g_options[idx].req_value)
 			_parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1, idx);
+		args->flags[flag] = _parse_value(strchr(option, '=') + 1, idx);
 		return (false);
 	}
 	if (g_options[idx].req_value)

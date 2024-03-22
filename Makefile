@@ -19,7 +19,6 @@ SRCS	:= ft_ping.c \
 
 DIR_INCLUDES:= includes
 DIR_OBJS:= objs
-LIBFT	:= libft
 VPATH	:= srcs
 
 # ---------------------------------------------------------------------------- #
@@ -30,7 +29,7 @@ OBJS	= $(addprefix $(DIR_OBJS)/, $(SRCS:.c=.o))
 DEPS	:= $(OBJS:.o=.d)
 CC		:= gcc
 CFLAGS	:= -Wall -Wextra -Werror
-INCLUDES:= -I $(DIR_INCLUDES) -I $(LIBFT)
+INCLUDES:= -I $(DIR_INCLUDES)
 
 BONUS=1
 
@@ -48,8 +47,7 @@ all		: $(NAME)
 -include $(DEPS)
 
 $(NAME)	: $(DIR_OBJS) $(OBJS)
-	$(MAKE) -C $(LIBFT)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -L$(LIBFT) -lft
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 $(DIR_OBJS)/%.o: %.c
 	$(CC) $(CFLAGS) -MMD -MP $(INCLUDES) -o $@ -c $<
@@ -59,12 +57,10 @@ $(DIR_OBJS):
 
 .PHONY: clean
 clean	:
-	$(MAKE) clean -C $(LIBFT)
 	$(RM) -R $(DIR_OBJS)
 
 .PHONY: fclean
 fclean	: clean
-	$(MAKE) fclean -C $(LIBFT)
 	$(RM) $(NAME)
 
 .PHONY: re
