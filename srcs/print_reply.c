@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stddef.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
