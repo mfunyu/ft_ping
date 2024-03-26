@@ -37,6 +37,8 @@ static void	_ping_run(t_ping *ping)
 	{
 		FD_ZERO(&readfds);
 		FD_SET(ping->sfd, &readfds);
+		if (ping->ping_count && ping->num_recv >= ping->ping_count)
+			break;
 		interval = get_timeout_time(ping->interval, last);
 		ready = select(fd_max, &readfds, NULL, NULL, &interval);
 		if (ready < 0)
