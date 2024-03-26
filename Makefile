@@ -31,8 +31,6 @@ CC		:= gcc
 CFLAGS	:= -Wall -Wextra -Werror
 INCLUDES:= -I $(DIR_INCLUDES)
 
-BONUS=1
-
 ifdef BONUS
 	CFLAGS	+= -D BONUS
 endif
@@ -71,25 +69,15 @@ re		: fclean
 bonus	:
 	make BONUS=1
 
-docker :
-	docker build . -t c_ft_ping
-	docker run -d --cap-add=NET_ADMIN -v "$(shell pwd)":/workdir --name i_ft_ping c_ft_ping
-
-conn	:
-	docker exec -it i_ft_ping /bin/bash
-
 # ---------------------------------------------------------------------------- #
 #                                    DOCKER                                    #
 # ---------------------------------------------------------------------------- #
 
-.PHONY:	build
-build	:
-	docker build . -t ft_ping
+.PHONY:	docker
+docker :
+	docker build . -t ft_ping_ctn
+	docker run -d --cap-add=NET_ADMIN -v "$(shell pwd)":/workdir --name ft_ping_img ft_ping_ctn
 
-.PHONY:	exec
-exec		:
-	docker run -it ft_ping /bin/bash
-
-# ---------------------------------------------------------------------------- #
-#                                     HELP                                     #
-# ---------------------------------------------------------------------------- #
+.PHONY:	conn
+conn	:
+	docker exec -it ft_ping_img /bin/bash
