@@ -92,7 +92,10 @@ void	print_reply(t_echo_data *echo_data, bool verbose, bool is_dup)
 		_print_stats(echo_data, is_dup);
 		break;
 	default:
-		printf(" %s (%s): ", echo_data->host, echo_data->ip);
+		printf(" %s", echo_data->host);
+		if (strncmp(echo_data->host, echo_data->ip, INET_ADDRSTRLEN) != 0)
+			printf(" (%s)", echo_data->ip);
+		printf(": ");
 		_print_icmp_code(echo_data->type, echo_data->code);
 		if (verbose)
 			_print_ip_data(&echo_data->req_iphdr, &echo_data->req_icmphdr);
