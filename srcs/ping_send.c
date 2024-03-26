@@ -5,6 +5,7 @@
 #include <netdb.h>
 #include <sys/time.h>
 #include "utils.h"
+#include "ping_icmp.h"
 
 static void	_send_echo(char *msg, t_ping *ping)
 {
@@ -12,12 +13,12 @@ static void	_send_echo(char *msg, t_ping *ping)
 
 	ret = sendto(ping->sfd, msg, ping->icmplen, 0, &ping->dst_addr, INET_ADDRSTRLEN);
 	if (ret == -1)
-		error_exit("sendto error");
+		error_exit_strerr("sendto error");
 }
 
 void	ping_send(t_ping *ping)
 {
-	char	msg[ICMP_MAX_PACKET_SIZE];
+	char	msg[PING_MAX_DATALEN + sizeof(struct icmphdr)];
 
 	icmp_set_icmphdr(msg, ping->ident, ping->num_xmit);
 	icmp_set_data(msg, ping->icmplen);

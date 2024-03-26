@@ -14,6 +14,7 @@ double			calc_square(double x);
 double			calc_sqrt(double x, double precision);
 double			calc_avg(double sum, size_t n);
 double			calc_stddev(double sum, double sum_sq, size_t n);
+int				ft_atoi_check(const char *n, int *error);
 
 /* utils_net.c */
 void			set_sockaddr_by_hostname(struct sockaddr *addr, const char *hostname);

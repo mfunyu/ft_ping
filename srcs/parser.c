@@ -1,10 +1,11 @@
 #include "parser.h"
 #include "ping_error.h"
-#include "libft.h"
 #include "ft_ping.h"
+#include "utils.h"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <unistd.h>
 
@@ -13,7 +14,6 @@ static t_options	g_options[] = {
 {'v', "--verbose",	VERBOSE,	false},
 # ifdef BONUS
 {'c', "--count",	COUNT,		true},
-{'t', "--ttl",		TTL,		true},
 {'s', "--size",		SIZE,		true},
 # endif
 {'\0', "\0",		NONE,		false}
@@ -56,10 +56,12 @@ static int	_parse_value(char *value, int idx)
 	ret = ft_atoi_check(value, &error);
 	switch (g_options[idx].flag)
 	{
+# ifdef BONUS
 		case SIZE:
-			if (error || ret < 0 || ICMP_MAX_PACKET_SIZE <= ret)
+			if (error || ret < 0 || PING_MAX_DATALEN < ret)
 				error_exit("option value too big");
 			break;
+# endif
 		default:
 			if (error)
 				error_exit("invalid value");
@@ -85,7 +87,7 @@ static int	_match_long_option(char *option)
 
 	for (int i = 0; g_options[i].flag; i++)
 	{
-		c = ft_strlen("--");
+		c = strlen("--");
 		while (option[c] && g_options[i].long_option[c] == option[c])
 			c++;
 		if (!option[c] || option[c] == '=')
@@ -102,7 +104,7 @@ static bool	_parse_short_option(char **av, t_args *args)
 	t_flags	flag;
 
 	option = av[0];
-	for (int j = 1; j < (int)ft_strlen(option); j++)
+	for (int j = 1; j < (int)strlen(option); j++)
 	{
 		idx = _match_short_option(option[j]);
 		flag = g_options[idx].flag;
@@ -130,15 +132,15 @@ static bool	_parse_long_option(char **av, t_args *args)
 	t_flags	flag;
 
 	option = av[0];
-	if (ft_strlen(option) <= 2)
+	if (strlen(option) <= 2)
 		return (false);
 	idx = _match_long_option(option);
 	flag = g_options[idx].flag;
-	if (ft_strchr(option, '='))
+	if (strchr(option, '='))
 	{
 		if (!g_options[idx].req_value)
 			_parse_error_exit(NOT_ALLOWED, g_options[idx].long_option, false);
-		args->flags[flag] = _parse_value(ft_strchr(option, '=') + 1, idx);
+		args->flags[flag] = _parse_value(strchr(option, '=') + 1, idx);
 		return (false);
 	}
 	if (g_options[idx].req_value)

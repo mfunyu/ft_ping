@@ -1,5 +1,5 @@
-#include "ft_ping.h"
 #include "ping_struct.h"
+#include "ping_icmp.h"
 #include "ping_error.h"
 #include "ping_print.h"
 #include "utils.h"
@@ -7,25 +7,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <arpa/inet.h>
 
-static void	_store_stats(t_ping *ping, double triptime)
+static void	_store_stats(t_stat *stats, double triptime)
 {
-	ping->stats.recieved++;
-	ping->stats.sum += triptime;
-	ping->stats.sum_sq += calc_square(triptime);
-	if (ping->stats.min == 0 || triptime < ping->stats.min)
-		ping->stats.min = triptime;
-	if (triptime > ping->stats.max)
-		ping->stats.max = triptime;
-}
-
-static bool	_is_valid_packet(t_packet *packet, t_ping *ping, t_echo_data *echo_data)
-{
-	if (icmp_calc_checksum((char *)&packet->icmphdr, echo_data->icmplen) != 0)
-		return (false);
-	if (strncmp(ping->dst_ip, echo_data->ip, INET_ADDRSTRLEN) != 0)
-		return (false);
-	return (true);
+	stats->sum += triptime;
+	stats->sum_sq += calc_square(triptime);
+	if (stats->min == 0 || triptime < stats->min)
+		stats->min = triptime;
+	if (triptime > stats->max)
+		stats->max = triptime;
 }
 
 static double	_calc_triptime(t_packet *packet, struct timeval tv_reply)
@@ -49,7 +40,6 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 	echo_data->type = packet->icmphdr.type;
 	echo_data->code = packet->icmphdr.code;
 	echo_data->icmplen = ret - sizeof(struct iphdr);
-	set_hostname_by_in_addr(echo_data->host, packet->iphdr.saddr);
 	set_ip_by_in_addr(echo_data->ip, packet->iphdr.saddr);
 	if (echo_data->type == ICMP_ECHOREPLY)
 	{
@@ -64,20 +54,29 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 	}
 }
 
-static bool	_is_reply(t_packet *packet, int ident)
+static bool	_is_reply(t_packet *packet, t_ping *ping)
 {
+	struct sockaddr_in	*addr;
+
+	switch (packet->icmphdr.type)
+	{
 	/* ignore requests */
-	if (packet->icmphdr.type == ICMP_ECHO)
+	case ICMP_ECHO:
 		return (false);
 
 	/* ignore responses to other ping */
-	if (packet->icmphdr.type == ICMP_ECHOREPLY)
-	{
-		if (packet->icmphdr.echo_id != htons(ident))
+	case ICMP_ECHOREPLY:
+		if (packet->icmphdr.echo_id != htons(ping->ident))
+			return (false);
+		break;
+
+	default:
+		if (packet->req_icmphdr.echo_id != htons(ping->ident))
+			return (false);
+		addr = (struct sockaddr_in *)&ping->dst_addr;
+		if (packet->req_iphdr.daddr != addr->sin_addr.s_addr)
 			return (false);
 	}
-	else if (packet->req_icmphdr.echo_id != htons(ident))
-		return (false);
 	return (true);
 }
 
@@ -99,9 +98,36 @@ static ssize_t	_recv_reply(int sfd, t_packet *packet)
 	if (ret < 0)
 	{
 		if (errno != EAGAIN && errno != EWOULDBLOCK)
-			error_exit("recvmsg error");
+			error_exit_strerr("recvmsg error");
 	}
 	return (ret);
+}
+
+static bool	_is_seq_duplicated(int sequence, t_ping *ping)
+{
+	int	index;
+	int	shift;
+
+	if ((size_t)sequence > ping->num_xmit)
+		return (false);
+	index = sequence % 64;
+	shift = sequence / 64;
+	/* dup if flag is already set */
+	return (ping->seq_table[index] & (1 << shift));
+}
+
+static void	_set_seq_table(int sequence, t_ping *ping)
+{
+	int	index;
+	int	shift;
+
+	/* ignore unsent sequence */
+	if ((size_t)sequence > ping->num_xmit)
+		return ;
+	index = sequence % 64;
+	shift = sequence / 64;
+	/* set flag */
+	ping->seq_table[index] |= (1 << shift);
 }
 
 void	ping_recv(t_ping *ping)
@@ -109,20 +135,34 @@ void	ping_recv(t_ping *ping)
 	t_packet	packet;
 	ssize_t		ret;
 	t_echo_data	echo_data;
+	bool		is_dup;
 
 	ret = _recv_reply(ping->sfd, &packet);
 	if (ret < 0)
 		return ;
-	if (!_is_reply(&packet, ping->ident))
+	if (!_is_reply(&packet, ping))
 		return ;
 
 	_set_echo_data(&echo_data, &packet, ret);
+	is_dup = false;
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
-		if (!_is_valid_packet(&packet, ping, &echo_data))
-			return ;
-		_store_stats(ping, echo_data.echo_triptime);
+		if (!icmp_is_correct_checksum(&packet.icmphdr, echo_data.icmplen))
+			fprintf(stderr, "checksum mismatch from %s\n", echo_data.ip);
+		if (_is_seq_duplicated(echo_data.echo_sequence, ping))
+		{
+			ping->num_dup++;
+			is_dup = true;
+		}
+		else
+		{
+			ping->num_recv++;
+			_set_seq_table(echo_data.echo_sequence, ping);
+		}
+		_store_stats(&ping->stats, echo_data.echo_triptime);
 	}
+	else
+		set_hostname_by_in_addr(echo_data.host, packet.iphdr.saddr);
 
-	print_reply(&echo_data, ping->verbose);
+	print_reply(&echo_data, ping->verbose, is_dup);
 }

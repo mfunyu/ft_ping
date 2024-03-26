@@ -2,10 +2,11 @@
 #include "utils.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include <sys/time.h>
 #include <netinet/ip_icmp.h>
 
-uint16_t	icmp_calc_checksum(char *msg, size_t len)
+static uint16_t	_icmp_calc_checksum(char *msg, size_t len)
 {
 	size_t		i;
 	uint32_t	sum;
@@ -23,12 +24,17 @@ uint16_t	icmp_calc_checksum(char *msg, size_t len)
 	return (~sum); /* one's complement */
 }
 
+bool	icmp_is_correct_checksum(struct icmphdr *icmphdr, size_t icmplen)
+{
+	return (_icmp_calc_checksum((char *)icmphdr, icmplen) == 0);
+}
+
 void	icmp_add_checksum(char *msg, size_t len)
 {
 	struct icmphdr	*header;
 
 	header = (struct icmphdr *)msg;
-	header->checksum = icmp_calc_checksum(msg, len);
+	header->checksum = _icmp_calc_checksum(msg, len);
 }
 
 void	icmp_set_data(char *msg, size_t total_len)

@@ -19,7 +19,6 @@ SRCS	:= ft_ping.c \
 
 DIR_INCLUDES:= includes
 DIR_OBJS:= objs
-LIBFT	:= libft
 VPATH	:= srcs
 
 # ---------------------------------------------------------------------------- #
@@ -30,9 +29,7 @@ OBJS	= $(addprefix $(DIR_OBJS)/, $(SRCS:.c=.o))
 DEPS	:= $(OBJS:.o=.d)
 CC		:= gcc
 CFLAGS	:= -Wall -Wextra -Werror
-INCLUDES:= -I $(DIR_INCLUDES) -I $(LIBFT)
-
-BONUS=1
+INCLUDES:= -I $(DIR_INCLUDES)
 
 ifdef BONUS
 	CFLAGS	+= -D BONUS
@@ -48,8 +45,7 @@ all		: $(NAME)
 -include $(DEPS)
 
 $(NAME)	: $(DIR_OBJS) $(OBJS)
-	$(MAKE) -C $(LIBFT)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) -L$(LIBFT) -lft
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 $(DIR_OBJS)/%.o: %.c
 	$(CC) $(CFLAGS) -MMD -MP $(INCLUDES) -o $@ -c $<
@@ -59,12 +55,10 @@ $(DIR_OBJS):
 
 .PHONY: clean
 clean	:
-	$(MAKE) clean -C $(LIBFT)
 	$(RM) -R $(DIR_OBJS)
 
 .PHONY: fclean
 fclean	: clean
-	$(MAKE) fclean -C $(LIBFT)
 	$(RM) $(NAME)
 
 .PHONY: re
@@ -79,14 +73,11 @@ bonus	:
 #                                    DOCKER                                    #
 # ---------------------------------------------------------------------------- #
 
-.PHONY:	build
-build	:
-	docker build . -t ft_ping
+.PHONY:	docker
+docker :
+	docker build . -t ft_ping_ctn
+	docker run -d --cap-add=NET_ADMIN -v "$(shell pwd)":/workdir --name ft_ping_img ft_ping_ctn
 
-.PHONY:	exec
-exec		:
-	docker run -it ft_ping /bin/bash
-
-# ---------------------------------------------------------------------------- #
-#                                     HELP                                     #
-# ---------------------------------------------------------------------------- #
+.PHONY:	conn
+conn	:
+	docker exec -it ft_ping_img /bin/bash

@@ -7,7 +7,7 @@ struct timeval	get_current_time(void)
 	struct timeval	tv;
 
 	if (gettimeofday(&tv, NULL))
-		error_exit("gettimeofday error");
+		error_exit_strerr("gettimeofday error");
 	return (tv);
 }
 

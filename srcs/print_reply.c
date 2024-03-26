@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <stddef.h>
 #include <sys/time.h>
 #include <arpa/inet.h>
@@ -38,9 +39,9 @@ static void	_print_ip_header(struct iphdr *iphdr)
 	ptr = (uint8_t *)iphdr;
 	for (size_t i = 0; i < sizeof(struct iphdr); i++)
 	{
-		printf("%02x", *(ptr + i));
-		if (i % 2)
+		if (i % 2 == 0)
 			printf(" ");
+		printf("%02x", *(ptr + i));
 	}
 	printf("\n");
 	printf("Vr HL TOS  Len   ID Flg  off TTL Pro  cks      Src\tDst\tData\n");
@@ -72,25 +73,30 @@ static void	_print_ip_data(struct iphdr *iphdr, struct icmphdr *icmphdr)
 	printf("\n");
 }
 
-static void	_print_stats(t_echo_data *echo_data)
+static void	_print_stats(t_echo_data *echo_data, bool is_dup)
 {
 	printf(": icmp_seq=%d", echo_data->echo_sequence);
 	printf(" ttl=%d", echo_data->echo_ttl);
 	printf(" time=%.3f ms", echo_data->echo_triptime);
+	if (is_dup)
+		printf(" (DUP!)");
 	printf("\n");
 }
 
-void	print_reply(t_echo_data *echo_data, bool verbose)
+void	print_reply(t_echo_data *echo_data, bool verbose, bool is_dup)
 {
 	printf("%d bytes from", echo_data->icmplen);
 	switch (echo_data->type)
 	{
 	case ICMP_ECHOREPLY:
 		printf(" %s", echo_data->ip);
-		_print_stats(echo_data);
+		_print_stats(echo_data, is_dup);
 		break;
 	default:
-		printf(" %s (%s) : ", echo_data->host, echo_data->ip);
+		printf(" %s", echo_data->host);
+		if (strncmp(echo_data->host, echo_data->ip, INET_ADDRSTRLEN) != 0)
+			printf(" (%s)", echo_data->ip);
+		printf(": ");
 		_print_icmp_code(echo_data->type, echo_data->code);
 		if (verbose)
 			_print_ip_data(&echo_data->req_iphdr, &echo_data->req_icmphdr);

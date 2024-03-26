@@ -2,6 +2,7 @@
 # define PING_ERROR_H
 
 void	error_exit_usage(char *msg);
+void	error_exit_strerr(char *msg);
 void	error_exit(char *msg);
 void	error_exit_gai(char *msg, int ret);
 

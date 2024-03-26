@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "parser.h"
 #include <unistd.h>
+#include <errno.h>
 
 static int _create_socket(void)
 {
@@ -11,16 +12,23 @@ static int _create_socket(void)
 
 	sfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (sfd == -1)
-		error_exit("socket error");
+	{
+		if (errno == EPERM)
+			error_exit("Lacking privilege for icmp socket.");
+		error_exit_strerr("socket error");
+	}
 	return (sfd);
 }
 
 void	ping_init(t_ping *ping, t_args *args)
 {
 	ping->dst_hostname = args->params[0];
-	ping->datalen = ICMP_DEFAULT_DATA_SIZE;
+	ping->datalen = PING_DEFAULT_DATALEN;
+# ifdef BONUS
 	if (args->flags[SIZE])
 		ping->datalen = args->flags[SIZE];
+	ping->ping_count = args->flags[COUNT];
+# endif
 	ping->icmplen = sizeof(struct icmphdr) + ping->datalen;
 	ping->verbose = false;
 	if (args->flags[VERBOSE])

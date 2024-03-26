@@ -26,7 +26,9 @@ static void	_ping_run(t_ping *ping)
 	int 			ready;
 	int 			fd_max;
 	fd_set			readfds;
+	bool			finishing;
 
+	finishing = false;
 	print_header(*ping);
 	ping_send(ping);
 	fd_max = ping->sfd + 1;
@@ -35,18 +37,28 @@ static void	_ping_run(t_ping *ping)
 	{
 		FD_ZERO(&readfds);
 		FD_SET(ping->sfd, &readfds);
+		if (ping->ping_count && ping->num_recv >= ping->ping_count)
+			break;
 		interval = get_timeout_time(ping->interval, last);
 		ready = select(fd_max, &readfds, NULL, NULL, &interval);
 		if (ready < 0)
 		{
 			if (errno != EINTR)
-				error_exit("select");
+				error_exit_strerr("select");
 		}
 		else if (ready)
 			ping_recv(ping);
 		else
 		{
-			ping_send(ping);
+			if (!ping->ping_count || ping->num_xmit < ping->ping_count)
+				ping_send(ping);
+			else if (finishing)
+				break;
+			else
+			{
+				finishing = true;
+				ping->interval.tv_sec = PING_MAXWAIT;
+			}
 			last = get_current_time();
 		}
 	}

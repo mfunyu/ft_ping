@@ -13,8 +13,6 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
 	printf("\
   -c, --count=NUMBER         stop after sending NUMBER packets\n");
 	printf("\
-  -t, --ttl=N                specify N as time-to-live\n");
-	printf("\
   -s, --size=NUMBER          ping NUMBER data octets\n");
 # endif
 	printf("\n\
@@ -32,13 +30,13 @@ void	print_header(t_ping ping)
 	printf("\n");
 }
 
-static void	_print_stats(t_stat stats)
+static void	_print_stats(t_stat stats, size_t total_recv)
 {
 	double	avg;
 	double	stddev;
 
-	avg = calc_avg(stats.sum, stats.recieved);
-	stddev = calc_stddev(stats.sum, stats.sum_sq, stats.recieved);
+	avg = calc_avg(stats.sum, total_recv);
+	stddev = calc_stddev(stats.sum, stats.sum_sq, total_recv);
 	printf("round-trip min/avg/max/stddev = %.3f/%.3f/%.3f/%.3f ms\n",
 		stats.min, avg, stats.max, stddev);
 }
@@ -46,9 +44,18 @@ static void	_print_stats(t_stat stats)
 void	print_footer(t_ping ping)
 {
 	printf("--- %s ping statistics ---\n", ping.dst_hostname);
-	printf("%zu packets transmitted, %zu packets received, %zu%% packet loss\n",
-		ping.num_xmit, ping.stats.recieved, (ping.num_xmit - ping.stats.recieved) * 100 / ping.num_xmit);
+	printf("%zu packets transmitted, %zu packets received,",
+		ping.num_xmit, ping.num_recv);
+	if (ping.num_dup)
+		printf(" +%zu duplicates,", ping.num_dup);
+	if (ping.num_xmit >= ping.num_recv)
+		printf(" %zu%% packet loss",
+			(ping.num_xmit - ping.num_recv) * 100 / ping.num_xmit);
+	else
+		printf(" -- somebody is printing forged packets!");
 
-	if (ping.stats.recieved)
-		_print_stats(ping.stats);
+	printf("\n");
+
+	if (ping.num_recv)
+		_print_stats(ping.stats, ping.num_recv + ping.num_dup);
 }
