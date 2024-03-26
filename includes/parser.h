@@ -10,7 +10,6 @@ typedef enum	e_flags
 	VERBOSE,
 # ifdef BONUS
 	COUNT,
-	TTL,
 	SIZE,
 # endif
 	TOTAL
