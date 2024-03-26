@@ -23,7 +23,7 @@ trap SIGINT
 exe () {
 	printf "$PROMPT "
 	echo $@
-	"sudo $@"
+	sudo "$@"
 }
 
 header () {
