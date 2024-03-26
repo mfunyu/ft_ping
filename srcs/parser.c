@@ -57,10 +57,12 @@ static int	_parse_value(char *value, int idx)
 	ret = ft_atoi_check(value, &error);
 	switch (g_options[idx].flag)
 	{
+# ifdef BONUS
 		case SIZE:
 			if (error || ret < 0 || PING_MAX_DATALEN < ret)
 				error_exit("option value too big");
 			break;
+# endif
 		default:
 			if (error)
 				error_exit("invalid value");

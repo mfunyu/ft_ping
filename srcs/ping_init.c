@@ -24,13 +24,15 @@ void	ping_init(t_ping *ping, t_args *args)
 {
 	ping->dst_hostname = args->params[0];
 	ping->datalen = PING_DEFAULT_DATALEN;
+# ifdef BONUS
 	if (args->flags[SIZE])
 		ping->datalen = args->flags[SIZE];
+	ping->ping_count = args->flags[COUNT];
+# endif
 	ping->icmplen = sizeof(struct icmphdr) + ping->datalen;
 	ping->verbose = false;
 	if (args->flags[VERBOSE])
 		ping->verbose = true;
-	ping->ping_count = args->flags[COUNT];
 
 	set_sockaddr_by_hostname(&ping->dst_addr, ping->dst_hostname);
 	set_ip_by_sockaddr(ping->dst_ip, &ping->dst_addr);
