@@ -50,6 +50,8 @@
 
 # Tests
 
+[How to run Tests](RUNTEST.md)
+
 ## Traffic Controle (`tc`)
 
 > ! Under ssh environment, these changes will make the connection unstable.
