@@ -98,6 +98,13 @@
 - Expect
   ```shell
   $> ping google.com
+  ...
+  64 bytes from 142.250.179.110: icmp_seq=7 ttl=63 time=8,070 ms
+  64 bytes from 142.250.179.110: icmp_seq=10 ttl=63 time=7,956 ms
+  64 bytes from 142.250.179.110: icmp_seq=11 ttl=63 time=7,912 ms
+  --- google.com ping statistics ---
+  12 packets transmitted, 10 packets received, 16% packet loss
+  round-trip min/avg/max/stddev = 7,434/8,106/9,049/0,426 ms
   ```
 
 ## Dynamic Injection (`LD_PRELOAD`)
