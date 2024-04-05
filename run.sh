@@ -15,7 +15,7 @@ PROMPT="${THICK}${CYAN}\$${RESET}"
 # ---------------------------------------------------------------------------- #
 
 # Get device name
-device=$(ip n | awk '{print $3}')
+device=$(ip n | grep -m 1 "REACHABLE" | awk '{print $3}')
 
 # Set up a trap to catch Ctrl+C (SIGINT)
 trap SIGINT
