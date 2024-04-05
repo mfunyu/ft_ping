@@ -4,7 +4,7 @@ TEST_RECV	:= test_recv
 TEST_PID	:= test_pid
 TEST_TIME	:= test_time
 
-all	: recv pid
+all	: recv pid time
 
 .PHONY	: recv
 recv	:
