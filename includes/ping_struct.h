@@ -87,7 +87,7 @@ typedef struct	s_echo_data
 {
 	int				type;
 	int				code;
-	int				icmplen;
+	size_t			icmplen;
 	char			ip[INET_ADDRSTRLEN];
 	char			host[HOST_NAME_MAX];
 	union
