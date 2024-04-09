@@ -135,7 +135,7 @@ static void	_set_seq_table(int sequence, t_ping *ping)
 
 void	ping_recv(t_ping *ping)
 {
-	t_packet	packet;
+	t_packet	packet = {0};
 	ssize_t		ret;
 	t_echo_data	echo_data;
 	bool		is_dup;
