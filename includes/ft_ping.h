@@ -8,6 +8,7 @@
 # define MAXIPLEN	60
 # define MAXICMPLEN	76
 # define PING_DEFAULT_DATALEN		64 - sizeof(struct icmphdr)
+# define PING_DEFAULT_TTL			64
 # define PING_MAX_DATALEN			65535 - MAXIPLEN - MAXICMPLEN
 # define PING_DEFAULT_INTERVAL_S	1 /* second */
 # define PING_SEQ_TABLE_SIZE		128

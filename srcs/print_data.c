@@ -14,6 +14,8 @@ Send ICMP ECHO_REQUEST packets to network hosts.\n\n");
   -c, --count=NUMBER         stop after sending NUMBER packets\n");
 	printf("\
   -s, --size=NUMBER          ping NUMBER data octets\n");
+	printf("\
+  -t, --ttl=N                specify N as time-to-live\n");
 # endif
 	printf("\n\
   -?, --help                 give this help list\n\n");
