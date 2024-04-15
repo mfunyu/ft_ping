@@ -43,6 +43,7 @@ void	icmp_set_data(char *msg, size_t total_len)
 	size_t	i;
 
 	offset = sizeof(struct icmphdr) + sizeof(struct timeval);
+	msg[total_len] = 0;
 	i = 0;
 	while (offset + i < total_len)
 	{
