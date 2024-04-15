@@ -43,6 +43,7 @@ void	icmp_set_data(char *msg, size_t total_len)
 	size_t	i;
 
 	offset = sizeof(struct icmphdr) + sizeof(struct timeval);
+	msg[total_len] = 0;
 	i = 0;
 	while (offset + i < total_len)
 	{
@@ -51,11 +52,13 @@ void	icmp_set_data(char *msg, size_t total_len)
 	}
 }
 
-void	icmp_add_timestamp(char *msg)
+void	icmp_add_timestamp(char *msg, size_t total_len)
 {
 	struct timeval	tv;
 
 	tv = get_current_time();
+	if (total_len < sizeof(struct icmphdr) + sizeof(struct timeval))
+		return ;
 	memcpy(msg + sizeof(struct icmphdr), &tv, sizeof(tv));
 }
 

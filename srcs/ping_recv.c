@@ -45,7 +45,10 @@ static void	_set_echo_data(t_echo_data *echo_data, t_packet *packet, ssize_t ret
 	{
 		echo_data->echo_sequence = ntohs(packet->icmphdr.echo_sequence);
 		echo_data->echo_ttl = packet->iphdr.ttl;
-		echo_data->echo_triptime = _calc_triptime(packet, tv_recv);
+		if (echo_data->icmplen >= sizeof(struct icmphdr) + sizeof(struct timeval))
+			echo_data->echo_triptime = _calc_triptime(packet, tv_recv);
+		else
+			echo_data->echo_triptime = 0;
 	}
 	else
 	{
@@ -132,7 +135,7 @@ static void	_set_seq_table(int sequence, t_ping *ping)
 
 void	ping_recv(t_ping *ping)
 {
-	t_packet	packet;
+	t_packet	packet = {0};
 	ssize_t		ret;
 	t_echo_data	echo_data;
 	bool		is_dup;
@@ -159,6 +162,7 @@ void	ping_recv(t_ping *ping)
 			ping->num_recv++;
 			_set_seq_table(echo_data.echo_sequence, ping);
 		}
+		if (echo_data.echo_triptime > 0)
 		_store_stats(&ping->stats, echo_data.echo_triptime);
 	}
 	else

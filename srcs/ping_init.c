@@ -25,7 +25,7 @@ void	ping_init(t_ping *ping, t_args *args)
 	ping->dst_hostname = args->params[0];
 	ping->datalen = PING_DEFAULT_DATALEN;
 # ifdef BONUS
-	if (args->flags[SIZE])
+	if (args->flags[SIZE] > -1)
 		ping->datalen = args->flags[SIZE];
 	ping->ping_count = args->flags[COUNT];
 # endif

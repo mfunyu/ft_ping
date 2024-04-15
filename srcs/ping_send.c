@@ -22,7 +22,7 @@ void	ping_send(t_ping *ping)
 
 	icmp_set_icmphdr(msg, ping->ident, ping->num_xmit);
 	icmp_set_data(msg, ping->icmplen);
-	icmp_add_timestamp(msg);
+	icmp_add_timestamp(msg, ping->icmplen);
 	icmp_add_checksum(msg, ping->icmplen);
 
 	_send_echo(msg, ping);

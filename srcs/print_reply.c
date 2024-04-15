@@ -77,7 +77,8 @@ static void	_print_stats(t_echo_data *echo_data, bool is_dup)
 {
 	printf(": icmp_seq=%d", echo_data->echo_sequence);
 	printf(" ttl=%d", echo_data->echo_ttl);
-	printf(" time=%.3f ms", echo_data->echo_triptime);
+	if (echo_data->echo_triptime > 0)
+		printf(" time=%.3f ms", echo_data->echo_triptime);
 	if (is_dup)
 		printf(" (DUP!)");
 	printf("\n");
@@ -85,7 +86,7 @@ static void	_print_stats(t_echo_data *echo_data, bool is_dup)
 
 void	print_reply(t_echo_data *echo_data, bool verbose, bool is_dup)
 {
-	printf("%d bytes from", echo_data->icmplen);
+	printf("%ld bytes from", echo_data->icmplen);
 	switch (echo_data->type)
 	{
 	case ICMP_ECHOREPLY:

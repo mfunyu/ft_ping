@@ -56,6 +56,6 @@ void	print_footer(t_ping ping)
 
 	printf("\n");
 
-	if (ping.num_recv)
+	if (ping.num_recv && ping.stats.sum)
 		_print_stats(ping.stats, ping.num_recv + ping.num_dup);
 }
