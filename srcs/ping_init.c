@@ -6,10 +6,11 @@
 #include <unistd.h>
 #include <errno.h>
 
-static int _create_socket(void)
+static int _create_socket(int ttl)
 {
 	int	sfd;
 
+	(void)ttl;
 	sfd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (sfd == -1)
 	{
@@ -17,6 +18,10 @@ static int _create_socket(void)
 			error_exit("Lacking privilege for icmp socket.");
 		error_exit_strerr("socket error");
 	}
+# ifdef BONUS
+	if (setsockopt(sfd, IPPROTO_IP, IP_TTL, &ttl, sizeof(int)))
+		error_exit_strerr("setsockopt error");
+# endif
 	return (sfd);
 }
 
@@ -24,10 +29,13 @@ void	ping_init(t_ping *ping, t_args *args)
 {
 	ping->dst_hostname = args->params[0];
 	ping->datalen = PING_DEFAULT_DATALEN;
+	ping->ttl = PING_DEFAULT_TTL;
 # ifdef BONUS
 	if (args->flags[SIZE] > -1)
 		ping->datalen = args->flags[SIZE];
 	ping->ping_count = args->flags[COUNT];
+	if (args->flags[TTL])
+		ping->ttl = args->flags[TTL];
 # endif
 	ping->icmplen = sizeof(struct icmphdr) + ping->datalen;
 	ping->verbose = false;
@@ -39,5 +47,5 @@ void	ping_init(t_ping *ping, t_args *args)
 	ping->ident = getpid();
 	ping->interval.tv_sec = 0;
 	ping->interval.tv_usec = PING_DEFAULT_INTERVAL_S * 1000000;
-	ping->sfd = _create_socket();
+	ping->sfd = _create_socket(ping->ttl);
 }

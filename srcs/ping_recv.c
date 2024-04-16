@@ -148,6 +148,7 @@ void	ping_recv(t_ping *ping)
 
 	_set_echo_data(&echo_data, &packet, ret);
 	is_dup = false;
+	ping->num_all++;
 	if (echo_data.type == ICMP_ECHOREPLY)
 	{
 		if (!icmp_is_correct_checksum(&packet.icmphdr, echo_data.icmplen))

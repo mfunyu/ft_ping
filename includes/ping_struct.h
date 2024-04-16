@@ -75,9 +75,11 @@ typedef struct	s_ping
 	int				icmplen;
 	int				datalen;
 	size_t			ping_count;
+	int				ttl;
 	size_t			num_xmit; /* Numbers of transmitted packets */
-	size_t			num_recv; /* Numbers of received packets */
+	size_t			num_recv; /* Numbers of received echo reply packets */
 	size_t			num_dup; /* Numbers of duplicated packets */
+	size_t			num_all; /* Numbers of received all packets */
 	uint64_t		seq_table[PING_SEQ_TABLE_SIZE];
 	int				ident;
 	struct timeval	interval;

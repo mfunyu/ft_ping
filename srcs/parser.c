@@ -15,6 +15,7 @@ static t_options	g_options[] = {
 # ifdef BONUS
 {'c', "--count",	COUNT,		true},
 {'s', "--size",		SIZE,		true},
+{'t', "--ttl",		TTL,		true},
 # endif
 {'\0', "\0",		NONE,		false}
 };
@@ -57,6 +58,12 @@ static int	_parse_value(char *value, int idx)
 	switch (g_options[idx].flag)
 	{
 # ifdef BONUS
+		case TTL:
+			if (ret == 0)
+				error_exit("option value too small");
+			if (error || ret < 0 || 256 <= ret)
+				error_exit("option value too big");
+			break;
 		case SIZE:
 			if (error || ret < 0 || PING_MAX_DATALEN < ret)
 				error_exit("option value too big");
