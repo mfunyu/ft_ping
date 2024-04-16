@@ -50,10 +50,10 @@ static void	_ping_run(t_ping *ping)
 			ping_recv(ping);
 		else
 		{
-			if (!ping->ping_count || ping->num_xmit < ping->ping_count)
-				ping_send(ping);
-			else if (finishing)
+			if (finishing || (ping->ping_count && ping->num_all >= ping->ping_count))
 				break;
+			else if (!ping->ping_count || ping->num_xmit < ping->ping_count)
+				ping_send(ping);
 			else
 			{
 				finishing = true;
