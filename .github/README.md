@@ -16,13 +16,13 @@
 
 ### bonus compilation
 
-- Supports `-w` option
+- Supports `-c`, `-s`, `--ttl` options
 
   | option | details |
   | :- | :- |
   | -c, --count=NUMBER | stop after sending NUMBER packets |
-  | -q, --quiet | quiet output |
-  | -w, --timeout=N | stop after N seconds |
+  | -s, --size=NUMBER | ping NUMBER data octets |
+  | -t, --ttl=N | specify N as time-to-live |
 
 ## Usage
 
