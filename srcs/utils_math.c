@@ -3,6 +3,13 @@
 #include <stdbool.h>
 #include <ctype.h>
 
+double	calc_abs(double x)
+{
+	if (x < 0)
+		return (-x);
+	return (x);
+}
+
 double	calc_square(double x)
 {
 	return (x * x);
@@ -15,7 +22,7 @@ double	calc_sqrt(double x, double precision)
 	if (x < precision)
 		return (0);
 	root = x / 2;
-	while (calc_square(root) - x > precision)
+	while (calc_abs(calc_square(root) - x) > precision)
 		root = (root + x / root) / 2;
 	return (root);
 }
